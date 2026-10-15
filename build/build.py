@@ -144,7 +144,8 @@ def text_of(el):
             parts.append(c.tail or "")
 
     rec(el)
-    return re.sub(r"\s+", " ", "".join(parts)).strip()
+    # Riigi Teataja tekstis esineb vahel tühiku asemel märgikood „(160)“ (NBSP).
+    return re.sub(r"\s+", " ", "".join(parts).replace("(160)", " ")).strip()
 
 
 def parse_html_table(s):
@@ -194,6 +195,8 @@ def block_list(container):
 
 def walk_act(xml):
     """Tagastab paragrahvide loendi koos peatükkide ja lõigetega."""
+    # Seaduste skeem (tyviseadus) kasutab samu elementide nimesid teises nimeruumis.
+    xml = re.sub(r'xmlns="tyviseadus_1_10\.02\.2010"', 'xmlns="maarus_1_10.02.2010"', xml, count=1)
     root = ET.fromstring(strip_files(xml).encode("utf-8"))
     out = []
 
@@ -594,6 +597,229 @@ def soeluuringud(prev, cfg):
     return items, meta
 
 
+# ----------------------------------------------------------------- teemakaardid
+
+BASE_SOURCES = {"ttl", "metoodika", "abivahendid", "mootorsoidukijuht", "meditsiiniseadmed"}
+TK_HUVITIS = "https://tervisekassa.ee/inimesele/huvitised/haigushuvitis"
+
+
+def norm_ws(s):
+    return re.sub(r"\s+", " ", (s or "").replace(" ", " ")).strip().lower()
+
+
+def act_lisad(xml, akt_id):
+    """Akti XML-is olevad lisad (PDF jm) koos Riigi Teataja aadressiga."""
+    out = []
+    for name in dict.fromkeys(re.findall(r'<fail[^>]*failNimi="([^"]+)"', xml)):
+        out.append({"n": name, "u": aktilisa_url(akt_id, name)})
+    return out
+
+
+def tk_huvitised(prev):
+    """Tervisekassa hüvitiste võrdlustabel (põhjus, lehe liik, kes ja kui palju maksab, kestus) ja päevane ülempiir."""
+    old = ((prev or {}).get("meta") or {}).get("huvitised")
+    try:
+        raw = http_get(TK_HUVITIS, timeout=60, tries=2).decode("utf-8", "replace")
+        doc = lhtml.fromstring(raw)
+    except Exception as e:  # noqa: BLE001
+        print(f"[hoiatus] Tervisekassa hüvitiste lehte ei saanud: {e}")
+        return old, [f"Tervisekassa hüvitiste lehte ei saanud ({e}); kasutan eelmist seisu."] if old else []
+
+    def cell(td):
+        ps = [norm_space(p.text_content()) for p in td.xpath(".//p")]
+        ps = [p for p in ps if p]
+        return ps or [norm_space(td.text_content())]
+
+    rows = []
+    for tr in doc.xpath("//table//tbody/tr"):
+        tds = tr.xpath("./td")
+        if len(tds) < 5:
+            continue
+        c = [cell(td) for td in tds[:5]]
+        rows.append({"pohjus": c[0], "nr": [x for x in c[1] if x], "liik": " ".join(c[2]), "kord": c[3], "kestus": " ".join(c[4])})
+    text = norm_space(doc.text_content())
+    m = re.search(r"ülempiir ühes kalendripäevas (\d{4})\. aastal on ([\d\s]+,\d\d) eurot", text)
+    upd = re.findall(r"Viimati uuendatud:\s*(\d\d)\.(\d\d)\.(\d\d)", text)
+    if len(rows) < 8:
+        return old, ["Tervisekassa hüvitiste võrdlustabelist leiti liiga vähe ridu; kasutan eelmist seisu."] if old else []
+    return {"page": TK_HUVITIS, "rows": rows,
+            "ylempiir": {"aasta": int(m.group(1)), "eur": m.group(2).replace(" ", "")} if m else (old or {}).get("ylempiir"),
+            "uuendatud": [f"20{y}-{mo}-{d}" for d, mo, y in upd]}, []
+
+
+def norm_space(s):
+    return re.sub(r"\s+", " ", (s or "").replace(" ", " ")).strip()
+
+
+def tvl_pohjused(par_text):
+    """Tööst vabastamise põhjuste koodid töövõimetuslehe määruse § 2 tekstist."""
+    m = re.search(r"tööst vabastamise põhjus numbri ja sõnadega \((.*?)\);", par_text)
+    if not m:
+        return []
+    out = []
+    for part in m.group(1).split("; "):
+        mm = re.match(r"(\d+)\.\s*(.+)", part.strip())
+        if mm:
+            out.append([mm.group(1), mm.group(2).strip()])
+    return out
+
+
+def imm_lisad(xml):
+    """Immuniseerimiskava lisa 1 (laste ajakava) ja lisa 2 (gripi ja COVID-19 riskiseisundid) PDF-ist."""
+    res, warn = {}, []
+    name1, pdf1 = lisa_pdf(xml, "lisa1")
+    if pdf1:
+        txt = "\n".join((p.extract_text() or "") for p in pdf1.pages)
+        body = txt.split("Vaktsiini tähis", 1)[-1].split("Tähiste seletused", 1)
+        rows = []
+        for line in body[0].split("\n"):
+            line = line.strip()
+            mm = re.match(r"^(.*(?:tundi|päeva|kuud|aasta|aastat|\(k\.a\)))\s+(\S.*)$", line)
+            if mm:
+                rows.append([mm.group(1), mm.group(2)])
+        legend, notes = [], []
+        if len(body) > 1:
+            for line in body[1].split("\n"):
+                line = line.strip()
+                if not line:
+                    continue
+                if re.match(r"^[¹²³⁴⁵]", line):
+                    notes.append(line)
+                elif notes:
+                    notes[-1] += " " + line
+                elif " – " in line:
+                    legend.append(line)
+                elif legend:
+                    legend[-1] += " " + line
+        if len(rows) < 8:
+            warn.append(f"Immuniseerimiskava lisa 1 ({name1}) ajakavast leiti ainult {len(rows)} rida.")
+        res["imm1"] = {"lisa": name1, "rows": rows, "legend": legend, "notes": notes, "text": txt}
+    name2, pdf2 = lisa_pdf(xml, "lisa2")
+    if pdf2:
+        txt = "\n".join((p.extract_text() or "") for p in pdf2.pages)
+        parts = re.split(r"\n(?=Tabel \d+\.)", txt)
+        tabs = []
+        for p in parts[1:]:
+            head, _, rest = p.partition("\n")
+            # pealkiri võib jätkuda järgmisel real
+            while rest and not re.match(r"Terviseseisund", rest) and len(head) < 400:
+                nxt, _, rest = rest.partition("\n")
+                head += " " + nxt
+            tabs.append({"n": head.strip(), "s": rest.strip()})
+        if len(tabs) < 3:
+            warn.append(f"Immuniseerimiskava lisa 2 ({name2}) tabeleid leiti {len(tabs)}.")
+        res["imm2"] = {"lisa": name2, "tabelid": tabs, "text": txt}
+    return res, warn
+
+
+def watch_sources(allikad, prev):
+    """Jälgib teemakaartide allikaid: veebilehe „Viimati uuendatud“ kuupäev, PDF-i räsi ja kättesaadavus."""
+    pw = ((prev or {}).get("meta") or {}).get("jalgimine") or {}
+    out = {}
+    for key, a in allikad.items():
+        url = a["u"]
+        old = pw.get(key) or {}
+        try:
+            raw = http_get(url, timeout=45, tries=2)
+            if url.lower().endswith(".pdf") or raw[:4] == b"%PDF":
+                out[key] = {"ok": True, "sha": hashlib.sha256(raw).hexdigest()[:16]}
+            else:
+                t = raw.decode("utf-8", "replace")
+                d = re.findall(r"(?:Viimati uuendatud|Uuendatud)[^0-9]{0,40}(\d\d)\.(\d\d)\.(\d{2,4})", re.sub(r"<[^>]+>", " ", t))
+                dates = sorted({(y if len(y) == 4 else "20" + y) + f"-{mo}-{dd}" for dd, mo, y in d})
+                out[key] = {"ok": True, "uuendatud": dates[-1] if dates else None}
+        except Exception as e:  # noqa: BLE001
+            out[key] = dict(old, ok=False, viga=str(e)[:120], vigu=(old.get("vigu") or 0) + 1)
+    return out
+
+
+def build_teemad(cfg, sources, par_text, dyn, lisad):
+    """Teemakaardid: read koos viidetega, tekstikontroll ja dünaamilised tabelid."""
+    items, warn = [], []
+    allikad = cfg.get("allikad", {})
+
+    def ref(a):
+        if isinstance(a, str):
+            x = allikad.get(a)
+            if not x:
+                warn.append(f"Tundmatu allikas „{a}“")
+                return None
+            return {"n": x["n"], "u": x["u"], "k": a}
+        src, par = a
+        s = sources.get(src)
+        if not s:
+            warn.append(f"Tundmatu akt „{src}“")
+            return None
+        if par.startswith("lisa"):
+            li = next((x for x in lisad.get(src, []) if par.replace(" ", "") in x["n"].lower()), None)
+            return {"src": src, "par": par, "n": f'{s.get("lyh") or s["nimi"]} {par}', "u": li["u"] if li else s["url"]}
+        pid = (par_text.get(src) or {}).get(par, {}).get("id")
+        if not pid:
+            warn.append(f"Viidatud säte puudub: {s.get('lyh')} {par}")
+        return {"src": src, "par": par, "n": f'{s.get("lyh") or s["nimi"]} {par}', "u": s["url"] + ("#" + pid if pid else "")}
+
+    def check(row, where):
+        bad = []
+        for src, par, needle in row.get("kontroll", []):
+            if par.startswith("lisa"):
+                hay = (dyn.get("imm1" if "1" in par else "imm2") or {}).get("text", "") if src == "immkava" else ""
+            else:
+                hay = (par_text.get(src) or {}).get(par, {}).get("t", "")
+            if norm_ws(needle) not in norm_ws(hay):
+                bad.append(f'{(sources.get(src) or {}).get("lyh", src)} {par}: „{needle}“')
+        if bad:
+            warn.append(f"{where}: allika tekst on muutunud, vaata üle → " + "; ".join(bad))
+        return bad
+
+    hu = dyn.get("huvitised") or {}
+    yl = hu.get("ylempiir")
+    for t in cfg["teemad"]:
+        it = {"t": "j", "k": t["k"], "n": t["n"], "sn": t.get("sn") or t["n"], "g": t["grupp"], "syn": t.get("syn", [])}
+        if t.get("boost"):
+            it["boost"] = t["boost"]
+        for key in ("read", "erinevused"):
+            out = []
+            for r in t.get(key, []):
+                s = r["s"]
+                if "{ylempiir}" in s:
+                    s = s.replace("{ylempiir}", f'{yl["aasta"]}. aastal on {yl["eur"]} eurot' if yl else "(vt Tervisekassa lehte)")
+                row = {"s": s, "a": [x for x in (ref(a) for a in r.get("allikas", [])) if x]}
+                if check(r, f'{t["sn"]} ({s[:50]}…)'):
+                    row["muutus"] = True
+                out.append(row)
+            if out:
+                it["r" if key == "read" else "e"] = out
+        fut = [dict(f, a=[x for x in (ref(a) for a in f.get("allikas", [])) if x]) for f in t.get("tulevik", []) if f["alates"] > TODAY.isoformat()]
+        if fut:
+            it["tul"] = [{"alates": f["alates"], "s": f["s"], "a": f["a"]} for f in fut]
+        tabs = [dict(tb, a=[x for x in (ref(a) for a in tb.get("allikas", [])) if x]) for tb in t.get("tabelid", [])]
+        for d in t.get("dyn", []):
+            if d == "huvitised" and hu.get("rows"):
+                tabs.insert(0, {"n": "Hüvitiste võrdlustabel (Tervisekassa)", "dyn": "huvitised", "rows": hu["rows"],
+                                "a": [{"n": "Tervisekassa: haigushüvitis", "u": hu["page"]}], "uuendatud": hu.get("uuendatud")})
+            elif d == "pohjused":
+                pr = tvl_pohjused((par_text.get("tvl") or {}).get("§ 2", {}).get("t", ""))
+                if pr:
+                    tabs.append({"n": "Tööst vabastamise põhjuse koodid", "pais": ["Kood", "Põhjus"], "read": pr, "a": [ref(["tvl", "§ 2"])]})
+                else:
+                    warn.append("Töövõimetuslehe põhjuse koode ei õnnestunud § 2-st lugeda.")
+            elif d == "imm1" and dyn.get("imm1"):
+                x = dyn["imm1"]
+                tabs.insert(0, {"n": "Laste immuniseerimiskava (määruse lisa 1)", "pais": ["Vanus", "Vaktsiin"], "read": x["rows"],
+                                "markus": "\n".join(x["notes"]), "legend": x["legend"], "a": [ref(["immkava", "lisa 1"])]})
+            elif d == "imm2" and dyn.get("imm2"):
+                for tb in dyn["imm2"]["tabelid"]:
+                    tabs.append({"n": tb["n"], "tekst": tb["s"], "a": [ref(["immkava", "lisa 2"])]})
+        if tabs:
+            it["tab"] = tabs
+        if t.get("lisad"):
+            it["lisad"] = lisad.get(t["lisad"], [])
+        if t.get("lingid"):
+            it["l"] = [x for x in (ref(a) for a in t["lingid"]) if x]
+        items.append(it)
+    return items, warn
+
+
 # ----------------------------------------------------------------- meditsiiniseadmed
 
 def lisa_pdf(xml, pattern=r"lisa"):
@@ -687,6 +913,8 @@ def build(args):
     for key, cfg in sources_cfg.items():
         info, xml = resolve_current(cfg["grupiId"], cache)
         info["nimi"] = cfg["nimi"]
+        if cfg.get("lyh"):
+            info["lyh"] = cfg["lyh"]
         sources[key] = info
         xmls[key] = xml
         if str(info["grupiId"]) != str(cfg["grupiId"]):
@@ -695,7 +923,7 @@ def build(args):
 
     toru_dir = os.path.join(HERE, "toru")
     aux_hash = hashlib.sha256()
-    for fn in ["synonyms.json", "links.json", "build.py", "ks_notes.json", "ms_ryhmakoodid.json", "soeluuringud.json"]:
+    for fn in ["synonyms.json", "links.json", "build.py", "ks_notes.json", "ms_ryhmakoodid.json", "soeluuringud.json", "teemad.json"]:
         with open(os.path.join(HERE, fn), "rb") as f:
             aux_hash.update(f.read())
     toru_loaded = load_toru_rows(toru_dir)  # xlsx olemasolul uuendab väljavõtet
@@ -719,6 +947,15 @@ def build(args):
     soel_items, soel_meta = soeluuringud(prev, soel_cfg)
     aux_hash.update(json.dumps([[x["k"], x.get("aasta"), x.get("sy"), x.get("vanus"), x.get("int"), x.get("kes"), x.get("osale"), x.get("juhend")]
                                 for x in soel_items] + [soel_meta["warn"]], ensure_ascii=False).encode())
+    with open(os.path.join(HERE, "teemad.json"), encoding="utf-8") as f:
+        teemad_cfg = json.load(f)
+    huvitised, hu_warn = tk_huvitised(prev)
+    if huvitised:
+        aux_hash.update(json.dumps([huvitised["rows"], huvitised.get("ylempiir")], ensure_ascii=False, sort_keys=True).encode())
+    jalgimine = watch_sources(teemad_cfg.get("allikad", {}), prev)
+    # Sõrmejälge mõjutab sisu muutus ja püsiv (vähemalt kaks järjestikust) kättesaamatus, mitte ühekordne võrgutõrge.
+    aux_hash.update(json.dumps({k: [v.get("uuendatud"), v.get("sha"), (v.get("vigu") or 0) >= 2] for k, v in sorted(jalgimine.items())},
+                               ensure_ascii=False).encode())
     fingerprint = "|".join([BUILD_VERSION] + [f"{k}:{v['id']}:{','.join(x['id'] for x in v['tulevased'])}" for k, v in sorted(sources.items())] + [aux_hash.hexdigest()[:16]])
     if prev and prev["meta"].get("fingerprint") == fingerprint and not args.force:
         print("Muudatusi ei ole.")
@@ -931,6 +1168,34 @@ def build(args):
     # 7b. sõeluuringud
     items.extend(soel_items)
 
+    # 7c. igapäevatöö teemade õigusaktid (sätted) ja teemakaardid
+    par_text, lisad = {}, {}
+    for key, cfg in sources_cfg.items():
+        s = sources[key]
+        pars, _ = walk_act(xmls[key])
+        want = cfg.get("par")
+        par_text[key] = {}
+        for p in pars:
+            if want and p["nr"] not in want:
+                continue
+            sate = make_sate(key, s, p)
+            par_text[key][p["nr"]] = {"id": p["id"], "t": " ".join(b.get("s", "") or " ".join(" ".join(r) for r in b.get("rows", [])) for b in sate["b"])}
+            if key not in BASE_SOURCES:
+                items.append(sate)
+        if want:
+            missing_pars = [x for x in want if x not in par_text[key]]
+            if missing_pars:
+                print(f"[hoiatus] {key}: sätteid ei leitud: {missing_pars}")
+        lisad[key] = act_lisad(xmls[key], s["id"])
+        if key not in BASE_SOURCES and lisad[key]:
+            s["lisad"] = lisad[key]
+    dyn = {"huvitised": huvitised}
+    imm, imm_warn = imm_lisad(xmls["immkava"]) if "immkava" in xmls else ({}, [])
+    dyn.update(imm)
+    teema_items, teema_warn = build_teemad(teemad_cfg, sources, par_text, dyn, lisad)
+    teema_warn = hu_warn + imm_warn + teema_warn
+    items.extend(teema_items)
+
     # 8. fondid, lingid, sünonüümid
     items.extend(funds)
     with open(os.path.join(HERE, "links.json"), encoding="utf-8") as f:
@@ -973,8 +1238,12 @@ def build(args):
         "toru": toru_meta,
         "abivCols": ab_cols,
         "starRule": star_rule,
-        "counts": {t: sum(1 for x in items if x["t"] == t) for t in ["s", "f", "l", "a", "k", "q", "b", "m", "v"]},
+        "counts": {t: sum(1 for x in items if x["t"] == t) for t in ["s", "f", "l", "a", "k", "q", "b", "m", "v", "j"]},
         "soel": soel_meta,
+        "huvitised": huvitised,
+        "jalgimine": jalgimine,
+        "teemad": {"kontrollitud": teemad_cfg["_meta"].get("kontrollitud"), "warn": teema_warn,
+                   "allikad": {k: v["n"] for k, v in teemad_cfg.get("allikad", {}).items()}},
         "msUnmapped": ms_unmapped,
         "countsPa": sum(1 for x in items if x["t"] == "s" and x.get("pa")),
         "synlab": synlab_meta,
@@ -1243,6 +1512,26 @@ def make_report(prev, data, missing):
         for w in (data["meta"].get("soel") or {}).get("warn", []):
             lines.append(f"- NB: {w}")
         lines.append("")
+    tm = data["meta"].get("teemad") or {}
+    jw = data["meta"].get("jalgimine") or {}
+    pj = ((prev or {}).get("meta") or {}).get("jalgimine") or {}
+    hu = data["meta"].get("huvitised") or {}
+    tlines = [f"- NB: {w}" for w in tm.get("warn", [])]
+    for k, v in jw.items():
+        o = pj.get(k)
+        name = tm.get("allikad", {}).get(k, k)
+        if not v.get("ok") and (v.get("vigu") or 0) >= 2:
+            tlines.append(f"- Allikas pole juba mitu kontrolli kättesaadav: {name} ({v.get('viga', '')})")
+        elif o and v.get("ok") and o.get("ok") and (o.get("uuendatud"), o.get("sha")) != (v.get("uuendatud"), v.get("sha")):
+            tlines.append(f"- Allikas muutus: {name} (uuendatud {v.get('uuendatud') or 'PDF sisu'}); vaata teemakaart üle (build/teemad.json)")
+    po = ((prev or {}).get("meta") or {}).get("huvitised") or {}
+    if po and po.get("rows") != hu.get("rows"):
+        tlines.append("- Tervisekassa hüvitiste võrdlustabel muutus")
+    if po and po.get("ylempiir") != hu.get("ylempiir"):
+        tlines.append(f"- Hüvitise päevane ülempiir: {hu.get('ylempiir')}")
+    lines.append("## Igapäevatöö teemakaardid")
+    lines.extend(tlines or ["- Kõik teemakaartide tekstikontrollid läbitud."])
+    lines.append("")
     if data["meta"].get("msUnmapped"):
         lines.append("## Meditsiiniseadme rühmad, millel puudub 9MS kood")
         lines.append(", ".join(data["meta"]["msUnmapped"]) + " (lisa kood faili build/ms_ryhmakoodid.json)")
@@ -1265,7 +1554,7 @@ def make_report(prev, data, missing):
         lines.append(", ".join(missing))
     c = data["meta"]["counts"]
     lines.append("")
-    lines.append(f"Kokku: {c['s']} teenust, {c.get('m', 0)} meditsiiniseadmete rühma, {c.get('b', 0)} SYNLABi analüüsi, {c['a']} abivahendit, {c['l']} sätet, {c['f']} fondi, {c.get('q', 0)} kvaliteedisüsteemi jaotist, {c.get('v', 0)} sõeluuringut, {c['k']} linki.")
+    lines.append(f"Kokku: {c['s']} teenust, {c.get('m', 0)} meditsiiniseadmete rühma, {c.get('b', 0)} SYNLABi analüüsi, {c['a']} abivahendit, {c['l']} sätet, {c['f']} fondi, {c.get('q', 0)} kvaliteedisüsteemi jaotist, {c.get('v', 0)} sõeluuringut, {c.get('j', 0)} teemakaarti, {c['k']} linki.")
     return "\n".join(lines) + "\n"
 
 

@@ -1,22 +1,155 @@
 {
   "ttl": {
     "nimi": "Tervisekassa tervishoiuteenuste loetelu",
-    "grupiId": 1063168
+    "grupiId": 1063168,
+    "lyh": "TTL"
   },
   "metoodika": {
     "nimi": "Tasu maksmise kohustuse ülevõtmise kord ja tasu arvutamise metoodika",
-    "grupiId": 309871
+    "grupiId": 309871,
+    "lyh": "Metoodika"
   },
   "abivahendid": {
     "nimi": "Abivahendite loetelu, tõendi ja kaardi andmed",
-    "grupiId": 1032376
+    "grupiId": 1032376,
+    "lyh": "Abivahendite määrus"
   },
   "mootorsoidukijuht": {
     "nimi": "Mootorsõidukijuhi tervisekontroll ja tervisenõuded",
-    "grupiId": 1001109
+    "grupiId": 1001109,
+    "lyh": "Juhi tervisenõuded"
   },
   "meditsiiniseadmed": {
     "nimi": "Tervisekassa meditsiiniseadmete loetelu",
-    "grupiId": 1055346
+    "grupiId": 1055346,
+    "lyh": "Meditsiiniseadmete loetelu"
+  },
+  "tookorraldus": {
+    "nimi": "Perearstiabi töökorraldus ning tervisekeskuse liigid ja nõuded",
+    "lyh": "Töökorralduse määrus",
+    "grupiId": 1063162
+  },
+  "nimistu": {
+    "nimi": "Perearsti nimistu moodustamine, muutmine ja piirarv",
+    "lyh": "Nimistu määrus",
+    "grupiId": 1008182
+  },
+  "ttks": {
+    "nimi": "Tervishoiuteenuste korraldamise seadus",
+    "lyh": "TTKS",
+    "grupiId": 153395,
+    "par": [
+      "§ 8",
+      "§ 8¹"
+    ]
+  },
+  "tvl": {
+    "nimi": "Töövõimetuslehe vormistamine ja andmete edastamine",
+    "lyh": "TVL määrus",
+    "grupiId": 1054587
+  },
+  "raks": {
+    "nimi": "Ravikindlustuse seadus (ajutise töövõimetuse hüvitis)",
+    "lyh": "RaKS",
+    "grupiId": 162949,
+    "par": [
+      "§ 50",
+      "§ 51",
+      "§ 52",
+      "§ 53",
+      "§ 54",
+      "§ 55",
+      "§ 55²",
+      "§ 56",
+      "§ 57",
+      "§ 59",
+      "§ 60",
+      "§ 61",
+      "§ 62"
+    ]
+  },
+  "ttos": {
+    "nimi": "Töötervishoiu ja tööohutuse seadus (haigushüvitis, P21)",
+    "lyh": "TTOS",
+    "grupiId": 159407,
+    "par": [
+      "§ 12²",
+      "§ 12⁴",
+      "§ 12⁵"
+    ]
+  },
+  "relvs": {
+    "nimi": "Relvaseadus (tervisekontroll)",
+    "lyh": "RelvS",
+    "grupiId": 160831,
+    "par": [
+      "§ 35",
+      "§ 35¹"
+    ]
+  },
+  "relvaluba": {
+    "nimi": "Soetamisloa ja relvaloa taotleja tervisekontroll ja tervisenõuded",
+    "lyh": "Relvaloa tervisekontrolli määrus",
+    "grupiId": 313793
+  },
+  "abipols": {
+    "nimi": "Abipolitseiniku seadus (tervisekontroll)",
+    "lyh": "APolS",
+    "grupiId": 1000259,
+    "par": [
+      "§ 6"
+    ]
+  },
+  "abipol": {
+    "nimi": "Abipolitseiniku tervisekontrolli tingimused ja kord",
+    "lyh": "Abipolitseiniku tervisekontrolli määrus",
+    "grupiId": 1054499
+  },
+  "kals": {
+    "nimi": "Kaitseliidu seadus (tervisekontroll)",
+    "lyh": "KaLS",
+    "grupiId": 1011889,
+    "par": [
+      "§ 28"
+    ]
+  },
+  "kaitsevagi": {
+    "nimi": "Kaitseväekohustuslase terviseseisundi hindamine",
+    "lyh": "Kaitseväe tervisehindamise määrus",
+    "grupiId": 1056432
+  },
+  "nets": {
+    "nimi": "Nakkushaiguste ennetamise ja tõrje seadus",
+    "lyh": "NETS",
+    "grupiId": 156299,
+    "par": [
+      "§ 8",
+      "§ 10",
+      "§ 13",
+      "§ 21"
+    ]
+  },
+  "nakkus": {
+    "nimi": "Nakkushaiguste loetelu ja neisse haigestumise andmete edastamine",
+    "lyh": "Nakkushaiguste määrus",
+    "grupiId": 1046526
+  },
+  "tis": {
+    "nimi": "Tervise infosüsteemi põhimäärus (andmete esitamise tähtajad)",
+    "lyh": "TIS põhimäärus",
+    "grupiId": 1036829,
+    "par": [
+      "§ 5"
+    ]
+  },
+  "immkava": {
+    "nimi": "Immuniseerimiskava",
+    "lyh": "Immuniseerimiskava",
+    "grupiId": 1059329
+  },
+  "immkorraldus": {
+    "nimi": "Immuniseerimise korraldamise nõuded",
+    "lyh": "Immuniseerimise korraldus",
+    "grupiId": 1055635
   }
 }

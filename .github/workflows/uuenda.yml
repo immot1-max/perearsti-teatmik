@@ -14,6 +14,7 @@ on:
       - "build/ks_notes.json"
       - "build/ms_ryhmakoodid.json"
       - "build/soeluuringud.json"
+      - "build/teemad.json"
       - "build/build.py"
 
 permissions:

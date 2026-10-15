@@ -1,6 +1,6 @@
 # Perearsti teatmik
 
-Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, abivahendite ja juhi tervisenõuete kohta. Töötab brauseris ja pärast esimest avamist ka võrguta.
+Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, sõeluuringute, haigus- ja hoolduslehtede, tervisetõendite, vaktsineerimise, abivahendite ja juhi tervisenõuete kohta. Töötab brauseris ja pärast esimest avamist ka võrguta.
 
 **Rakendus:** https://immot1-max.github.io/perearsti-teatmik/
 
@@ -17,6 +17,11 @@ Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, abivahendite
 | SYNLABi hinnakiri (tervishoiuteenuse pakkujale) | Analüüsi nimi, lühend, Tervisekassa kood ja hind; analüüsilt koodini ja koodilt analüüsideni |
 | Terviseportaal: vähi sõeluuringud | Rinna-, emakakaela- ja soolevähi sõeluuringu vanus, intervall ja jooksva aasta sünniaastad; koodid ja raviarve info failist `build/soeluuringud.json` |
 | Tervisekassa: kopsuvähi sõeluuring | Tegevusjuhendi link ja lehe uuendamise kuupäev; sihtrühm ja kodeerimine failist `build/soeluuringud.json` |
+| Riigi Teataja: töövõimetus | Ravikindlustuse seadus § 50–62, TTOS § 12², 12⁴, 12⁵, töövõimetuslehe määrus |
+| Riigi Teataja: tervisetõendid | Relvaseadus § 35, 35¹ ja relvaloa tervisekontrolli määrus, abipolitseiniku seadus § 6 ja määrus, Kaitseliidu seadus § 28, kaitseväe tervisehindamise määrus, NETS § 13 |
+| Riigi Teataja: nakkushaigused ja vaktsineerimine | Nakkushaiguste määrus, TIS-i põhimäärus § 5, NETS § 8, 10, 21, immuniseerimiskava koos lisadega, immuniseerimise korraldus |
+| Riigi Teataja: töökorraldus ja nimistu | Perearstiabi töökorralduse määrus (nr 14), nimistu määrus (nr 47), TTKS § 8, 8¹ |
+| Tervisekassa: hüvitiste võrdlustabel | Haigus- ja hoolduslehe põhjused, kes maksab, määr, kestus ja päevane ülempiir (loetakse igal kontrollil) |
 | Toru (Tervisekassa) | Hinna kehtivuse algus, eelmine hind, koodid, mida loetelu tabelites ei ole |
 | Sotsiaalkindlustusamet | Lingid juhenditele ja vormidele |
 
@@ -44,6 +49,18 @@ Kriteeriumid, koodid, punktid ja koefitsiendid loetakse automaatselt metoodika �
 Igal kontrollil loetakse terviseportaali lehelt https://www.terviseportaal.ee/haiguste-ennetus/soeluuringud iga programmi vanusevahemik, intervall ja kutsutavad sünniaastad. Skript kontrollib, et sünniaastatest arvutatud vanused klapivad lehel nimetatud vanusega, et sünniaastate vahe vastab intervallile ja et alamlehe sünniaastad ühtivad koondlehega. Kui midagi ei klapi või lehte ei saa, jääb alles eelmine seis ja teavitusse tuleb märkus. Uue aasta sünniaastad jõuavad rakendusse järgmisel kuukontrollil pärast seda, kui terviseportaal need avaldab.
 
 Rakenduses näitab sünniaasta otsing (nt „1966“), millise sõeluuringu sihtrühma inimene sel aastal kuulub.
+
+## Igapäevatöö reeglid (teemakaardid)
+
+Haigus- ja hooldusleht, töövõimetuslehe vormistamine, P21, tervisetõendid (relvaluba, abipolitseinik, Kaitseliit, kaitsevägi, nakkushaiguste tõend), nakkushaiguse teatis, vaktsineerimine, töökorraldus, nimistu ja PADI. Kokkuvõtted on failis `build/teemad.json`; need põhinevad Tommi allikaregistril (15.10.2026) ja on üle kontrollitud aktide kehtivast tekstist.
+
+Iga punkti juures on viide sättele (avaneb rakenduses) või allikale. Automaatne kontroll teeb igal kuul kolm asja:
+
+1. Iga punkti `kontroll`-lõik peab kehtivas sättes alles olema. Kui akt muutub ja lõik kaob, märgitakse punkt rakenduses „allika tekst muutunud“ ja teavitusse tuleb märkus.
+2. Tervisekassa hüvitiste võrdlustabel, päevane ülempiir, immuniseerimiskava lisad ja töövõimetuslehe põhjuse koodid loetakse otse allikast.
+3. Tervisekassa ja Terviseameti lehtede „Viimati uuendatud“ kuupäev ja PDF-ide sisu jälgitakse; muutusest tuleb teavitus koos soovitusega teemakaart üle vaadata.
+
+Allikate omavahelised vastuolud on kaardil „Erinevused allikates“ all (nt õe õigused töövõimetuslehel, perearsti vahetuse kuupäev, P21 juhendi 15./16. päev, Tervisekassa aegunud patsiendilehed).
 
 ## Sünonüümid
 

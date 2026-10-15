@@ -19,6 +19,12 @@
     meditsiiniseadmed: 'Meditsiiniseadmete loetelu',
     toru: 'Toru',
   };
+  function srcName(k) {
+    const s = state.data && state.data.meta.sources[k];
+    return SRC[k] || (s && s.nimi) || k || '';
+  }
+  // Küsimuse abisõnad, mida otsingus ei nõuta (nt „kui kaua haigusleht“).
+  const STOP = new Set(['kui', 'kaua', 'pikalt', 'mis', 'kes', 'kas', 'ja', 'on', 'mitu', 'palju', 'millal', 'kuidas', 'viisil', 'moodi', 'see', 'ning', 'saab', 'tohib', 'mida', 'kus', 'mille', 'ma', 'me', 'ei', 'vaja', 'tuleb', 'peab', 'ka', 'aga', 'et', 'oma', 'seda', 'selle', 'mul', 'meil', 'kelle', 'mitme', 'miks']);
   const FUND_SHORT = { f37: 'Uuringufond 37%', f13: 'Teraapiafond 13%', lisaks: 'Tegevusfond' };
   const FUND_HELP = {
     f37: 'Tasutakse kuni 37% ulatuses nimistu pearahadeks arvestatud summast aastas.',
@@ -127,6 +133,7 @@
       else if (it.t === 'b') cls = 'lab';
       else if (it.t === 'm') cls = 'ms';
       else if (it.t === 'v') cls = 'soel';
+      else if (it.t === 'j') cls = 'teema';
       it._cls = cls;
       let name = it.n || '';
       let ctx = '', txt = '', code = '';
@@ -145,7 +152,7 @@
         txt = it.v['12'] || '';
       } else if (it.t === 'l') {
         name = `${it.par} ${it.n}`;
-        ctx = SRC[it.src] + ' ' + (it.ptk || '');
+        ctx = srcName(it.src) + ' ' + (it.ptk || '');
         txt = it.b.map((b) => (b.t === 'tbl' ? b.rows.map((r) => r.join(' ')).join(' ') : b.s)).join(' ');
         boost += 8;
       } else if (it.t === 'f') {
@@ -171,6 +178,14 @@
         ctx = `vähi sõeluuring ${it.kes || ''} ${(it.sy || []).join(' ')}`;
         txt = (it.notes || []).join(' ') + ' ' + (it.osale || '') + ' ' + (it.codes || []).map((c) => c.join(' ')).join(' ');
         boost += 50;
+      } else if (it.t === 'j') {
+        name = `${it.n} ${it.sn || ''}`;
+        ctx = `${it.g || ''} teema`;
+        const tabTxt = (it.tab || []).map((tb) => [tb.n, tb.tekst || '', tb.markus || '', (tb.legend || []).join(' '),
+          (tb.read || []).map((r) => r.join(' ')).join(' '),
+          (tb.rows || []).map((r) => [r.pohjus.join(' '), r.nr.join(' '), r.liik, r.kord.join(' '), r.kestus].join(' ')).join(' ')].join(' ')).join(' ');
+        txt = [...(it.r || []), ...(it.e || []), ...(it.tul || [])].map((r) => r.s + ' ' + (r.a || []).map((a) => a.n).join(' ')).join(' ') + ' ' + tabTxt;
+        boost += 45 + (it.boost || 0);
       }
       const syn = (it.syn || []).map(norm);
       if (it.t === 'b' && it.ab) {
@@ -209,51 +224,78 @@
     if (state.filter === 'b') return t === 'b';
     if (state.filter === 'm') return t === 'm';
     if (state.filter === 'v') return t === 'v';
+    if (state.filter === 'j') return t === 'j';
     return t === state.filter;
+  }
+
+  // Ühe otsingusõna skoor kirjele (0 = ei sobi). via = vaste ainult sisutekstis.
+  function tokScore(e, t) {
+    let s = 0;
+    if (e.code) {
+      if (e.code === t) s = 400;
+      else if (t.length >= 2 && e.code.startsWith(t)) s = 150;
+    }
+    if (e.name.includes(' ' + t + ' ')) s = Math.max(s, 60);
+    else if (e.name.includes(' ' + t)) s = Math.max(s, 45);
+    else if (t.length >= 5 && e.name.includes(t)) s = Math.max(s, 20);
+    for (const sy of e.syn) {
+      if (sy === t) s = Math.max(s, 90);
+      else if ((' ' + sy).includes(' ' + t)) s = Math.max(s, 40);
+    }
+    if (!s && t.length >= 6) {
+      // eesti käändelõpud: haiguslehte → haiguslehe → haigusleh
+      const cuts = t.length >= 7 ? [1, 2, 3] : [1, 2];
+      for (const n of cuts) {
+        const cut = t.slice(0, -n);
+        if (e.name.includes(' ' + cut)) { s = 30; break; }
+        if (e.syn.some((sy) => (' ' + sy).includes(' ' + cut))) { s = 30; break; }
+      }
+    }
+    if (!s && e.ctx.includes(' ' + t)) s = 12;
+    if (!s && e.txt.includes(' ' + t)) return { s: 6, via: true };
+    return { s, via: false };
   }
 
   function search(q) {
     const qn = norm(q);
-    const toks = qn.split(' ').filter(Boolean);
-    const out = [];
-    let hidden = 0;
-    for (const e of state.idx) {
-      if (!passFilter(e)) continue;
-      const exact = e.code && e.code === qn;
-      const paOk = passPa(e) || exact;
-      let score = 0, via = false, ok = true;
-      for (const t of toks) {
-        let s = 0;
-        if (e.code) {
-          if (e.code === t) s = 400;
-          else if (t.length >= 2 && e.code.startsWith(t)) s = 150;
+    let toks = qn.split(' ').filter(Boolean);
+    const core = toks.filter((t) => !STOP.has(t));
+    if (core.length) toks = core;
+    const run = (tk) => {
+      const out = [];
+      let hidden = 0;
+      for (const e of state.idx) {
+        if (!passFilter(e)) continue;
+        const exact = e.code && e.code === qn;
+        const paOk = passPa(e) || exact;
+        let score = 0, via = false, ok = true;
+        for (const t of tk) {
+          const r = tokScore(e, t);
+          if (!r.s) { ok = false; break; }
+          score += r.s;
+          via = via || r.via;
         }
-        if (e.name.includes(' ' + t + ' ')) s = Math.max(s, 60);
-        else if (e.name.includes(' ' + t)) s = Math.max(s, 45);
-        else if (t.length >= 5 && e.name.includes(t)) s = Math.max(s, 20);
-        for (const sy of e.syn) {
-          if (sy === t) s = Math.max(s, 90);
-          else if ((' ' + sy).includes(' ' + t)) s = Math.max(s, 40);
-        }
-        if (!s && t.length >= 6) {
-          for (const cut of [t.slice(0, -1), t.slice(0, -2)]) {
-            if (e.name.includes(' ' + cut)) { s = 30; break; }
-            if (e.syn.some((sy) => (' ' + sy).includes(' ' + cut))) { s = 30; break; }
-          }
-        }
-        if (!s && e.ctx.includes(' ' + t)) s = 12;
-        if (!s && e.txt.includes(' ' + t)) { s = 6; via = true; }
-        if (!s) { ok = false; break; }
-        score += s;
+        if (!ok) continue;
+        if (tk.length > 1) for (const sy of e.syn) if (sy === qn) score += 200;
+        if (exact) score += 600;
+        if (!paOk) { hidden++; continue; }
+        out.push({ e, score: score + e.boost, via });
       }
-      if (!ok) continue;
-      if (toks.length > 1) for (const sy of e.syn) if (sy === qn) score += 200;
-      if (exact) score += 600;
-      if (!paOk) { hidden++; continue; }
-      out.push({ e, score: score + e.boost, via });
+      out.sort((a, b) => b.score - a.score || a.e.name.length - b.e.name.length);
+      return { list: out, hidden };
+    };
+    let res = run(toks);
+    let dropped = [];
+    if (!res.list.length && toks.length > 1) {
+      // Sõnad, mis ei sobi ühegi kirjega, jäetakse kõrvale (nt „rahastatakse“).
+      const known = toks.filter((t) => state.idx.some((e) => passFilter(e) && tokScore(e, t).s));
+      if (known.length && known.length < toks.length) {
+        dropped = toks.filter((t) => !known.includes(t));
+        res = run(known);
+        toks = known;
+      }
     }
-    out.sort((a, b) => b.score - a.score || a.e.name.length - b.e.name.length);
-    return { list: out, toks, hidden };
+    return { list: res.list, toks, hidden: res.hidden, dropped };
   }
 
   // tähemärgitundetu esiletõst
@@ -272,15 +314,17 @@
     if (state.focus != null) {
       const it = state.data.items[state.focus];
       state.open.add(it._id);
-      r.innerHTML = `<div class="summary"><span>${esc(SRC[it.src] || '')}</span><button class="btn" data-act="home">← Avaleht</button></div><div class="list">${row(it)}</div>`;
+      r.innerHTML = `<div class="summary"><span>${esc(srcName(it.src) || '')}</span><button class="btn" data-act="home">← Avaleht</button></div><div class="list">${row(it)}</div>`;
       return;
     }
     if (!q && !state.fund && state.filter === 'all') { renderHome(); return; }
     let list;
     let hidden = 0;
+    let dropped = [];
     if (q) {
       const res = search(q);
       hidden = res.hidden;
+      dropped = res.dropped || [];
       list = res.list.map((x) => ({ it: x.e.it, via: x.via }));
     } else {
       const all = state.idx.filter(passFilter);
@@ -302,6 +346,7 @@
     const yCard = q && !state.fund && (state.filter === 'all' || state.filter === 'v') ? birthYearCard(norm(q).split(' ')) : '';
     html += yCard;
     html += `<div class="summary"><span>${total ? `${total} vastet` : ''}${q && total > state.limit ? `, näitan ${state.limit}` : ''}</span>${q || state.fund || state.filter !== 'all' ? '<button class="btn" data-act="home">Tühjenda</button>' : ''}</div>`;
+    if (dropped.length) html += `<div class="hidden-note">Neid sõnu ei leitud, otsisin ilma nendeta: ${dropped.map(esc).join(', ')}</div>`;
     if (hidden && state.pa) html += `<div class="hidden-note">${hidden} vastet väljaspool perearstiabi on peidetud.<button class="btn" data-act="pa-off">Näita kõiki</button></div>`;
     if (!total && yCard) {
       // sünniaasta kaart on vastus
@@ -310,12 +355,12 @@
       if (q && (state.fund || state.filter !== 'all')) html += '<button class="btn solid" data-act="all">Otsi kõigist kategooriatest</button>';
     } else {
       html += '<div class="list">';
-      const grouped = !q && (state.fund || state.filter === 'a' || state.filter === 'l' || state.filter === 'q' || state.filter === 'b' || state.filter === 's' || state.filter === 'm');
+      const grouped = !q && (state.fund || state.filter === 'a' || state.filter === 'l' || state.filter === 'q' || state.filter === 'b' || state.filter === 's' || state.filter === 'm' || state.filter === 'j');
       if (!q && state.filter === 'm') shown.sort((a, b) => a.it.n.localeCompare(b.it.n, 'et'));
       let lastG = null;
       for (const x of shown) {
         if (grouped) {
-          const g = x.it.t === 'm' ? 'Tervisekassa meditsiiniseadmed' : x.it.t === 'a' ? (x.it.g || [])[0] || x.it.n : x.it.t === 'l' ? SRC[x.it.src] : x.it.t === 'f' ? 'Fondid' : x.it.t === 'q' ? KS_CAT[x.it.cat] : x.it.t === 'b' ? x.it.cat : x.it.pt || (x.it.tp && x.it.tp.hk) || SRC[x.it.src];
+          const g = x.it.t === 'j' ? x.it.g : x.it.t === 'm' ? 'Tervisekassa meditsiiniseadmed' : x.it.t === 'a' ? (x.it.g || [])[0] || x.it.n : x.it.t === 'l' ? srcName(x.it.src) : x.it.t === 'f' ? 'Fondid' : x.it.t === 'q' ? KS_CAT[x.it.cat] : x.it.t === 'b' ? x.it.cat : x.it.pt || (x.it.tp && x.it.tp.hk) || srcName(x.it.src);
           if (g !== lastG) { html += `<div class="group-h">${esc(g)}</div>`; lastG = g; }
         }
         html += row(x.it, x.via);
@@ -355,7 +400,7 @@
       const price = zl ? `<small>${zl}</small>` : it.p != null ? fmtEur(it.p) : '';
       const ks = (it.ks || []).map((k) => state.qByKey[k]).filter(Boolean).map((qq) => `<span class="badge ks" data-focus="${qq._id}" title="Ava kvaliteedisüsteemi jaotis">${esc(ksPrefix(qq))}: ${esc(qq.sn)}</span>`).join('');
       head = `<span class="name">${hl(it.n, re)}</span><span class="price">${price}</span>
-        <span class="meta"><span class="code" data-copy="${esc(it.c)}" title="Kopeeri kood">${esc(it.c)}</span>${fund}${ks}${it.fn ? '<span class="badge f37">* ainult S00–S09</span>' : ''}<span>${esc(it.par ? it.par + ' ' + (it.pt || '') : SRC[it.src])}</span>${via ? '<span class="via">· vaste tingimustes</span>' : ''}</span>`;
+        <span class="meta"><span class="code" data-copy="${esc(it.c)}" title="Kopeeri kood">${esc(it.c)}</span>${fund}${ks}${it.fn ? '<span class="badge f37">* ainult S00–S09</span>' : ''}<span>${esc(it.par ? it.par + ' ' + (it.pt || '') : srcName(it.src))}</span>${via ? '<span class="via">· vaste tingimustes</span>' : ''}</span>`;
     } else if (it.t === 'a') {
       const v = it.v;
       const price = v['10'] ? `${esc(v['10'])} €` : v['9'] ? `${esc(v['9'])} € <small>/kuu</small>` : '';
@@ -363,7 +408,11 @@
       head = `<span class="name">${hl(it.n, re)}</span><span class="price">${price}</span>
         <span class="meta"><span class="code" data-copy="${esc(it.c)}" title="Kopeeri kood">${esc(it.c)}</span>${v['8'] ? `<span class="badge plain">${esc(v['8'])}</span>` : ''}${pe}${it.grp ? '<span class="badge plain">rühm</span>' : ''}<span>${esc((it.g || []).slice(-1)[0] || '')}</span>${via ? '<span class="via">· vaste kirjelduses</span>' : ''}</span>`;
     } else if (it.t === 'l') {
-      head = `<span class="name">${esc(it.par)} ${hl(it.n, re)}</span><span></span><span class="meta"><span>${esc(SRC[it.src])}</span>${via ? '<span class="via">· vaste tekstis</span>' : ''}</span>`;
+      head = `<span class="name">${esc(it.par)} ${hl(it.n, re)}</span><span></span><span class="meta"><span>${esc(srcName(it.src))}</span>${via ? '<span class="via">· vaste tekstis</span>' : ''}</span>`;
+    } else if (it.t === 'j') {
+      const changed = (it.r || []).some((r) => r.muutus);
+      head = `<span class="name">${hl(it.n, re)}</span><span></span>
+        <span class="meta"><span class="badge teema">${esc(it.g || 'teema')}</span><span>${(it.r || []).length} punkti</span>${(it.e || []).length ? `<span class="badge warn">${it.e.length} erinevus${it.e.length > 1 ? 't' : ''} allikates</span>` : ''}${changed ? '<span class="badge warn">allikas muutunud</span>' : ''}${via ? '<span class="via">· vaste sisus</span>' : ''}</span>`;
     } else if (it.t === 'v') {
       const yrs = it.sy ? `${it.aasta}: ${it.sy.length} sünniaastat` : (it.lyh || '');
       head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${esc(ageRange(it))}</small></span>
@@ -425,7 +474,7 @@
         h += '<div class="rules"><h4>Tingimused ja seotud sätted</h4>';
         for (const ri of it.r) {
           const rr = d.rules[ri];
-          h += `<div class="rule"><span class="ref">${esc(SRC[rr.src])} ${esc(rr.par)}</span>${hl(rr.s, re)} <a href="${esc(rr.url)}" target="_blank" rel="noopener">↗</a></div>`;
+          h += `<div class="rule"><span class="ref">${esc(srcName(rr.src))} ${esc(rr.par)}</span>${hl(rr.s, re)} <a href="${esc(rr.url)}" target="_blank" rel="noopener">↗</a></div>`;
         }
         h += '</div>';
       }
@@ -530,6 +579,44 @@
         + '</div>';
       return h;
     }
+    if (it.t === 'j') {
+      const chips = (a) => (a || []).filter(Boolean).map((x) => (x.src && !/^lisa/.test(x.par || '')
+        ? `<button class="badge srcb" data-goto="${esc(x.src)}:${esc(x.par)}" title="Ava säte">${esc(x.n)}</button>`
+        : `<a class="badge srcb" href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.n)} ↗</a>`)).join(' ');
+      let h = '';
+      for (const f of it.tul || []) {
+        if (f.alates <= new Date().toISOString().slice(0, 10)) continue;
+        h += `<p class="note"><b>Alates ${fmtDate(f.alates)}:</b> ${hl(f.s, re)} ${chips(f.a)}</p>`;
+      }
+      for (const tb of it.tab || []) {
+        h += `<h4>${esc(tb.n)}</h4>`;
+        if (tb.dyn === 'huvitised') {
+          h += '<div class="hv">' + tb.rows.map((r) => `<div class="hvr"><div class="hvh">${r.nr.map((n) => `<span class="code">${esc(n)}</span>`).join('')}<b>${r.pohjus.map((x) => hl(x, re)).join(' / ')}</b><small>${esc(r.liik)}</small></div>`
+            + `<div>${r.kord.map((x) => hl(x, re)).join(' ')}</div><div class="hvk">${hl(r.kestus, re)}</div></div>`).join('') + '</div>';
+          if (tb.uuendatud && tb.uuendatud.length) h += `<p class="small">Tervisekassa leht uuendatud ${tb.uuendatud.map(fmtDate).join(', ')}.</p>`;
+        } else if (tb.read) {
+          h += `<div class="tbl"><table><tr>${(tb.pais || []).map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`
+            + tb.read.map((r) => `<tr>${r.map((c) => `<td>${hl(c, re)}</td>`).join('')}</tr>`).join('') + '</table></div>';
+        } else if (tb.tekst) {
+          const open = re && new RegExp(re.source, 'i').test(tb.tekst);
+          h += `<details class="lisa"${open ? ' open' : ''}><summary>Näita loetelu (PDF-i tekst)</summary><div class="pre">${hl(tb.tekst, re)}</div></details>`;
+        }
+        if (tb.markus) h += `<p class="small">${hl(tb.markus, re).replace(/\n/g, '<br>')}</p>`;
+        if (tb.legend && tb.legend.length) h += `<p class="small">${tb.legend.map((x) => hl(x, re)).join('; ')}</p>`;
+        if (tb.a && tb.a.length) h += `<div class="srcs">${chips(tb.a)}</div>`;
+      }
+      if ((it.r || []).length) {
+        h += '<div class="rules"><h4>Põhireeglid</h4>' + it.r.map((r) => `<div class="rule${r.muutus ? ' changed' : ''}">${r.muutus ? '<span class="badge warn">allika tekst muutunud, vaata üle</span> ' : ''}${hl(r.s, re)}<div class="srcs">${chips(r.a)}</div></div>`).join('') + '</div>';
+      }
+      if ((it.e || []).length) {
+        h += '<div class="rules"><h4>Erinevused allikates</h4>' + it.e.map((r) => `<div class="note">${hl(r.s, re)}<div class="srcs">${chips(r.a)}</div></div>`).join('') + '</div>';
+      }
+      const links = [...(it.lisad || []).map((x) => ({ n: 'Lisa: ' + x.n, u: x.u })), ...(it.l || [])];
+      if (links.length) h += `<div class="actions">${links.map((x) => `<a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.n)} ↗</a>`).join('')}</div>`;
+      const tm = d.meta.teemad || {};
+      h += `<p class="small">Kokkuvõte on koostatud allikate põhjal (kontrollitud ${fmtDate(tm.kontrollitud)}). Automaatkontroll võrdleb igal kuul viidatud sätete teksti; õiguslikult kehtib alati allikas.</p>`;
+      return h;
+    }
     if (it.t === 'v') {
       let h = '<dl class="kv">';
       h += `<div><dt>Kellele</dt><dd>${esc(it.kes || '')}</dd></div>`;
@@ -596,9 +683,15 @@
       ['msq', 'meditsiiniseadmed', '§ 64', 'Meditsiiniseadme kaart', 'Kes kirjutab ja kuidas hüvitatakse'],
     ].map(([cls, src, par, t, sub]) => {
       const it = q(src, par);
-      return it ? `<button class="qbtn ${cls}" data-focus="${it._id}"><b>${esc(t)}</b><small>${esc(SRC[src])} ${esc(par)} · ${esc(sub)}</small></button>` : '';
+      return it ? `<button class="qbtn ${cls}" data-focus="${it._id}"><b>${esc(t)}</b><small>${esc(srcName(src))} ${esc(par)} · ${esc(sub)}</small></button>` : '';
     }).join('');
-    const ex = ['holter', 'IGRA', 'HCV', 'jalaortoos', '7115', 'hüpertoonia', '1966', 'mammograafia', 'ratastool', 'juhiload'];
+    const ex = ['holter', 'IGRA', 'HCV', 'jalaortoos', '7115', 'hüpertoonia', '1966', 'haigusleht', 'P21', 'relvaluba', 'nakkushaiguse teatis', 'ratastool', 'juhiload'];
+    const tj = d.items.filter((x) => x.t === 'j');
+    const groups = [...new Set(tj.map((x) => x.g))];
+    const teemaHtml = !tj.length ? '' : `<section class="section"><h2>Igapäevatöö reeglid</h2><div class="tgroups">`
+      + groups.map((g) => `<div class="tgroup"><h3>${esc(g)}</h3><div class="quick">`
+        + tj.filter((x) => x.g === g).map((x) => `<button class="qbtn teema" data-focus="${x._id}"><b>${esc(x.sn)}</b><small>${x.n !== x.sn ? esc(x.n) + ' · ' : ''}${(x.r || []).length} punkti${(x.e || []).length ? ' · ⚠ ' + x.e.length : ''}</small></button>`).join('')
+        + '</div></div>').join('') + '</div></section>';
     const sv = d.items.filter((x) => x.t === 'v');
     const sy0 = soelYear();
     const soelHtml = !sv.length ? '' : `<section class="section"><h2>Vähi sõeluuringud ${sy0}</h2><div class="soel">`
@@ -612,18 +705,20 @@
         ${funds.map((f) => `<button class="fund ${f.k}" data-fund="${f.k}"><strong>${esc(f.n)}</strong><span>${esc(FUND_HELP[f.k] || '')}</span><span class="cnt">${f.cnt} teenust · ${esc(f.par)}</span></button>`).join('')}
       </div></section>
       ${soelHtml}
+      ${teemaHtml}
       <section class="section"><h2>Kvaliteedisüsteem (metoodika § 8)</h2><div class="quick">${ksCards}</div></section>
       <section class="section"><h2>Kiirvalikud</h2><div class="quick">${quick}<button class="qbtn msq" data-filter="m"><b>Meditsiiniseadmed (9MS)</b><small>${d.meta.counts.m || 0} rühma · ortoosid, testribad, sensorid, kompressioontooted jm</small></button></div></section>
       <section class="section"><h2>Proovi otsida</h2><div class="examples">${ex.map((w) => `<button class="chip" data-q="${esc(w)}">${esc(w)}</button>`).join('')}</div></section>
       <section class="section"><h2>Andmete seis</h2><div class="status" id="status"></div></section>
       <section class="section"><h2>Värvid</h2><div class="legend">
         <span><i style="--k:var(--c-f37)"></i>uuringufond 37%</span><span><i style="--k:var(--c-lisaks)"></i>tegevusfond</span><span><i style="--k:var(--c-f13)"></i>teraapiafond 13%</span>
-        <span><i style="--k:var(--c-teenus)"></i>muu teenus</span><span><i style="--k:var(--c-abiv)"></i>abivahend</span><span><i style="--k:var(--c-sate)"></i>säte</span><span><i style="--k:var(--c-juhi)"></i>juhi tervisenõuded</span><span><i style="--k:var(--c-ks)"></i>kvaliteedisüsteem</span><span><i style="--k:var(--c-lab)"></i>SYNLABi analüüs</span><span><i style="--k:var(--c-ms)"></i>meditsiiniseade</span><span><i style="--k:var(--c-soel)"></i>sõeluuring</span>
+        <span><i style="--k:var(--c-teenus)"></i>muu teenus</span><span><i style="--k:var(--c-abiv)"></i>abivahend</span><span><i style="--k:var(--c-sate)"></i>säte</span><span><i style="--k:var(--c-juhi)"></i>juhi tervisenõuded</span><span><i style="--k:var(--c-ks)"></i>kvaliteedisüsteem</span><span><i style="--k:var(--c-lab)"></i>SYNLABi analüüs</span><span><i style="--k:var(--c-ms)"></i>meditsiiniseade</span><span><i style="--k:var(--c-soel)"></i>sõeluuring</span><span><i style="--k:var(--c-teema)"></i>igapäevatöö reegel</span>
       </div></section>
       <section class="section info"><h2>Kasutamine</h2>
         <p>Otsi nimetuse, koodi, lühendi või argisõnaga (nt „holter“, „TSH“, „6417“). Täpitähti pole vaja. Koodil klõpsates kopeerub see.</p>
         <p>Laborianalüüsi saab otsida SYNLABi nime või lühendiga (nt „IGRA“, „HCV“). Vastes on Tervisekassa kood ja see, kas analüüs kuulub perearsti fondi. Koodi avades on näha kõik selle koodi alla kuuluvad SYNLABi analüüsid.</p>
         <p>Sünniaasta otsing (nt „1966“) näitab, millise rinna-, emakakaela- või soolevähi sõeluuringu sihtrühma inimene sel aastal kuulub. Sünniaastad tulevad terviseportaalist ja neid kontrollitakse kord kuus.</p>
+        <p>„Igapäevatöö reeglid“ koondavad haigus- ja hoolduslehe, P21, tervisetõendite, nakkushaiguse teatiste, vaktsineerimise, töökorralduse ja nimistu põhireeglid. Iga punkti juures on viide sättele; ⚠ märgib allikate omavahelisi erinevusi. Otsida võib ka küsimusena (nt „kui kaua makstakse haigushüvitist“).</p>
         <p>Linnuke „Ainult perearstiabi“ peidab teenused, mis ei kuulu perearsti fondidesse, kvaliteedisüsteemi ega perearstiabi peatükki (nt operatsioonid). Täpse koodi otsing näitab koodi alati.</p>
         <p>Rakendus töötab pärast esimest avamist ka võrguta. Telefonis lisa see avakuvale: iPhone'is Safari jagamismenüü → „Lisa avakuvale“, Androidis Chrome'i menüü → „Installi rakendus“.</p>
         <p>Andmed tulevad Riigi Teataja avalikust liidesest ja neid kontrollitakse automaatselt kord kuus. Õiguslikult kehtib alati Riigi Teatajas avaldatud tekst.</p>
@@ -641,10 +736,12 @@
     let h = '';
     for (const [k, s] of Object.entries(m.sources)) {
       const fut = (s.tulevased || []).map((f) => ` <a class="future" href="https://www.riigiteataja.ee/akt/${esc(f.id)}" target="_blank" rel="noopener">uus redaktsioon alates ${fmtDate(f.alates)}</a>`).join('');
-      h += `<div class="src"><span><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(SRC[k])}</a>${fut}</span><span>kehtib alates ${fmtDate(s.alates)}</span></div>`;
+      h += `<div class="src"><span><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(srcName(k))}</a>${fut}</span><span>kehtib alates ${fmtDate(s.alates)}</span></div>`;
     }
     if (m.toru) h += `<div class="src"><span>Toru (${esc(m.toru.file)})</span><span>seis ${fmtDate(m.toru.seisuga)}</span></div>`;
     if (m.synlab) h += `<div class="src"><span><a href="${esc(m.synlab.page)}" target="_blank" rel="noopener">SYNLABi hinnakiri</a></span><span>kehtib alates ${esc(m.synlab.seisuga || '')}</span></div>`;
+    const tm = m.teemad;
+    if (tm) h += `<div class="src"><span>Igapäevatöö reeglite tekstikontroll</span><span>${(tm.warn || []).length ? (tm.warn.length + ' märkust') : 'korras'}</span></div>`;
     const sv = d.items.filter((x) => x.t === 'v' && x.aasta);
     if (sv.length && m.soel) h += `<div class="src"><span><a href="${esc(m.soel.page)}" target="_blank" rel="noopener">Vähi sõeluuringud (terviseportaal)</a></span><span>${Math.max(...sv.map((x) => x.aasta))}. aasta sihtrühmad</span></div>`;
     h += `<div class="src"><span>Viimati kontrollitud</span><span>${fmtDate(m.date)}</span></div>`;
@@ -662,6 +759,7 @@
       + funds.map(fund).join('')
       + (c.q ? `<button class="chip kschip" data-filter="q" aria-pressed="${!state.fund && state.filter === 'q'}">Kvaliteedisüsteem<span class="n">${c.q - 1}</span></button>` : '')
       + (c.v ? `<button class="chip soelchip" data-filter="v" aria-pressed="${!state.fund && state.filter === 'v'}">Sõeluuringud<span class="n">${c.v}</span></button>` : '')
+      + (c.j ? `<button class="chip teemachip" data-filter="j" aria-pressed="${!state.fund && state.filter === 'j'}">Igapäevatöö reeglid<span class="n">${c.j}</span></button>` : '')
       + (c.b ? `<button class="chip labchip" data-filter="b" aria-pressed="${!state.fund && state.filter === 'b'}">Labor (SYNLAB)<span class="n">${c.b}</span></button>` : '')
       + [['a', 'Abivahendid', c.a]].map(cat).join('')
       + (c.m ? `<button class="chip mschip" data-filter="m" aria-pressed="${!state.fund && state.filter === 'm'}">Meditsiiniseadmed<span class="n">${c.m}</span></button>` : '')
