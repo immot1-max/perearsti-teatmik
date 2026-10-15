@@ -720,9 +720,29 @@
     } catch (e) { /* ignoreeri */ }
   }
 
+  // Avamiste loendur (Abacus, küpsisteta). Üks loendus brauseri seansi kohta; ainult avalikul lehel.
+  async function countViews() {
+    const el = $('#views');
+    if (!el || !navigator.onLine || !/github\.io$/.test(location.hostname)) return;
+    const base = 'https://abacus.jasoncameron.dev';
+    const path = '/perearsti-teatmik-immot1/avamised';
+    let counted = false;
+    try { counted = sessionStorage.getItem('teatmik-counted') === '1'; } catch (e) { /* ignoreeri */ }
+    try {
+      const r = await fetch(base + (counted ? '/get' : '/hit') + path, { cache: 'no-store' });
+      if (!r.ok) return;
+      const j = await r.json();
+      if (typeof j.value !== 'number' || j.value < 0) return;
+      try { sessionStorage.setItem('teatmik-counted', '1'); } catch (e) { /* ignoreeri */ }
+      el.textContent = `Lehte on avatud ${j.value.toLocaleString('et-EE')} korda (alates 15.10.2026).`;
+      el.hidden = false;
+    } catch (e) { /* võrguta või teenus maas: ei näita */ }
+  }
+
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
   bind();
   load();
+  countViews();
 })();
