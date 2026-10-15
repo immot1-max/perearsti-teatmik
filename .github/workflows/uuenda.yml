@@ -28,6 +28,7 @@ concurrency:
 jobs:
   kontroll:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
 
@@ -47,6 +48,8 @@ jobs:
 
       - name: Kontrolli ja ehita
         id: b
+        env:
+          PYTHONUNBUFFERED: "1"
         run: python build/build.py
 
       - name: Salvesta uued andmed

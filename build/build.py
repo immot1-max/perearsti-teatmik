@@ -52,7 +52,7 @@ def http_get(url, timeout=300, tries=6):
     host = urllib.parse.urlsplit(url).netloc
     last = None
     for i in range(tries):
-        wait = 0.6 - (time.time() - _last_call.get(host, 0))
+        wait = (1.5 if "riigiteataja" in host else 0.6) - (time.time() - _last_call.get(host, 0))
         if wait > 0:
             time.sleep(wait)
         _last_call[host] = time.time()
@@ -75,6 +75,21 @@ def http_get(url, timeout=300, tries=6):
 
 def api_json(path):
     return json.loads(http_get(API + path, timeout=60))
+
+
+def api_meta(akt_id, cache_dir):
+    """Redaktsiooni metaandmed. Kehtiva akti andmed hoitakse vahemälus kuni 20 päeva
+    (kehtetuks tunnistamisel tekib uus redaktsioon uue ID-ga), et Riigi Teatajat mitte koormata."""
+    p = os.path.join(cache_dir, f"{akt_id}.meta.json") if cache_dir else None
+    if p and os.path.exists(p) and time.time() - os.path.getmtime(p) < 20 * 86400:
+        with open(p, encoding="utf-8") as f:
+            return json.load(f)
+    meta = api_json(f"/akt/{akt_id}")
+    if p:
+        os.makedirs(cache_dir, exist_ok=True)
+        with open(p, "w", encoding="utf-8") as f:
+            json.dump(meta, f, ensure_ascii=False)
+    return meta
 
 
 def fetch_xml(akt_id, cache_dir):
@@ -106,7 +121,7 @@ def resolve_current(grupi_id, cache_dir, depth=0):
         raise RuntimeError("Liiga pikk asendusaktide ahel")
     red = api_json(f"/akt/{grupi_id}/redaktsioonid")
     kid = red["kehtivRedaktsioon"]
-    meta = api_json(f"/akt/{kid}")
+    meta = api_meta(kid, cache_dir)
     xml = fetch_xml(kid, cache_dir)
     body = re.sub(r"<metaandmed>.*?</metaandmed>", "", xml, flags=re.S)
     m = re.search(r"<oigusakt[^>]*>\s*(?:<aktinimi>.*?</aktinimi>)?\s*<muutmismarge>(.*?)</muutmismarge>", body, flags=re.S)
@@ -114,7 +129,7 @@ def resolve_current(grupi_id, cache_dir, depth=0):
         m and "Kehtetu" in m.group(1) and re.search(r"<sisu[^>]*/>", body))
     if is_repealed and m:
         new_id = re.search(r"<aktViide[^>]*>(\d+)</aktViide>", m.group(1)).group(1)
-        new_meta = api_json(f"/akt/{new_id}")
+        new_meta = api_meta(new_id, cache_dir)
         return resolve_current(new_meta["grupiId"], cache_dir, depth + 1)
     future = []
     for r in red["redaktsioonid"]:
@@ -930,6 +945,7 @@ def build(args):
     # 1. kehtivad redaktsioonid
     sources, xmls = {}, {}
     for key, cfg in sources_cfg.items():
+        print(f"[RT] {key}", flush=True)
         info, xml = resolve_current(cfg["grupiId"], cache)
         info["nimi"] = cfg["nimi"]
         if cfg.get("lyh"):
