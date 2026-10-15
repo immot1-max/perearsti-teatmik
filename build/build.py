@@ -20,6 +20,8 @@ import os
 import re
 import sys
 import time
+import urllib.error
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 
@@ -41,13 +43,30 @@ FUND_NAMES = {"f37": "Uuringufond", "lisaks": "Tegevusfond", "f13": "Teraapiafon
 
 # ----------------------------------------------------------------- võrk
 
-def http_get(url, timeout=300, tries=4):
+_last_call = {}
+
+
+def http_get(url, timeout=300, tries=6):
+    """GET koos ettevaatliku tempoga: sama hosti päringute vahel vähemalt 0,6 s;
+    vastuse 429 (liiga palju päringuid) korral oodatakse Retry-After või kasvava pausi võrra."""
+    host = urllib.parse.urlsplit(url).netloc
     last = None
     for i in range(tries):
+        wait = 0.6 - (time.time() - _last_call.get(host, 0))
+        if wait > 0:
+            time.sleep(wait)
+        _last_call[host] = time.time()
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "perearsti-teatmik/1 (+github pages)"})
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 return r.read()
+        except urllib.error.HTTPError as e:
+            last = e
+            if e.code == 404:
+                break
+            ra = e.headers.get("Retry-After") if e.headers else None
+            pause = int(ra) if ra and ra.isdigit() else (20 * (i + 1) if e.code == 429 else 3 * (i + 1))
+            time.sleep(min(pause, 120))
         except Exception as e:  # noqa: BLE001
             last = e
             time.sleep(3 * (i + 1))
