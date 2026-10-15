@@ -6,6 +6,7 @@
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const eur = new Intl.NumberFormat('et-EE', { style: 'currency', currency: 'EUR' });
   const fmtEur = (v) => (v == null ? '' : eur.format(v));
+  const fmtNum = (v) => (v == null ? '' : v.toLocaleString('et-EE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
   const fmtDate = (iso) => (iso ? iso.split('-').reverse().join('.') : '');
   const norm = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9%.]+/g, ' ').replace(/(^|\s)\.+|\.+(\s|$)/g, ' ').trim();
@@ -15,6 +16,7 @@
     metoodika: 'Metoodika',
     abivahendid: 'Abivahendite määrus',
     mootorsoidukijuht: 'Mootorsõidukijuhi tervisenõuded',
+    meditsiiniseadmed: 'Meditsiiniseadmete loetelu',
     toru: 'Toru',
   };
   const FUND_SHORT = { f37: 'Uuringufond 37%', f13: 'Teraapiafond 13%', lisaks: 'Tegevusfond' };
@@ -48,7 +50,7 @@
 
   let paPref = true;
   try { paPref = localStorage.getItem('teatmik-pa') !== '0'; } catch (e) { /* ignoreeri */ }
-  const state = { data: null, idx: [], filter: 'all', fund: null, q: '', open: new Set(), limit: 60, focus: null, pa: paPref, labsAll: new Set() };
+  const state = { data: null, idx: [], filter: 'all', fund: null, q: '', open: new Set(), limit: 60, focus: null, pa: paPref, labsAll: new Set(), msAll: new Set() };
   const el = {};
 
   // ------------------------------------------------------------ andmed
@@ -92,6 +94,7 @@
       else if (it.t === 'f') cls = it.k;
       else if (it.t === 'q') cls = 'ks';
       else if (it.t === 'b') cls = 'lab';
+      else if (it.t === 'm') cls = 'ms';
       it._cls = cls;
       let name = it.n || '';
       let ctx = '', txt = '', code = '';
@@ -118,6 +121,11 @@
         boost += 40;
       } else if (it.t === 'k') {
         txt = it.d || '';
+      } else if (it.t === 'm') {
+        code = norm(it.c || '');
+        ctx = (it.subs || []).map((x) => x[0]).join(' ') + ' meditsiiniseade';
+        txt = (it.b || []).map((b) => b.s || '').join(' ') + ' ' + (it.pr || []).map((x) => `${x[0]} ${x[1]}`).join(' ');
+        boost += 20;
       } else if (it.t === 'b') {
         ctx = `${it.cat || ''} ${(it.c || []).map((x) => x[0]).join(' ')} ${it.mat || ''}`;
         boost += it.f ? 25 : 15;
@@ -162,6 +170,7 @@
     if (state.filter === 'l') return t === 'l' || t === 'f';
     if (state.filter === 'q') return t === 'q';
     if (state.filter === 'b') return t === 'b';
+    if (state.filter === 'm') return t === 'm';
     return t === state.filter;
   }
 
@@ -259,11 +268,12 @@
       if (q && (state.fund || state.filter !== 'all')) html += '<button class="btn solid" data-act="all">Otsi kõigist kategooriatest</button>';
     } else {
       html += '<div class="list">';
-      const grouped = !q && (state.fund || state.filter === 'a' || state.filter === 'l' || state.filter === 'q' || state.filter === 'b' || state.filter === 's');
+      const grouped = !q && (state.fund || state.filter === 'a' || state.filter === 'l' || state.filter === 'q' || state.filter === 'b' || state.filter === 's' || state.filter === 'm');
+      if (!q && state.filter === 'm') shown.sort((a, b) => a.it.n.localeCompare(b.it.n, 'et'));
       let lastG = null;
       for (const x of shown) {
         if (grouped) {
-          const g = x.it.t === 'a' ? (x.it.g || [])[0] || x.it.n : x.it.t === 'l' ? SRC[x.it.src] : x.it.t === 'f' ? 'Fondid' : x.it.t === 'q' ? KS_CAT[x.it.cat] : x.it.t === 'b' ? x.it.cat : x.it.pt || (x.it.tp && x.it.tp.hk) || SRC[x.it.src];
+          const g = x.it.t === 'm' ? 'Tervisekassa meditsiiniseadmed' : x.it.t === 'a' ? (x.it.g || [])[0] || x.it.n : x.it.t === 'l' ? SRC[x.it.src] : x.it.t === 'f' ? 'Fondid' : x.it.t === 'q' ? KS_CAT[x.it.cat] : x.it.t === 'b' ? x.it.cat : x.it.pt || (x.it.tp && x.it.tp.hk) || SRC[x.it.src];
           if (g !== lastG) { html += `<div class="group-h">${esc(g)}</div>`; lastG = g; }
         }
         html += row(x.it, x.via);
@@ -284,7 +294,11 @@
       return `<article class="row ${it.k}"><button class="head" data-fund="${it.k}"><span class="name">${esc(it.n)}</span><span class="price">${it.cnt} <small>teenust</small></span><span class="meta"><span class="badge ${it.k}">${esc(FUND_SHORT[it.k] || it.k)}</span>metoodika ${esc(it.par)} · ava loetelu</span></button></article>`;
     }
     let head = '';
-    if (it.t === 'b') {
+    if (it.t === 'm') {
+      const pct = (it.pct || []).map((x) => x + '%').join(' / ');
+      head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${esc(pct)}</small></span>
+        <span class="meta">${it.c ? `<span class="code" data-copy="${esc(it.c)}" title="Kopeeri rühma kood">${esc(it.c)}</span>` : ''}<span class="badge msb">meditsiiniseade</span><span>${esc(it.par || '')} · ${(it.pr || []).length} toodet</span>${via ? '<span class="via">· vaste tingimustes või toodetes</span>' : ''}</span>`;
+    } else if (it.t === 'b') {
       const fund = (it.f || []).map((f) => `<span class="badge ${f}">${esc(FUND_SHORT[f] || f)}</span>`).join('') || '<span class="badge no">ei ole perearsti fondis</span>';
       const ks = (it.ks || []).map((k) => state.qByKey[k]).filter(Boolean).map((qq) => `<span class="badge ks" data-focus="${qq._id}">${esc(ksPrefix(qq))}: ${esc(qq.sn)}</span>`).join('');
       const codes = (it.c || []).map(([c, x]) => `<span class="code" data-copy="${esc(c)}" title="Kopeeri TK kood">${esc(c)}${x > 1 ? ' ×' + x : ''}</span>`).join('');
@@ -389,6 +403,31 @@
       h += `<div class="actions">${ab.lisaUrl ? `<a href="${esc(ab.lisaUrl)}" target="_blank" rel="noopener">Abivahendite loetelu (PDF) ↗</a>` : ''}<a href="https://sotsiaalkindlustusamet.ee/abivahendite-otsimootor" target="_blank" rel="noopener">SKA otsimootor ↗</a><button class="btn" data-goto="abivahendid:§ 2¹">Tõendi andmed (§ 2¹)</button></div>`;
       return h;
     }
+    if (it.t === 'm') {
+      const ms = d.meta.sources.meditsiiniseadmed || {};
+      let h = '<dl class="kv">';
+      if (it.c) h += `<div><dt>Rühma kood</dt><dd><button class="code" data-copy="${esc(it.c)}">${esc(it.c)}</button> (meditsiiniseadme kaardil)</dd></div>`;
+      h += `<div><dt>Väljakirjutamine</dt><dd>Meditsiiniseadme kaart retseptikeskuses. Välja kirjutada võib Terviseametis registreeritud arst (määruse § 64 lg 2), kui tingimused on täidetud.</dd></div>`;
+      h += `<div><dt>Hüvitis</dt><dd>${(it.pct || []).map((x) => x + '%').join(' / ')} Tervisekassa piirhinnast; omaosalus on vahe piirhinna (või odavama jaemüügihinna) ja hüvitise vahel (§ 3).</dd></div>`;
+      h += '</dl>';
+      if (it.b && it.b.length) {
+        h += `<div class="rules"><h4>Tingimused (${esc(it.par || '')})</h4><div class="text">` + it.b.map((b) => (b.t === 'p' ? `<p>${hl(b.s, re)}</p>` : b.t === 'li' ? `<p class="li">${hl(b.s, re)}</p>` : '')).join('') + '</div></div>';
+      }
+      h += '<h4>Alarühmad</h4><div class="tbl"><table><tr><td>Alarühm</td><td>Tooteid</td><td>TK piirhind</td><td>%</td></tr>'
+        + (it.subs || []).map(([n, cnt, mn, mx, pc]) => `<tr><td>${hl(n, re)}</td><td class="num">${cnt}</td><td class="num">${mn == null ? '' : mn === mx ? fmtEur(mn) : fmtNum(mn) + '–' + fmtEur(mx)}</td><td class="num">${(pc || []).join('/')}</td></tr>`).join('') + '</table></div>';
+      const all = state.msAll.has(it._id);
+      const reNG = state.hl ? new RegExp(state.hl.source, 'i') : null;
+      const tokens = reNG ? (it.pr || []).filter((x) => reNG.test(x[1]) || reNG.test(x[0])) : [];
+      const prs = all ? it.pr : tokens.slice(0, 40);
+      if (prs.length) {
+        h += `<h4>${all ? 'Tooted' : 'Otsingule vastavad tooted'} (${prs.length})</h4><div class="tbl"><table><tr><td>Kood</td><td>Toode</td><td>Pakendi piirhind</td><td>TK piirhind</td><td>%</td></tr>`
+          + prs.map((x) => `<tr><td><span class="code">${esc(x[0])}</span></td><td>${hl(x[1], re)}<br><small class="inh">${esc((it.subs[x[2]] || [])[0] || '')}</small></td><td class="num">${x[3] != null ? fmtEur(x[3]) : ''}</td><td class="num">${x[4] != null ? fmtEur(x[4]) : ''}</td><td class="num">${x[5] ?? ''}</td></tr>`).join('') + '</table></div>';
+      }
+      h += '<div class="actions">' + (all ? '' : `<button class="btn" data-ms-all="${it._id}">Näita kõiki tooteid (${(it.pr || []).length})</button>`)
+        + (it.url ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">Määrus ${esc(it.par)} ↗</a>` : '')
+        + (ms.lisaUrl ? `<a href="${esc(ms.lisaUrl)}" target="_blank" rel="noopener">Meditsiiniseadmete loetelu (PDF) ↗</a>` : '') + '</div>';
+      return h;
+    }
     if (it.t === 'b') {
       let h = '<dl class="kv">';
       if (it.ab) h += `<div><dt>Lühend</dt><dd>${esc(it.ab)}</dd></div>`;
@@ -473,11 +512,12 @@
       ['juhi', 'mootorsoidukijuht', '§ 3', 'Juhi tervisenõuded, 1. grupp', 'ja § 4 vastunäidustused'],
       ['juhi', 'mootorsoidukijuht', '§ 5', 'Juhi tervisenõuded, 2. grupp', 'ja § 6 vastunäidustused'],
       ['juhi', 'mootorsoidukijuht', '§ 10', 'Tervisetõendi vormistamine', 'Väljastamine ja kehtivus'],
+      ['msq', 'meditsiiniseadmed', '§ 64', 'Meditsiiniseadme kaart', 'Kes kirjutab ja kuidas hüvitatakse'],
     ].map(([cls, src, par, t, sub]) => {
       const it = q(src, par);
       return it ? `<button class="qbtn ${cls}" data-focus="${it._id}"><b>${esc(t)}</b><small>${esc(SRC[src])} ${esc(par)} · ${esc(sub)}</small></button>` : '';
     }).join('');
-    const ex = ['holter', 'IGRA', 'HCV', 'TSH', '7115', 'hüpertoonia', 'ratastool', 'juhiload'];
+    const ex = ['holter', 'IGRA', 'HCV', 'jalaortoos', '7115', 'hüpertoonia', 'ratastool', 'juhiload'];
     const ksCards = d.items.filter((x) => x.t === 'q').sort((a, b) => KS_ORDER.indexOf(a.cat) - KS_ORDER.indexOf(b.cat))
       .map((x) => `<button class="qbtn ks" data-focus="${x._id}"><b>${esc(x.k === 'ylevaade' ? 'Ülevaade ja lisatasud' : x.sn)}</b><small>${esc(KS_CAT[x.cat])}${ksValue(x) ? ' · ' + esc(ksValue(x)) : ''} · ${esc(x.par)}</small></button>`).join('');
     el.results.innerHTML = `
@@ -485,12 +525,12 @@
         ${funds.map((f) => `<button class="fund ${f.k}" data-fund="${f.k}"><strong>${esc(f.n)}</strong><span>${esc(FUND_HELP[f.k] || '')}</span><span class="cnt">${f.cnt} teenust · ${esc(f.par)}</span></button>`).join('')}
       </div></section>
       <section class="section"><h2>Kvaliteedisüsteem (metoodika § 8)</h2><div class="quick">${ksCards}</div></section>
-      <section class="section"><h2>Kiirvalikud</h2><div class="quick">${quick}</div></section>
+      <section class="section"><h2>Kiirvalikud</h2><div class="quick">${quick}<button class="qbtn msq" data-filter="m"><b>Meditsiiniseadmed (9MS)</b><small>${d.meta.counts.m || 0} rühma · ortoosid, testribad, sensorid, kompressioontooted jm</small></button></div></section>
       <section class="section"><h2>Proovi otsida</h2><div class="examples">${ex.map((w) => `<button class="chip" data-q="${esc(w)}">${esc(w)}</button>`).join('')}</div></section>
       <section class="section"><h2>Andmete seis</h2><div class="status" id="status"></div></section>
       <section class="section"><h2>Värvid</h2><div class="legend">
         <span><i style="--k:var(--c-f37)"></i>uuringufond 37%</span><span><i style="--k:var(--c-lisaks)"></i>tegevusfond</span><span><i style="--k:var(--c-f13)"></i>teraapiafond 13%</span>
-        <span><i style="--k:var(--c-teenus)"></i>muu teenus</span><span><i style="--k:var(--c-abiv)"></i>abivahend</span><span><i style="--k:var(--c-sate)"></i>säte</span><span><i style="--k:var(--c-juhi)"></i>juhi tervisenõuded</span><span><i style="--k:var(--c-ks)"></i>kvaliteedisüsteem</span><span><i style="--k:var(--c-lab)"></i>SYNLABi analüüs</span>
+        <span><i style="--k:var(--c-teenus)"></i>muu teenus</span><span><i style="--k:var(--c-abiv)"></i>abivahend</span><span><i style="--k:var(--c-sate)"></i>säte</span><span><i style="--k:var(--c-juhi)"></i>juhi tervisenõuded</span><span><i style="--k:var(--c-ks)"></i>kvaliteedisüsteem</span><span><i style="--k:var(--c-lab)"></i>SYNLABi analüüs</span><span><i style="--k:var(--c-ms)"></i>meditsiiniseade</span>
       </div></section>
       <section class="section info"><h2>Kasutamine</h2>
         <p>Otsi nimetuse, koodi, lühendi või argisõnaga (nt „holter“, „TSH“, „6417“). Täpitähti pole vaja. Koodil klõpsates kopeerub see.</p>
@@ -531,7 +571,9 @@
       + funds.map(fund).join('')
       + (c.q ? `<button class="chip kschip" data-filter="q" aria-pressed="${!state.fund && state.filter === 'q'}">Kvaliteedisüsteem<span class="n">${c.q - 1}</span></button>` : '')
       + (c.b ? `<button class="chip labchip" data-filter="b" aria-pressed="${!state.fund && state.filter === 'b'}">Labor (SYNLAB)<span class="n">${c.b}</span></button>` : '')
-      + [['a', 'Abivahendid', c.a], ['l', 'Sätted', c.l + c.f], ['k', 'Lingid', c.k]].map(cat).join('')
+      + [['a', 'Abivahendid', c.a]].map(cat).join('')
+      + (c.m ? `<button class="chip mschip" data-filter="m" aria-pressed="${!state.fund && state.filter === 'm'}">Meditsiiniseadmed<span class="n">${c.m}</span></button>` : '')
+      + [['l', 'Sätted', c.l + c.f], ['k', 'Lingid', c.k]].map(cat).join('')
       + `<label class="chip pa-toggle" title="Väljas: kõik teenused, ka operatsioonid ja haiglateenused"><input type="checkbox" id="pa" ${state.pa ? 'checked' : ''}> Ainult perearstiabi</label>`;
   }
 
@@ -595,7 +637,7 @@
       if (e.key === '/' && document.activeElement !== el.q) { e.preventDefault(); el.q.focus(); el.q.select(); }
     });
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('[data-copy],[data-open],[data-fund],[data-filter],[data-q],[data-focus],[data-goto],[data-act],[data-labs-all]');
+      const t = e.target.closest('[data-copy],[data-open],[data-fund],[data-filter],[data-q],[data-focus],[data-goto],[data-act],[data-labs-all],[data-ms-all]');
       if (!t || !state.data) return;
       if (t.dataset.copy) { e.stopPropagation(); e.preventDefault(); copy(t.dataset.copy); return; }
       if (t.dataset.open) {
@@ -614,6 +656,12 @@
         const [src, par] = t.dataset.goto.split(':');
         const it = state.data.items.find((x) => x.t === 'l' && x.src === src && x.par === par);
         if (it) { state.focus = it._id; route(); window.scrollTo(0, 0); }
+        return;
+      }
+      if (t.dataset.msAll) {
+        state.msAll.add(+t.dataset.msAll);
+        const art = t.closest('article');
+        art.outerHTML = row(state.data.items[+t.dataset.msAll]);
         return;
       }
       if (t.dataset.labsAll) {

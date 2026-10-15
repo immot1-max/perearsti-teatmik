@@ -5,6 +5,7 @@
 - Tasu maksmise kohustuse ülevõtmise kord ja tasu arvutamise metoodika: [116062026009](https://www.riigiteataja.ee/akt/116062026009) kehtib alates 01.07.2026; tulevikus jõustub: [116062026010](https://www.riigiteataja.ee/akt/116062026010) alates 01.01.2027
 - Abivahendite loetelu, tõendi ja kaardi andmed: [126092026005](https://www.riigiteataja.ee/akt/126092026005) kehtib alates 01.10.2026
 - Mootorsõidukijuhi tervisekontroll ja tervisenõuded: [114072020021](https://www.riigiteataja.ee/akt/114072020021) kehtib alates 17.07.2020
+- Tervisekassa meditsiiniseadmete loetelu: [126062026020](https://www.riigiteataja.ee/akt/126062026020) kehtib alates 01.07.2026
 - SYNLABi hinnakiri: 949 analüüsi, SYNLAB Eesti OÜ analüüside hinnakiri ja koondtabel tervishoiuteenuse pakkujale (al 01.04.2026) - SYNLAB Eesti
 - Toru: toru_2026jul.xlsx (viimane muudatus 01.07.2026), hinnaerinevusi loeteluga: 3
 
@@ -12,4 +13,4 @@
 ## Abivahendid: 0 muudetud, 0 uut, 0 eemaldatud
 
 
-Kokku: 2644 teenust, 949 SYNLABi analüüsi, 326 abivahendit, 36 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 12 linki.
+Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 42 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 13 linki.

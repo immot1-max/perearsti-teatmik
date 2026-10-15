@@ -13,6 +13,7 @@ Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, abivahendite
 | Abivahendite loetelu, tõendi ja kaardi andmed | Määruse tekst ja lisa (abivahendite loetelu) |
 | Mootorsõidukijuhi tervisekontroll ja tervisenõuded | Kogu määruse tekst |
 | Metoodika § 8 ja Tervisekassa kvaliteedisüsteemi leht | Kvaliteedisüsteemi kriteeriumid, koodid, punktid ja lisapädevuste koodiloetelud; Tervisekassa uusimad juhendid |
+| Tervisekassa meditsiiniseadmete loetelu (tervise- ja tööministri määrus nr 86) | 64 rühma: hüvitamise tingimused (§ 4–63⁴), alarühmad ja tooted koos piirhindadega; rühmakoodid 9MS failist `build/ms_ryhmakoodid.json` |
 | SYNLABi hinnakiri (tervishoiuteenuse pakkujale) | Analüüsi nimi, lühend, Tervisekassa kood ja hind; analüüsilt koodini ja koodilt analüüsideni |
 | Toru (Tervisekassa) | Hinna kehtivuse algus, eelmine hind, koodid, mida loetelu tabelites ei ole |
 | Sotsiaalkindlustusamet | Lingid juhenditele ja vormidele |

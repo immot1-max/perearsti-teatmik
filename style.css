@@ -22,6 +22,7 @@
   --c-link: #5d6963;
   --c-ks: #a3195b;
   --c-lab: #3d5a9e;
+  --c-ms: #5f7a1e;
 
   --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -35,7 +36,7 @@
     --bg: #0f1513; --surface: #161e1b; --surface-2: #1e2824; --ink: #e5ece8; --muted: #9aa8a0; --line: #2b3732;
     --accent: #8fc0dc; --accent-ink: #0f1513; --mark: #6b5310; --warn-bg: #3a2c0c; --warn-ink: #f3cf85;
     --c-f37: #6cc48c; --c-lisaks: #e3a646; --c-f13: #b39be8; --c-teenus: #7fb3d1; --c-abiv: #4fc7c2;
-    --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0;
+    --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a;
     color-scheme: dark;
   }
 }
@@ -43,7 +44,7 @@
   --bg: #0f1513; --surface: #161e1b; --surface-2: #1e2824; --ink: #e5ece8; --muted: #9aa8a0; --line: #2b3732;
   --accent: #8fc0dc; --accent-ink: #0f1513; --mark: #6b5310; --warn-bg: #3a2c0c; --warn-ink: #f3cf85;
   --c-f37: #6cc48c; --c-lisaks: #e3a646; --c-f13: #b39be8; --c-teenus: #7fb3d1; --c-abiv: #4fc7c2;
-  --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0;
+  --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a;
   color-scheme: dark;
 }
 
@@ -85,6 +86,11 @@ button { font: inherit; color: inherit; }
 .foot .wrap { padding-block: 14px 28px; display: grid; gap: 4px; }
 .foot p { margin: 0; max-width: 80ch; }
 .row.lab { --stripe: var(--c-lab); }
+.row.ms { --stripe: var(--c-ms); }
+.badge.msb { color: var(--c-ms); }
+.chip.mschip { border-color: var(--c-ms); color: var(--c-ms); }
+.chip.mschip[aria-pressed="true"] { background: var(--c-ms); color: var(--surface); }
+.qbtn.msq { border-left: 4px solid var(--c-ms); }
 .badge.no { color: var(--muted); border-style: dashed; }
 .chip.labchip { border-color: var(--c-lab); color: var(--c-lab); }
 .chip.labchip[aria-pressed="true"] { background: var(--c-lab); color: var(--surface); }

@@ -14,5 +14,9 @@
   "mootorsoidukijuht": {
     "nimi": "Mootorsõidukijuhi tervisekontroll ja tervisenõuded",
     "grupiId": 1001109
+  },
+  "meditsiiniseadmed": {
+    "nimi": "Tervisekassa meditsiiniseadmete loetelu",
+    "grupiId": 1055346
   }
 }

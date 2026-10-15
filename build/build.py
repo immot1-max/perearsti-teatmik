@@ -496,6 +496,59 @@ def synlab_labs(prev):
     return out, {"page": SYNLAB_PAGE, "seisuga": m.group(1) if m else None, "title": title, "count": len(out)}
 
 
+# ----------------------------------------------------------------- meditsiiniseadmed
+
+def lisa_pdf(xml, pattern=r"lisa"):
+    m = re.search(r'<fail[^>]*failNimi="([^"]*' + pattern + r'[^"]*\.pdf)"[^>]*>([A-Za-z0-9+/=\s]+)</fail>', xml, re.I)
+    if not m:
+        return None, None
+    return m.group(1), pdfplumber.open(io.BytesIO(base64.b64decode(re.sub(r"\s", "", m.group(2)))))
+
+
+def parse_meditsiiniseadmed(xml, src, codes_map):
+    pars, _ = walk_act(xml)
+    lisa_name, pdf = lisa_pdf(xml)
+    products = []
+    if pdf:
+        for page in pdf.pages:
+            for tb in page.extract_tables():
+                for r in tb:
+                    r = [re.sub(r"\s+", " ", (c or "")).strip() for c in r]
+                    if len(r) >= 7 and re.fullmatch(r"\d{7}", r[2]):
+                        products.append(r[:7])
+    nmap = {norm_ascii(k): v for k, v in codes_map.items() if not k.startswith("_")}
+    groups = {}
+    for r in products:
+        groups.setdefault(r[0], []).append(r)
+    items, unmapped = [], []
+    group_pars = [p for p in pars if p["pealkiri"].strip() and not re.match(r"(Üldsätted|Tervisekassa poolt tasu|Kindlustatud isiku omaosaluse|Tasu maksmise kohustuse ülevõtmise kord|Määruse)", p["pealkiri"])]
+    for gname, rows in groups.items():
+        gn = norm_ascii(gname)
+        par = next((p for p in group_pars if norm_ascii(p["pealkiri"].strip()) == gn), None) or \
+            next((p for p in group_pars if gn.startswith(norm_ascii(p["pealkiri"].strip()))), None)
+        code = nmap.get(gn)
+        if not code:
+            unmapped.append(gname)
+        subs, pr = [], []
+        for r in rows:
+            if r[1] not in subs:
+                subs.append(r[1])
+            pr.append([r[2], r[3], subs.index(r[1]), parse_price(r[4]), parse_price(r[5]), int(r[6]) if r[6].isdigit() else None])
+        sub_info = []
+        for i, sname in enumerate(subs):
+            sp = [x for x in pr if x[2] == i]
+            tkp = [x[4] for x in sp if x[4] is not None]
+            sub_info.append([sname, len(sp), min(tkp) if tkp else None, max(tkp) if tkp else None, sorted({x[5] for x in sp if x[5] is not None})])
+        pcts = sorted({x[5] for x in pr if x[5] is not None})
+        item = {"t": "m", "n": gname, "c": code, "subs": sub_info, "pr": pr, "pct": pcts}
+        if par:
+            sate = make_sate("meditsiiniseadmed", src, par)
+            item.update({"par": par["nr"], "url": sate["url"], "b": sate["b"]})
+        items.append(item)
+    general = [make_sate("meditsiiniseadmed", src, p) for p in pars if p not in group_pars]
+    return items, general, lisa_name, unmapped
+
+
 # ----------------------------------------------------------------- ehitus
 
 def make_sate(src_key, src, par, kind="säte"):
@@ -544,7 +597,7 @@ def build(args):
 
     toru_dir = os.path.join(HERE, "toru")
     aux_hash = hashlib.sha256()
-    for fn in ["synonyms.json", "links.json", "build.py", "ks_notes.json"]:
+    for fn in ["synonyms.json", "links.json", "build.py", "ks_notes.json", "ms_ryhmakoodid.json"]:
         with open(os.path.join(HERE, fn), "rb") as f:
             aux_hash.update(f.read())
     toru_loaded = load_toru_rows(toru_dir)  # xlsx olemasolul uuendab väljavõtet
@@ -754,6 +807,18 @@ def build(args):
     abiv["lisaUrl"] = aktilisa_url(abiv["id"], lisa_name) if lisa_name else None
     items.extend(ab_items)
 
+    # 6b. meditsiiniseadmed
+    ms_unmapped = []
+    if "meditsiiniseadmed" in sources:
+        msrc = sources["meditsiiniseadmed"]
+        with open(os.path.join(HERE, "ms_ryhmakoodid.json"), encoding="utf-8") as f:
+            ms_codes = json.load(f)
+        ms_items, ms_general, ms_lisa, ms_unmapped = parse_meditsiiniseadmed(xmls["meditsiiniseadmed"], msrc, ms_codes)
+        msrc["lisa"] = ms_lisa
+        msrc["lisaUrl"] = aktilisa_url(msrc["id"], ms_lisa) if ms_lisa else None
+        items.extend(ms_items)
+        items.extend(ms_general)
+
     # 7. mootorsõidukijuht
     mj = sources["mootorsoidukijuht"]
     mj_pars, _ = walk_act(xmls["mootorsoidukijuht"])
@@ -780,6 +845,9 @@ def build(args):
         elif k.startswith("sate:"):
             src_key, nr = k[5:].split(":", 1)
             targets = [x for x in items if x["t"] == "l" and x["src"] == src_key and x["par"] == nr]
+        elif k.startswith("ms:"):
+            key = norm_ascii(k[3:])
+            targets = [x for x in items if x["t"] == "m" and (norm_ascii(x["n"]) == key or (x.get("c") or "").lower() == key)]
         elif k.startswith("lab:"):
             targets = [x for x in items if x["t"] == "b" and (x.get("ab") or "").lower() == k[4:].lower()]
         elif k.startswith("link:"):
@@ -799,7 +867,8 @@ def build(args):
         "toru": toru_meta,
         "abivCols": ab_cols,
         "starRule": star_rule,
-        "counts": {t: sum(1 for x in items if x["t"] == t) for t in ["s", "f", "l", "a", "k", "q", "b"]},
+        "counts": {t: sum(1 for x in items if x["t"] == t) for t in ["s", "f", "l", "a", "k", "q", "b", "m"]},
+        "msUnmapped": ms_unmapped,
         "countsPa": sum(1 for x in items if x["t"] == "s" and x.get("pa")),
         "synlab": synlab_meta,
         "tk": tk,
@@ -1051,6 +1120,10 @@ def make_report(prev, data, missing):
         lines.append(f"## NB: Tervisekassa on avaldanud kvaliteedisüsteemi {newest}. aasta juhendid")
         lines.append(f"Märkused failis build/ks_notes.json põhinevad {kn['aasta']}. aasta juhenditel; vaata need üle.")
         lines.append("")
+    if data["meta"].get("msUnmapped"):
+        lines.append("## Meditsiiniseadme rühmad, millel puudub 9MS kood")
+        lines.append(", ".join(data["meta"]["msUnmapped"]) + " (lisa kood faili build/ms_ryhmakoodid.json)")
+        lines.append("")
     if unknown:
         lines.append("## Uued kvaliteedisüsteemi jaotised metoodika § 8-s (märkused puuduvad)")
         lines.append(", ".join(unknown))
@@ -1069,7 +1142,7 @@ def make_report(prev, data, missing):
         lines.append(", ".join(missing))
     c = data["meta"]["counts"]
     lines.append("")
-    lines.append(f"Kokku: {c['s']} teenust, {c.get('b', 0)} SYNLABi analüüsi, {c['a']} abivahendit, {c['l']} sätet, {c['f']} fondi, {c.get('q', 0)} kvaliteedisüsteemi jaotist, {c['k']} linki.")
+    lines.append(f"Kokku: {c['s']} teenust, {c.get('m', 0)} meditsiiniseadmete rühma, {c.get('b', 0)} SYNLABi analüüsi, {c['a']} abivahendit, {c['l']} sätet, {c['f']} fondi, {c.get('q', 0)} kvaliteedisüsteemi jaotist, {c['k']} linki.")
     return "\n".join(lines) + "\n"
 
 
