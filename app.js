@@ -579,9 +579,36 @@
 
   // ------------------------------------------------------------ sündmused
   let deferredInstall = null;
+  const isStandalone = () => {
+    try { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; } catch (e) { return false; }
+  };
+  function installSteps() {
+    const ua = navigator.userAgent || '';
+    if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && 'ontouchend' in document)) {
+      return 'iPhone/iPad: ava leht <b>Safaris</b>, vajuta jagamisnuppu (ruut noolega) ja vali <b>„Lisa avakuvale“</b> (Add to Home Screen).';
+    }
+    if (/Android/.test(ua)) {
+      return 'Android: ava Chrome\'i menüü <b>⋮</b> (paremal üleval) ja vali <b>„Installi rakendus“</b> või <b>„Lisa avakuvale“</b>. Kui seda valikut pole, võib rakendus olla juba paigaldatud: otsi rakenduste loendist „Teatmik“.';
+    }
+    return 'Arvutis: Chrome\'is või Edge\'is vajuta aadressiriba paremas otsas paigaldusikooni või ava menüü ja vali <b>„Installi Perearsti teatmik“</b>.';
+  }
   function renderInstall() {
+    const btn = $('#install');
+    if (btn) btn.hidden = isStandalone();
     const slot = $('#install-slot');
-    if (slot && deferredInstall) slot.innerHTML = '<button class="btn solid" data-act="install">Paigalda rakendusena</button>';
+    if (slot) slot.innerHTML = isStandalone() ? 'Rakendus on sellesse seadmesse paigaldatud.' : `<button class="btn solid" data-act="install">Paigalda rakendusena</button>`;
+  }
+  async function doInstall() {
+    const help = $('#install-help');
+    if (deferredInstall) {
+      deferredInstall.prompt();
+      try { await deferredInstall.userChoice; } catch (e) { /* ignoreeri */ }
+      deferredInstall = null;
+      renderInstall();
+      return;
+    }
+    help.innerHTML = `${installSteps()} <button class="clear-help" data-act="install-close" aria-label="Sulge">×</button>`;
+    help.hidden = !help.hidden;
   }
 
   let toastTimer;
@@ -675,7 +702,8 @@
       if (t.dataset.act === 'home') { goHome(); return; }
       if (t.dataset.act === 'all') { state.fund = null; state.filter = 'all'; state.limit = 60; renderChips(); route(); return; }
       if (t.dataset.act === 'more') { state.limit += 60; route(); return; }
-      if (t.dataset.act === 'install' && deferredInstall) { deferredInstall.prompt(); deferredInstall = null; renderInstall(); }
+      if (t.dataset.act === 'install') { doInstall(); return; }
+      if (t.dataset.act === 'install-close') { $('#install-help').hidden = true; return; }
     });
     const net = $('#net');
     const upd = () => { net.textContent = navigator.onLine ? 'võrgus' : 'võrguta'; net.classList.toggle('off', !navigator.onLine); };
@@ -683,6 +711,9 @@
     window.addEventListener('offline', upd);
     upd();
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstall = e; renderInstall(); });
+    window.addEventListener('appinstalled', () => { deferredInstall = null; renderInstall(); toast('Rakendus paigaldati'); });
+    $('#install').addEventListener('click', doInstall);
+    renderInstall();
     try {
       const q0 = new URLSearchParams(location.search).get('q');
       if (q0) { el.q.value = q0; state.q = q0; }
