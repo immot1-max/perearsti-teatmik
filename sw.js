@@ -1,6 +1,9 @@
 /* Võrguta töö: rakenduse kest ja andmed vahemällu.
-   Kest: kiire vastus vahemälust, taustal uuendus. Andmed: vahemälust; app.js kontrollib version.json kaudu uut versiooni. */
-const SHELL = 'teatmik-shell-v7';
+   Kest: võrgust (uusim versioon), võrguta või aeglase võrgu korral vahemälust.
+   Andmed: vahemälust; app.js kontrollib version.json kaudu uut versiooni.
+   Uue versiooni aktiveerimisel laaditakse avatud aknad automaatselt uuesti. */
+const SHELL = 'teatmik-shell-v8';
+const NET_TIMEOUT = 3500;
 const DATA = 'teatmik-data-v1';
 const ASSETS = ['./', 'index.html', 'app.js', 'style.css', 'fonts.css', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
   'fonts/ibm-plex-mono-latin-400-normal.woff2',
@@ -29,8 +32,16 @@ self.addEventListener('install', (e) => {
 self.addEventListener('activate', (e) => {
   e.waitUntil((async () => {
     const keep = [SHELL, DATA];
-    for (const k of await caches.keys()) if (!keep.includes(k)) await caches.delete(k);
+    let hadOld = false;
+    for (const k of await caches.keys()) {
+      if (!keep.includes(k)) { await caches.delete(k); if (k.startsWith('teatmik-shell')) hadOld = true; }
+    }
     await self.clients.claim();
+    if (hadOld) {
+      // Ei oota navigeerimise lõppu: aktiveerimine peab enne lõppema, muidu jääks navigeerimise päring ootama.
+      const wins = await self.clients.matchAll({ type: 'window' });
+      for (const w of wins) w.navigate(w.url).catch(() => {});
+    }
   })());
 });
 
@@ -62,8 +73,24 @@ self.addEventListener('fetch', (e) => {
     })());
     return;
   }
-  e.respondWith(staleWhileRevalidate(SHELL, req));
+  e.respondWith(networkFirst(SHELL, req));
 });
+
+async function networkFirst(name, req) {
+  const c = await caches.open(name);
+  try {
+    const r = await Promise.race([
+      fetch(req, { cache: 'no-cache' }),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), NET_TIMEOUT)),
+    ]);
+    if (r && r.ok) { c.put(req, r.clone()); return r; }
+    if (r) return r;
+  } catch (err) { /* võrguta või aeglane: vahemälust */ }
+  const hit = await c.match(req, { ignoreSearch: true });
+  if (hit) return hit;
+  if (req.mode === 'navigate') return (await c.match('index.html')) || (await c.match('./')) || Response.error();
+  return Response.error();
+}
 
 async function staleWhileRevalidate(name, req) {
   const c = await caches.open(name);
