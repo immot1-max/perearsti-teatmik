@@ -12,6 +12,7 @@ on:
       - "build/links.json"
       - "build/sources.json"
       - "build/ks_notes.json"
+      - "build/ms_ryhmakoodid.json"
       - "build/build.py"
 
 permissions:
