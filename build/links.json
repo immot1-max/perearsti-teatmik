@@ -1,0 +1,50 @@
+[
+  {
+    "id": "ska-toend",
+    "n": "Abivahendi tõendi väljastajale (Sotsiaalkindlustusamet)",
+    "u": "https://www.sotsiaalkindlustusamet.ee/spetsialistile-ja-koostoopartnerile/teenuseosutajale/abivahendi-toendi-valjastajale",
+    "d": "Kes võib tõendi väljastada, kohustuslikud andmeväljad (alates 01.09.2025), diagnoosi tõendile ei märgita, digiretsept ei sobi tõendiks. Anna tõend alati ka isikule kaasa."
+  },
+  {
+    "id": "ska-vajajale",
+    "n": "Abivahendi vajajale (Sotsiaalkindlustusamet)",
+    "u": "https://sotsiaalkindlustusamet.ee/puue-ja-hoolekanne/abivahendid/abivahendi-vajajale",
+    "d": "Kuidas abivahendit saada, omaosalus vähemalt 7 €, soodustus lastel 90%, toimetulekutoetuse saajatel 95%, erandi taotlemine enne soetamist, lepingupartnerite kaart."
+  },
+  {
+    "id": "ska-otsimootor",
+    "n": "Abivahendite otsimootor",
+    "u": "https://sotsiaalkindlustusamet.ee/abivahendite-otsimootor",
+    "d": "SKA otsing: abivahendi tingimused ja kes võib tõendi väljastada."
+  },
+  {
+    "id": "ska-naidisvorm",
+    "n": "Abivahendi tõendi näidisvorm (PDF)",
+    "u": "https://www.sotsiaalkindlustusamet.ee/sites/default/files/documents/2025-10/abivahenditoend.pdf",
+    "d": "SKA näidisvorm. Võib kasutada ka oma vormi, kui kohustuslikud andmeväljad on olemas."
+  },
+  {
+    "id": "ska-erand",
+    "n": "Abivahendi erandi taotlus (DOCX)",
+    "u": "https://www.sotsiaalkindlustusamet.ee/sites/default/files/documents/2025-01/Abivahendi%20erandi%20taotlus%2003.01.2025.docx",
+    "d": "Erandit taotletakse enne soetamist, menetlus tavaliselt 30 päeva. Esitada saab ka iseteeninduses."
+  },
+  {
+    "id": "ska-infoleht",
+    "n": "Abivahendite muudatuste infoleht 01.09.2025 (PDF)",
+    "u": "https://www.sotsiaalkindlustusamet.ee/sites/default/files/documents/2025-10/Infoleht_%20AV-muudatus_01.09.2025.pdf",
+    "d": "Tõendi kohustuslikud andmeväljad ja muudatuste kokkuvõte."
+  },
+  {
+    "id": "ska-seletuskiri-2026",
+    "n": "Abivahendite määruse seletuskiri 01.10.2026 (PDF)",
+    "u": "https://www.sotsiaalkindlustusamet.ee/sites/default/files/documents/2026-09/abivahendite-maaruse-seletuskiri_01.10.2026.pdf",
+    "d": "01.10.2026 jõustunud muudatuste selgitused."
+  },
+  {
+    "id": "ska-iseteenindus",
+    "n": "Sotsiaalkindlustusameti iseteenindus",
+    "u": "https://iseteenindus.sotsiaalkindlustusamet.ee/",
+    "d": "Isiku abivahendi tehingud ja erandi taotluse esitamine."
+  }
+]

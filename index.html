@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="et">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Perearsti teatmik</title>
+<meta name="description" content="Perearsti fondid, teenuste koodid ja piirhinnad, abivahendid ning juhi tervisenõuded. Töötab ka võrguta.">
+<meta name="theme-color" content="#24516b" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1513" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Teatmik">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><h1>Perearsti teatmik <span>· koodid, fondid, nõuded</span></h1><span class="net" id="net">võrgus</span></div>
+    <div class="search">
+      <input id="q" type="search" placeholder="Otsi: holter, 6417, TSH, ratastool, juhiload…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Otsing" autofocus>
+      <button class="clear" id="clear" aria-label="Tühjenda">×</button>
+    </div>
+    <nav class="chips" id="chips" aria-label="Kategooriad"></nav>
+  </div>
+</header>
+<main><div class="wrap" id="results"><p class="loading">Laadin andmeid…</p></div></main>
+<script src="app.js"></script>
+</body>
+</html>

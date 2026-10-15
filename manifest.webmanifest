@@ -1,0 +1,16 @@
+{
+  "name": "Perearsti teatmik",
+  "short_name": "Teatmik",
+  "description": "Perearsti fondid, teenuste koodid ja piirhinnad, abivahendid ning juhi tervisenõuded. Töötab ka võrguta.",
+  "lang": "et",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f5f2",
+  "theme_color": "#24516b",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

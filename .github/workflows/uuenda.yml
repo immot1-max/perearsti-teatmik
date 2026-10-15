@@ -1,0 +1,69 @@
+name: Andmete kontroll
+
+on:
+  schedule:
+    - cron: "17 4 3 * *"   # iga kuu 3. kuupäeval kell 04:17 UTC (07:17 Eesti suveajal)
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "build/toru/**"
+      - "build/synonyms.json"
+      - "build/links.json"
+      - "build/sources.json"
+      - "build/build.py"
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: andmed
+  cancel-in-progress: false
+
+jobs:
+  kontroll:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Riigi Teataja vahemälu
+        uses: actions/cache@v4
+        with:
+          path: build/cache
+          key: rt-${{ hashFiles('build/sources.json') }}-${{ github.run_id }}
+          restore-keys: rt-
+
+      - name: Sõltuvused
+        run: pip install openpyxl pdfplumber lxml
+
+      - name: Kontrolli ja ehita
+        id: b
+        run: python build/build.py
+
+      - name: Salvesta uued andmed
+        if: steps.b.outputs.changed == 'true'
+        run: |
+          git config user.name "teatmiku-robot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data build/sources.json build/report.md build/toru/toru_valjavote.json
+          git commit -m "Andmete uuendus $(date +%Y-%m-%d)" || exit 0
+          git push
+
+      - name: Teavita muudatustest
+        if: steps.b.outputs.changed == 'true' && github.event_name != 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh issue create --title "Teatmiku andmed uuenesid $(date +%d.%m.%Y)" --body-file build/report.md
+
+      - name: Teavita veast
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create --title "Teatmiku andmete kontroll ebaõnnestus $(date +%d.%m.%Y)" \
+            --body "Automaatne kontroll ebaõnnestus. Logi: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

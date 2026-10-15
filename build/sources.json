@@ -1,0 +1,18 @@
+{
+  "ttl": {
+    "nimi": "Tervisekassa tervishoiuteenuste loetelu",
+    "grupiId": 1063168
+  },
+  "metoodika": {
+    "nimi": "Tasu maksmise kohustuse ülevõtmise kord ja tasu arvutamise metoodika",
+    "grupiId": 309871
+  },
+  "abivahendid": {
+    "nimi": "Abivahendite loetelu, tõendi ja kaardi andmed",
+    "grupiId": 1032376
+  },
+  "mootorsoidukijuht": {
+    "nimi": "Mootorsõidukijuhi tervisekontroll ja tervisenõuded",
+    "grupiId": 1001109
+  }
+}
