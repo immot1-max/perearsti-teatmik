@@ -352,8 +352,10 @@ def build(args):
     for fn in ["synonyms.json", "links.json", "build.py"]:
         with open(os.path.join(HERE, fn), "rb") as f:
             aux_hash.update(f.read())
-    for tf in sorted(glob.glob(os.path.join(toru_dir, "*.xlsx")) + glob.glob(os.path.join(toru_dir, "toru_valjavote.json"))):
-        with open(tf, "rb") as f:
+    toru_loaded = load_toru_rows(toru_dir)  # xlsx olemasolul uuendab väljavõtet
+    ex_path = os.path.join(toru_dir, "toru_valjavote.json")
+    if os.path.exists(ex_path):
+        with open(ex_path, "rb") as f:
             aux_hash.update(f.read())
     fingerprint = "|".join([BUILD_VERSION] + [f"{k}:{v['id']}:{','.join(x['id'] for x in v['tulevased'])}" for k, v in sorted(sources.items())] + [aux_hash.hexdigest()[:16]])
 
@@ -488,7 +490,7 @@ def build(args):
             by_code[c].setdefault("r", []).append(ri)
 
     # 5. Toru
-    toru_meta = merge_toru(toru_dir, by_code, items)
+    toru_meta = merge_toru(toru_loaded, by_code, items)
 
     # 6. abivahendid
     abiv = sources["abivahendid"]
@@ -631,8 +633,8 @@ def load_toru_rows(toru_dir):
     return ex["file"], ex["seisuga"], hist
 
 
-def merge_toru(toru_dir, by_code, items):
-    fname, seisuga, hist = load_toru_rows(toru_dir)
+def merge_toru(loaded, by_code, items):
+    fname, seisuga, hist = loaded
     if not hist:
         return None
     added = mism = 0
