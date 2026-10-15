@@ -36,7 +36,7 @@ ROOT = os.path.dirname(HERE)
 SUP = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
 TODAY = dt.date.today()
 # Fondide argikeelsed nimed (määruse tekstis neid ei ole)
-FUND_NAMES = {"lisaks": "Tegevusfond", "f13": "Teraapiafond"}
+FUND_NAMES = {"f37": "Uuringufond", "lisaks": "Tegevusfond", "f13": "Teraapiafond"}
 
 
 # ----------------------------------------------------------------- võrk

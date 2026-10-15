@@ -1,9 +1,20 @@
 /* Võrguta töö: rakenduse kest ja andmed vahemällu.
    Kest: kiire vastus vahemälust, taustal uuendus. Andmed: vahemälust; app.js kontrollib version.json kaudu uut versiooni. */
-const SHELL = 'teatmik-shell-v2';
+const SHELL = 'teatmik-shell-v3';
 const DATA = 'teatmik-data-v1';
-const FONTS = 'teatmik-fonts-v1';
-const ASSETS = ['./', 'index.html', 'app.js', 'style.css', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
+const ASSETS = ['./', 'index.html', 'app.js', 'style.css', 'fonts.css', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
+  'fonts/ibm-plex-mono-latin-400-normal.woff2',
+  'fonts/ibm-plex-mono-latin-500-normal.woff2',
+  'fonts/ibm-plex-mono-latin-ext-400-normal.woff2',
+  'fonts/ibm-plex-mono-latin-ext-500-normal.woff2',
+  'fonts/ibm-plex-sans-condensed-latin-600-normal.woff2',
+  'fonts/ibm-plex-sans-condensed-latin-ext-600-normal.woff2',
+  'fonts/ibm-plex-sans-latin-400-normal.woff2',
+  'fonts/ibm-plex-sans-latin-500-normal.woff2',
+  'fonts/ibm-plex-sans-latin-600-normal.woff2',
+  'fonts/ibm-plex-sans-latin-ext-400-normal.woff2',
+  'fonts/ibm-plex-sans-latin-ext-500-normal.woff2',
+  'fonts/ibm-plex-sans-latin-ext-600-normal.woff2'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
@@ -17,7 +28,7 @@ self.addEventListener('install', (e) => {
 
 self.addEventListener('activate', (e) => {
   e.waitUntil((async () => {
-    const keep = [SHELL, DATA, FONTS];
+    const keep = [SHELL, DATA];
     for (const k of await caches.keys()) if (!keep.includes(k)) await caches.delete(k);
     await self.clients.claim();
   })());
@@ -28,10 +39,6 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
-  if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
-    e.respondWith(cacheFirst(FONTS, req));
-    return;
-  }
   if (url.origin !== location.origin) return;
 
   if (url.pathname.endsWith('/data/version.json')) {
@@ -57,15 +64,6 @@ self.addEventListener('fetch', (e) => {
   }
   e.respondWith(staleWhileRevalidate(SHELL, req));
 });
-
-async function cacheFirst(name, req) {
-  const c = await caches.open(name);
-  const hit = await c.match(req);
-  if (hit) return hit;
-  const r = await fetch(req);
-  if (r.ok || r.type === 'opaque') c.put(req, r.clone());
-  return r;
-}
 
 async function staleWhileRevalidate(name, req) {
   const c = await caches.open(name);

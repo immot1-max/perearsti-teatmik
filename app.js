@@ -17,9 +17,9 @@
     mootorsoidukijuht: 'Mootorsõidukijuhi tervisenõuded',
     toru: 'Toru',
   };
-  const FUND_SHORT = { f37: '37% fond', f13: 'Teraapiafond 13%', lisaks: 'Tegevusfond' };
+  const FUND_SHORT = { f37: 'Uuringufond 37%', f13: 'Teraapiafond 13%', lisaks: 'Tegevusfond' };
   const FUND_HELP = {
-    f37: 'Tasutakse kuni 37% ulatuses nimistu pearahadeks arvestatud summast aastas (nn uuringufond).',
+    f37: 'Tasutakse kuni 37% ulatuses nimistu pearahadeks arvestatud summast aastas.',
     f13: 'Tasutakse kuni 13% ulatuses nimistu pearahadeks arvestatud summast aastas.',
     lisaks: 'Tasutakse raviarvega lisaks pearahale, tervishoiuteenuste loetelu piirhinna alusel. Protsendilist piirmäära sellel lõikel ei ole.',
   };
@@ -344,7 +344,7 @@
       <section class="section"><h2>Proovi otsida</h2><div class="examples">${ex.map((w) => `<button class="chip" data-q="${esc(w)}">${esc(w)}</button>`).join('')}</div></section>
       <section class="section"><h2>Andmete seis</h2><div class="status" id="status"></div></section>
       <section class="section"><h2>Värvid</h2><div class="legend">
-        <span><i style="--k:var(--c-f37)"></i>37% fond</span><span><i style="--k:var(--c-lisaks)"></i>tegevusfond</span><span><i style="--k:var(--c-f13)"></i>teraapiafond 13%</span>
+        <span><i style="--k:var(--c-f37)"></i>uuringufond 37%</span><span><i style="--k:var(--c-lisaks)"></i>tegevusfond</span><span><i style="--k:var(--c-f13)"></i>teraapiafond 13%</span>
         <span><i style="--k:var(--c-teenus)"></i>muu teenus</span><span><i style="--k:var(--c-abiv)"></i>abivahend</span><span><i style="--k:var(--c-sate)"></i>säte</span><span><i style="--k:var(--c-juhi)"></i>juhi tervisenõuded</span>
       </div></section>
       <section class="section info"><h2>Kasutamine</h2>
@@ -375,12 +375,13 @@
   function renderChips() {
     const d = state.data;
     const c = d.meta.counts;
-    const chips = [
-      ['all', 'Kõik', null], ['s', 'Teenused', c.s], ['a', 'Abivahendid', c.a], ['l', 'Sätted', c.l + c.f], ['k', 'Lingid', c.k],
-    ];
-    const funds = d.items.filter((x) => x.t === 'f');
-    el.chips.innerHTML = chips.map(([k, t, n]) => `<button class="chip" data-filter="${k}" aria-pressed="${!state.fund && state.filter === k}">${t}${n != null ? `<span class="n">${n}</span>` : ''}</button>`).join('')
-      + funds.map((f) => `<button class="chip fchip" style="--stripe:var(--c-${f.k})" data-fund="${f.k}" aria-pressed="${state.fund === f.k}">${esc(FUND_SHORT[f.k])}<span class="n">${f.cnt}</span></button>`).join('');
+    const cat = ([k, t, n]) => `<button class="chip" data-filter="${k}" aria-pressed="${!state.fund && state.filter === k}">${t}${n != null ? `<span class="n">${n}</span>` : ''}</button>`;
+    const fund = (f) => `<button class="chip fchip" style="--stripe:var(--c-${f.k})" data-fund="${f.k}" aria-pressed="${state.fund === f.k}">${esc(FUND_SHORT[f.k])}<span class="n">${f.cnt}</span></button>`;
+    const order = ['f37', 'lisaks', 'f13'];
+    const funds = d.items.filter((x) => x.t === 'f').sort((a, b) => order.indexOf(a.k) - order.indexOf(b.k));
+    el.chips.innerHTML = [['all', 'Kõik', null], ['s', 'Teenused', c.s]].map(cat).join('')
+      + funds.map(fund).join('')
+      + [['a', 'Abivahendid', c.a], ['l', 'Sätted', c.l + c.f], ['k', 'Lingid', c.k]].map(cat).join('');
   }
 
   // ------------------------------------------------------------ sündmused
