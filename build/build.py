@@ -458,6 +458,41 @@ def tk_ks_docs(prev_meta):
     return {"page": TK_KS_PAGE, "docs": docs}
 
 
+# ----------------------------------------------------------------- SYNLAB
+
+SYNLAB_URL = "https://synlab.ee/arstile/hinnakiri/?show=all"
+SYNLAB_PAGE = "https://synlab.ee/arstile/hinnakiri/"
+
+
+def synlab_labs(prev):
+    """SYNLABi tervishoiuteenuse pakkuja hinnakiri: analüüs, lühend, TK kood, hind."""
+    try:
+        page = http_get(SYNLAB_URL, timeout=120, tries=2).decode("utf-8", "replace")
+        doc = lhtml.fromstring(page)
+        tbl = doc.xpath("//table")[0]
+    except Exception as e:  # noqa: BLE001
+        print(f"[hoiatus] SYNLABi hinnakirja ei saanud: {e}")
+        if prev:
+            return [x for x in prev["items"] if x["t"] == "b"], (prev["meta"].get("synlab") or {})
+        return [], None
+    title = (doc.findtext(".//title") or "").strip()
+    m = re.search(r"\(al ([\d.]+)\)", title)
+    cat, out = None, []
+    for tr in tbl.iter("tr"):
+        tds = [re.sub(r"\s+", " ", td.text_content().replace("\u00a0", " ")).strip().replace("ő", "õ").replace("Ő", "Õ") for td in tr if td.tag in ("td", "th")]
+        if "table-heading" in (tr.get("class") or ""):
+            cat = tds[0].strip(" *")
+            continue
+        if len(tds) < 6 or not tds[0] or (cat or "").upper().startswith("VETERINAARIA"):
+            continue
+        codes = [[c, int(x) if x else 1] for c, x in re.findall(r"\b(\d{4,5}[A-Z]?)\b(?:\s*x\s*(\d+))?", tds[4])]
+        price = parse_price(tds[5].replace(".", ",")) if tds[5] else None
+        out.append({"t": "b", "n": tds[0], "ab": tds[1] or None, "cat": cat, "mat": tds[3] or None, "tk": tds[4] or None,
+                    "c": codes, "p": price, "aeg": (tds[6] if len(tds) > 6 else "") or None,
+                    "vah": (tds[8] if len(tds) > 8 else "") or None})
+    return out, {"page": SYNLAB_PAGE, "seisuga": m.group(1) if m else None, "title": title, "count": len(out)}
+
+
 # ----------------------------------------------------------------- ehitus
 
 def make_sate(src_key, src, par, kind="säte"):
@@ -523,6 +558,8 @@ def build(args):
     tk = tk_ks_docs(prev["meta"] if prev else None)
     if tk:
         aux_hash.update(json.dumps(tk["docs"], sort_keys=True).encode())
+    labs, synlab_meta = synlab_labs(prev)
+    aux_hash.update(json.dumps([[x["n"], x["ab"], x["tk"], x["p"]] for x in labs], ensure_ascii=False).encode())
     fingerprint = "|".join([BUILD_VERSION] + [f"{k}:{v['id']}:{','.join(x['id'] for x in v['tulevased'])}" for k, v in sorted(sources.items())] + [aux_hash.hexdigest()[:16]])
     if prev and prev["meta"].get("fingerprint") == fingerprint and not args.force:
         print("Muudatusi ei ole.")
@@ -676,6 +713,34 @@ def build(args):
         items.append(ks_overview)
     items.extend(ks_items)
 
+    # 5c. perearstiabi tunnus ja SYNLABi analüüsid
+    for it in items:
+        if it["t"] == "s" and (it.get("f") or it.get("ks") or (it.get("ptk") or "").startswith("2.")
+                               or (it.get("tp") or {}).get("hk") == "PEREARSTIABI" or it.get("src") == "metoodika"):
+            it["pa"] = True
+    for lb in labs:
+        for k in ("f", "ks", "miss"):
+            lb.pop(k, None)
+        fl, kl, miss = [], [], []
+        for c, _x in lb["c"]:
+            it = by_code.get(c)
+            if it is None:
+                miss.append(c)
+                continue
+            for f in it.get("f") or []:
+                if f not in fl:
+                    fl.append(f)
+            for k in it.get("ks") or []:
+                if k not in kl:
+                    kl.append(k)
+        if fl:
+            lb["f"] = fl
+        if kl:
+            lb["ks"] = kl
+        if miss:
+            lb["miss"] = miss
+        items.append(lb)
+
     # 6. abivahendid
     abiv = sources["abivahendid"]
     ab_pars, _ = walk_act(xmls["abivahendid"])
@@ -712,6 +777,8 @@ def build(args):
         elif k.startswith("sate:"):
             src_key, nr = k[5:].split(":", 1)
             targets = [x for x in items if x["t"] == "l" and x["src"] == src_key and x["par"] == nr]
+        elif k.startswith("lab:"):
+            targets = [x for x in items if x["t"] == "b" and (x.get("ab") or "").lower() == k[4:].lower()]
         elif k.startswith("link:"):
             targets = [x for x in items if x["t"] == "k" and x.get("id") == k[5:]]
         else:
@@ -729,7 +796,9 @@ def build(args):
         "toru": toru_meta,
         "abivCols": ab_cols,
         "starRule": star_rule,
-        "counts": {t: sum(1 for x in items if x["t"] == t) for t in ["s", "f", "l", "a", "k", "q"]},
+        "counts": {t: sum(1 for x in items if x["t"] == t) for t in ["s", "f", "l", "a", "k", "q", "b"]},
+        "countsPa": sum(1 for x in items if x["t"] == "s" and x.get("pa")),
+        "synlab": synlab_meta,
         "tk": tk,
         "ksNotes": ks_notes.get("_meta"),
     }
@@ -941,6 +1010,9 @@ def make_report(prev, data, missing):
         if s["tulevased"]:
             fut = "; tulevikus jõustub: " + ", ".join(f'[{x["id"]}]({RT}{x["id"]}) alates {fmt_date(x["alates"])}' for x in s["tulevased"])
         lines.append(f'- {s["nimi"]}: [{s["id"]}]({s["url"]}) kehtib alates {fmt_date(s["alates"])}{mark}{fut}')
+    sm = data["meta"].get("synlab")
+    if sm:
+        lines.append(f'- SYNLABi hinnakiri: {sm.get("count")} analüüsi, {sm.get("title") or ""}')
     t = data["meta"].get("toru")
     if t:
         lines.append(f'- Toru: {t["file"]} (viimane muudatus {fmt_date(t["seisuga"])}), hinnaerinevusi loeteluga: {t["hinnaErinevusi"]}')
@@ -994,7 +1066,7 @@ def make_report(prev, data, missing):
         lines.append(", ".join(missing))
     c = data["meta"]["counts"]
     lines.append("")
-    lines.append(f"Kokku: {c['s']} teenust, {c['a']} abivahendit, {c['l']} sätet, {c['f']} fondi, {c.get('q', 0)} kvaliteedisüsteemi jaotist, {c['k']} linki.")
+    lines.append(f"Kokku: {c['s']} teenust, {c.get('b', 0)} SYNLABi analüüsi, {c['a']} abivahendit, {c['l']} sätet, {c['f']} fondi, {c.get('q', 0)} kvaliteedisüsteemi jaotist, {c['k']} linki.")
     return "\n".join(lines) + "\n"
 
 

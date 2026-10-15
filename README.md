@@ -13,6 +13,7 @@ Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, abivahendite
 | Abivahendite loetelu, tõendi ja kaardi andmed | Määruse tekst ja lisa (abivahendite loetelu) |
 | Mootorsõidukijuhi tervisekontroll ja tervisenõuded | Kogu määruse tekst |
 | Metoodika § 8 ja Tervisekassa kvaliteedisüsteemi leht | Kvaliteedisüsteemi kriteeriumid, koodid, punktid ja lisapädevuste koodiloetelud; Tervisekassa uusimad juhendid |
+| SYNLABi hinnakiri (tervishoiuteenuse pakkujale) | Analüüsi nimi, lühend, Tervisekassa kood ja hind; analüüsilt koodini ja koodilt analüüsideni |
 | Toru (Tervisekassa) | Hinna kehtivuse algus, eelmine hind, koodid, mida loetelu tabelites ei ole |
 | Sotsiaalkindlustusamet | Lingid juhenditele ja vormidele |
 
@@ -38,6 +39,14 @@ Kriteeriumid, koodid, punktid ja koefitsiendid loetakse automaatselt metoodika �
 ## Sünonüümid
 
 `build/synonyms.json` seob argisõnad ametlike nimetustega, nt „holter“ → 6371 „EKG monitooring 24 tundi“. Faili saab GitHubis otse muuta; pärast salvestamist ehitatakse andmed automaatselt uuesti.
+
+## Ainult perearstiabi
+
+Vaikimisi näidatakse teenustest ainult neid, mis kuuluvad perearsti fondidesse, kvaliteedisüsteemi või perearstiabi peatükki (424 koodi 15.10.2026 seisuga). Linnukese eemaldamisel on nähtavad kõik koodid, ka operatsioonid ja haiglateenused. Täpse koodi otsing näitab koodi alati.
+
+## Autor
+
+Idee ja sisu: Tommi Ründal, perearst (Medicum Perearstikeskus). Rakendus on ehitatud Claude'i (Anthropic) abil. Isiklik projekt, mitte Tervisekassa ega Medicumi ametlik tööriist.
 
 ## Vastutus
 

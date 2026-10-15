@@ -44,8 +44,8 @@
   "66224": ["peitveri", "fit", "jämesoolevähi sõeluuring"],
   "66306": ["d-dimeer", "ddimeer"],
   "66721": ["psa"],
-  "66706": ["kilpnäärme hormoonid", "tsh", "ft4"],
-  "66707": ["ferritiin", "b12", "foolhape", "troponiin"],
+  "66706": ["kilpnäärme hormoonid"],
+  "66707": ["aneemia markerid", "kasvajamarkerid"],
   "66719": ["hiv"],
 
   "3089": ["gripivaktsiin", "gripi vaktsiin"],
@@ -57,6 +57,9 @@
   "22.06": ["kuuldeaparaat", "kuulmisaparaat", "kuuldeaparaadid"],
   "22.06.12": ["kuuldeaparaat", "kuulmisaparaat"],
   "22.06.15": ["kuuldeaparaat", "kuulmisaparaat"],
+
+  "lab:P-IGRA": ["quantiferon", "tuberkuloosi test", "tb test", "latentne tuberkuloos"],
+  "lab:S,P-HCV Ab": ["hepatiit c", "c-hepatiit", "hcv antikehad"],
 
   "fond:f37": ["uuringufond", "37%", "uuringute fond", "pearaha arvel lisaks"],
   "fond:f13": ["teraapiafond", "13%", "psühholoogi fond", "füsioteraapia fond", "logopeed"],
