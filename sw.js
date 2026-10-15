@@ -2,7 +2,7 @@
    Kest: võrgust (uusim versioon), võrguta või aeglase võrgu korral vahemälust.
    Andmed: vahemälust; app.js kontrollib version.json kaudu uut versiooni.
    Uue versiooni aktiveerimisel laaditakse avatud aknad automaatselt uuesti. */
-const SHELL = 'teatmik-shell-v11';
+const SHELL = 'teatmik-shell-v12';
 const NET_TIMEOUT = 3500;
 const DATA = 'teatmik-data-v1';
 const ASSETS = ['./', 'index.html', 'app.js', 'style.css', 'fonts.css', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
