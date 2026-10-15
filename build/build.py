@@ -490,6 +490,9 @@ def synlab_labs(prev):
         out.append({"t": "b", "n": tds[0], "ab": tds[1] or None, "cat": cat, "mat": tds[3] or None, "tk": tds[4] or None,
                     "c": codes, "p": price, "aeg": (tds[6] if len(tds) > 6 else "") or None,
                     "vah": (tds[8] if len(tds) > 8 else "") or None})
+    if len(out) < 200 and prev:
+        print(f"[hoiatus] SYNLABi hinnakirjast leiti ainult {len(out)} rida; jätan eelmised andmed alles")
+        return [x for x in prev["items"] if x["t"] == "b"], (prev["meta"].get("synlab") or {})
     return out, {"page": SYNLAB_PAGE, "seisuga": m.group(1) if m else None, "title": title, "count": len(out)}
 
 
