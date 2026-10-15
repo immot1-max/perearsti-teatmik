@@ -1,0 +1,121 @@
+{
+  "_meta": {
+    "aasta": 2026,
+    "allikas": "Tervisekassa rakendusjuhis ja indikaatorite kirjeldused 2026",
+    "kommentaar": "Kvaliteedisüsteemi selgitused, mida metoodika § 8 tabelis ei ole. Kriteeriumid, koodid ja punktid tulevad automaatselt metoodika § 8-st. Kui Tervisekassa avaldab uue aasta juhendid, annab automaatkontroll sellest teada ja need märkused tuleb üle vaadata."
+  },
+  "ylevaade": {
+    "n": "Perearsti kvaliteedisüsteem (PKS)",
+    "sn": "Kvaliteedisüsteem",
+    "syn": ["kvaliteedisüsteem", "pks", "kvaliteeditasu", "tulemustasu", "lisatasu", "erialane lisapädevus", "lisapädevus", "ks"],
+    "notes": [
+      "Õiguslik alus: metoodika § 8 (kriteeriumid, punktid ja koefitsiendid) ning tervishoiuteenuste loetelu § 3 (lisatasude piirhinnad). Rakendamise kord lepitakse kokku ravi rahastamise lepingus; üksikasjad on Tervisekassa rakendusjuhises ja indikaatorite kirjelduses.",
+      "Hinnatakse eelmise kalendriaasta tegevust. Tervisekassa kinnitab tulemused 1. juuliks ja avaldab koodide 3061, 3062, 3069 ja 3083 punktisummad ja koefitsiendid oma veebilehel.",
+      "3061 ja 3069 (haigusi ennetav ja krooniliste haigete jälgimise töö): koefitsient 0,8, kui kriteeriumidest on täidetud vähemalt 80%, ja 1,0, kui vähemalt 90%. Sama kehtib jämesoolevähi ennetuse lisatasule 3083.",
+      "3062 (erialane lisapädevus) hinnatakse, kui kaks kolmandikku tervishoiuteenuse osutaja perearstidest on täitnud 80% või 90% tingimuse. Täidetud kriteeriumide koefitsiendid liidetakse.",
+      "Erialase lisapädevuse tegevus läheb arvesse selle tegelikule tegijale, st arvestus on arsti-, mitte patsiendikeskne. Günekoloogilist läbivaatust, kirurgilisi manipulatsioone ja e-konsultatsioone hinnatakse tervishoiuteenuse osutaja põhiselt.",
+      "Krooniliseks haigeks loetakse isik, kelle vastav diagnoos on raviarvetel olnud vähemalt korra viimase kahe aasta jooksul.",
+      "Kui nimistus ei ole mõne haiguse diagnoosiga haigeid, määratakse selle haiguse kriteeriumides keskmine punktide arv."
+    ]
+  },
+  "laste": {
+    "n": "Laste vaktsineerimine ja tervisekontroll (0–18 a)",
+    "sn": "Laste jälgimine",
+    "syn": ["laste jälgimine", "lastejälgimine", "väikelaps", "väikelapse läbivaatus", "lapse tervisekontroll", "vaktsineerimine", "immuniseerimine", "kooliminev laps", "koolilaps"],
+    "notes": [
+      "Vaktsineerimine 0–0,99 a: rotaviirus 9029 kolm korda (2-, 3- ja 4,5-kuune) ning DTaP-IPV-Hib-HepB 9120 kolm korda (3-, 4,5- ja 6-kuune).",
+      "Vaktsineerimine 1–1,99 a: MMR 9121 üks kord 1-aastaselt. 1,5–2,99 a: 9120 üks kord 1,5–2-aastaselt.",
+      "Läbivaatus 9080: 1-kuune (14.–60. päev) ja 3-kuune (75.–150. päev), 1-, 2- ja 3-aastane, kooliminev laps 6-, 7- või 8-aastaselt, kooliealine 10-, 11- või 12-aastaselt.",
+      "Keeldumine: vaktsiini kood lisatähisega k (nt 9120k) ja RHK-10 Z28 vastava täiendusega (nt Z28.2); keeldumine vormistatakse lapsevanema kirjaliku avaldusega. Meditsiiniline vastunäidustus: lisatähis v ja Z28.0.",
+      "Kui läbivaatusel leitud seisund vaktsineerimist ei takista: vaktsiini kood, haiguse diagnoos ja vaktsinatsiooni Z-kood. Kui takistab: 9001 ja haiguse diagnoos.",
+      "Kood kantakse raviarvele iga plaanilise korra kohta eraldi, ka korduva keeldumise korral. Kõiki kordi ühele arvele kanda ei saa, sest siis ei teki seost lapse vanusega. Vaktsineerimise koodi kannab ainult lapse nimistu perearst või tema asendaja.",
+      "Teenus peab olema tehtud enne lapse järgmist sünnipäeva. 2026. aasta teenused hinnatakse 2027. aastal ja need peavad olema Tervisekassale edastatud hiljemalt 07.02.2027."
+    ]
+  },
+  "diabeet": {
+    "n": "Diabeet II",
+    "sn": "Diabeet II",
+    "syn": ["diabeet", "suhkruhaigus", "e11", "dm2", "t2d", "ii tüüpi diabeet"],
+    "notes": [
+      "Sihtrühm: II tüüpi diabeedi haiged (E11) hinnatava aasta krooniliste haigete loetelus.",
+      "Kõik tegevused 1 kord aastas.",
+      "Erinevus allikates: indikaatorite kirjelduse järgi vaadatakse kolesterooli fraktsioonide puhul 3 aastat (hinnatav ja kaks eelnevat), metoodikas ja rakendusjuhises on 1 kord aastas.",
+      "Ravimiindikaator (0 punkti, jälgimiseks): metformiin, ka kombinatsioonis, vähemalt 3 soodusretsepti 12 kuu jooksul."
+    ]
+  },
+  "hypertoonia": {
+    "n": "Hüpertooniatõbi",
+    "sn": "Hüpertoonia",
+    "syn": ["hüpertoonia", "hüpertensioon", "kõrgvererõhutõbi", "vererõhk", "i10", "ht"],
+    "notes": [
+      "Sihtrühm: I10–I15 diagnoosiga haiged krooniliste haigete loetelus. Raskusaste (I, II, III) võetakse raviarvetelt; kui see puudub, loetakse I astmeks; mitme astme korral arvestatakse kõrgeimat. Tavariskiga patsiente ei arvestata.",
+      "I (madal risk): glükoos või HbA1c, üldkolesterool ja fraktsioonid 1 kord 3 aasta jooksul, nõustamine 1 kord aastas.",
+      "II ja III: analüüsid ja nõustamine 1 kord aastas, kolesterool alla 80-aastastel. II astmel lisaks EKG 1 kord 3 aasta jooksul.",
+      "Ravimiindikaator (0 punkti, jälgimiseks): II ja III riskiga haigele vähemalt 4 retsepti 12 kuu jooksul (AKE inhibiitor, kaltsiumikanali blokaator, beetablokaator või angiotensiin II antagonist, ka kombinatsioonis).",
+      "Erinevus allikates: rakendusjuhises ja indikaatorite kirjelduses on EKG koodid 6361 või 6362, metoodikas ainult 6361. Koodi 6362 kehtivas tervishoiuteenuste loetelus ega Torus ei ole."
+    ]
+  },
+  "infarkt": {
+    "n": "Müokardiinfarkt",
+    "sn": "Infarkt",
+    "syn": ["infarkt", "müokardiinfarkt", "mi", "i21", "i25.2", "statiin"],
+    "notes": [
+      "Sihtrühm: müokardiinfarkti läbipõdenud (I21, I22, I23, I25.2) krooniliste haigete loetelus.",
+      "Glükoos või HbA1c, kolesterooli fraktsioonid ja nõustamine 1 kord aastas.",
+      "Statiin, ka kombinatsioonis, vähemalt 4 soodusretsepti 12 kuu jooksul: 20 punkti.",
+      "Erinevus allikates: metoodika tabelis on infarkti jälgimise punktide lahter tühi. Tabeli kokkusumma 442 ja rakendusjuhis viitavad 24 punktile."
+    ]
+  },
+  "jalgimine": {
+    "n": "Jälgimisindikaatorid (0 punkti)",
+    "sn": "Jälgimisindikaator",
+    "syn": ["jälgimisindikaator", "e-konsultatsiooni osakaal", "hiv test", "antikoagulant", "kodade virvendus", "i48"],
+    "notes": [
+      "Jälgitakse, kuid punkte ei anta: e-konsultatsioonile suunamise osakaal saatekirjadest, HIV-indikaatorseisundiga patsientide testimine (66719), diabeedi ja hüpertoonia ravimiindikaatorid ning ≥65-aastaste kodade virvendusarütmia (I48) haigete püsiv suukaudne antikoagulantravi."
+    ]
+  },
+  "padevus": {
+    "n": "Lisapädevus: erialane pädevus",
+    "sn": "Erialane pädevus",
+    "syn": ["sertifitseerimine", "pädevushindamine", "resertifitseerimine", "pereõe pädevus"],
+    "notes": [
+      "Perearstil täidetud, kui sertifitseerimine kehtib kogu arvestusaasta. Pereõel täidetud, kui hinnatud pädevus kehtib kogu aasta; pädevaks loetakse ka õde, kes on kutsetunnistuse saanud ja registreeritud viimase viie aasta jooksul. Andmed võetakse Terviseametist 31. detsembri seisuga."
+    ]
+  },
+  "gunekoloogia": {
+    "n": "Lisapädevus: günekoloogiline läbivaatus",
+    "sn": "Günekoloogia",
+    "syn": ["günekoloogia", "güneko", "lisapädevus", "pap", "raseduse jälgimine", "hpv"],
+    "notes": [
+      "Täidetud, kui loetelu koode esineb raviarvetel kokku vähemalt 10 korda nimistu kohta korrutatuna tervishoiuteenuse osutaja nimistute arvuga.",
+      "66821 või 66644 ennetustegevusena kaebusteta isikul: RHK-10 Z12.4.",
+      "Erinevus allikates: rakendusjuhises on loetelus ka 66820 (vedelikupõhine günekotsütoloogiline uuring pärast HPV kodutesti), metoodika tabelis seda koodi ei ole."
+    ]
+  },
+  "kirurgia": {
+    "n": "Lisapädevus: kirurgilised manipulatsioonid ja pisioperatsioonid",
+    "sn": "Kirurgia",
+    "syn": ["kirurgia", "pisioperatsioon", "pisioperatsioonid", "kirurgilised manipulatsioonid", "lisapädevus", "väikekirurgia"],
+    "notes": [
+      "Täidetud, kui loetelu koode esineb raviarvetel kokku vähemalt 40 korda nimistu kohta korrutatuna tervishoiuteenuse osutaja nimistute arvuga."
+    ]
+  },
+  "ekons": {
+    "n": "Lisapädevus: e-konsultatsioonid",
+    "sn": "E-konsultatsioon",
+    "syn": ["e-konsultatsioon", "ekons", "lisapädevus"],
+    "notes": [
+      "Täidetud, kui kood 3039 esineb raviarvetel kokku vähemalt 10 korda nimistu kohta korrutatuna tervishoiuteenuse osutaja nimistute arvuga."
+    ]
+  },
+  "jvs": {
+    "n": "Jämesoolevähi sõeluuring",
+    "sn": "JVS",
+    "syn": ["jvs", "jämesoolevähk", "jämesoolevähi sõeluuring", "peitveri", "sõeluuring", "z12.1"],
+    "notes": [
+      "Sihtrühm: 60–68-aastased sõeluuringu sihtrühma isikud; peitvere test 66224.",
+      "Raviarvel diagnoos Z12.1, teenuse tüüp 1. Pearahasisesed koodid: 9038 nõustamine, 9039 peitvere testi komplekt, 9047 soolepuhastuspreparaat, 9048 sõeluuringust keeldumine. Ravikindlustuseta isikul lisaks 3002 (esmane) või 3004 (korduv vastuvõtt).",
+      "Lisatasu kood 3083: koefitsient 0,8 kui täidetud vähemalt 80%, 1,0 kui vähemalt 90%."
+    ]
+  }
+}

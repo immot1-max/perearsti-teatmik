@@ -1,6 +1,6 @@
 /* Võrguta töö: rakenduse kest ja andmed vahemällu.
    Kest: kiire vastus vahemälust, taustal uuendus. Andmed: vahemälust; app.js kontrollib version.json kaudu uut versiooni. */
-const SHELL = 'teatmik-shell-v3';
+const SHELL = 'teatmik-shell-v4';
 const DATA = 'teatmik-data-v1';
 const ASSETS = ['./', 'index.html', 'app.js', 'style.css', 'fonts.css', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
   'fonts/ibm-plex-mono-latin-400-normal.woff2',

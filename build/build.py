@@ -180,7 +180,7 @@ def block_list(container):
         if hk is not None and hk.text:
             rows = parse_html_table(hk.text)
             if rows:
-                blocks.append({"t": "tbl", "rows": rows})
+                blocks.append({"t": "tbl", "rows": rows, "html": hk.text})
             else:
                 txt = re.sub(r"\s+", " ", lhtml.fromstring(hk.text).text_content()).strip() if hk.text.strip() else ""
                 if txt:
@@ -303,6 +303,161 @@ def table_entries(rows):
     return out
 
 
+# ----------------------------------------------------------------- kvaliteedisüsteem
+
+TK_KS_PAGE = "https://tervisekassa.ee/partnerile/raviasutusele/perearstile/perearsti-kvaliteedisusteem"
+KS_KEYS = [
+    (r"0.18|laste", "laste"), (r"diabeet", "diabeet"), (r"hüpertoon", "hypertoonia"), (r"infarkt", "infarkt"),
+    (r"^indikaator", "jalgimine"), (r"erialane pädevus", "padevus"), (r"günekol", "gunekoloogia"),
+    (r"kirurg", "kirurgia"), (r"e-konsult", "ekons"), (r"jämesoole", "jvs"),
+]
+KS_CAT = {"ennetus": "Ennetus", "krooniline": "Kroonilised haiged", "jalgimine": "Jälgimisindikaatorid",
+          "lisapadevus": "Erialane lisapädevus", "soeluuring": "Sõeluuringud", "ylevaade": "Ülevaade"}
+
+
+def html_grid(s):
+    """HTML-tabel ruudustikuks; rowspan'i jätkulahtrid on None, colspan'i täited ''."""
+    doc = lhtml.fromstring(s)
+    rows, pending = [], {}
+    for tr in doc.iter("tr"):
+        cells = [td for td in tr if td.tag in ("td", "th")]
+        row, col, ci = [], 0, 0
+        while ci < len(cells) or col in pending:
+            if col in pending:
+                rem = pending[col]
+                row.append(None)
+                if rem <= 1:
+                    del pending[col]
+                else:
+                    pending[col] = rem - 1
+                col += 1
+                continue
+            td = cells[ci]
+            ci += 1
+            txt = re.sub(r"\s+", " ", td.text_content().replace("\u00a0", " ")).strip()
+            rs, cs = int(td.get("rowspan", 1) or 1), int(td.get("colspan", 1) or 1)
+            row.append(txt)
+            for k in range(1, cs):
+                row.append("")
+            if rs > 1:
+                for k in range(cs):
+                    pending[col + k] = rs - 1
+            col += cs
+        rows.append(row)
+    return rows
+
+
+def is_code_cell(c):
+    if not c:
+        return False
+    codes = split_codes(c)
+    rest = re.sub(r"[0-9A-Z]{3,8}|ja/või|ja|või|,|\s", "", c)
+    return bool(codes) and rest == ""
+
+
+def parse_ks(met_pars, met, ks_notes):
+    par = next((p for p in met_pars if p["pealkiri"].startswith("Lisatasu tasumine perearstile")), None)
+    if not par:
+        return [], None
+    kinds = [("Haigusi ennetava", "ennetus"), ("Krooniliste haigete", "krooniline"), ("Jälgimise indikaatorid", "jalgimine"),
+             ("Erialase lisapädevuse", "lisapadevus"), ("Sõeluuringutega", "soeluuring")]
+    sections = []
+    for lo in par["loiked"]:
+        intro = next((b["s"] for b in lo["blocks"] if b["t"] == "p"), "")
+        kind = next((k for t, k in kinds if intro.startswith(t)), None)
+        tbls = [b for b in lo["blocks"] if b["t"] == "tbl"]
+        if not kind or not tbls:
+            continue
+        cur, total = None, None
+        for tb in tbls:
+            for row in html_grid(tb["html"]):
+                vals = [c for c in row if c]
+                if not vals:
+                    continue
+                if any((c or "").strip().upper() == "KOOD" for c in row):
+                    cur = {"title": vals[0], "vl": vals[-1].capitalize(), "kind": kind, "lg": lo["nr"], "a": lo["id"], "rows": [], "sub": "", "last": ""}
+                    sections.append(cur)
+                    continue
+                if re.match(r"^kokku$", vals[0], re.I):
+                    total = vals[-1]
+                    continue
+                if cur is None:
+                    continue
+                ci = next((i for i, c in enumerate(row) if is_code_cell(c)), None)
+                v = row[-1] if row[-1] and re.fullmatch(r"\d+(,\d+)?", row[-1]) else ""
+                end = ci if ci is not None else (len(row) - 1 if v else len(row))
+                texts = [(i, c) for i, c in enumerate(row[:end]) if c]
+                lead_cont = row[0] is None or row[0] == ""
+                if len(texts) >= 2:
+                    cur["sub"] = texts[0][1]
+                    desc = " ".join(c for _, c in texts[1:])
+                elif texts:
+                    desc = texts[0][1]
+                    if not lead_cont or texts[0][0] == 0:
+                        cur["sub"] = ""
+                else:
+                    desc = cur["last"]
+                codes = list(dict.fromkeys(split_codes(row[ci]))) if ci is not None else []
+                cur["rows"].append({"s": cur["sub"] or None, "d": desc, "c": codes, "v": v or None})
+                cur["last"] = desc
+        if total:
+            for sec in sections:
+                if sec["kind"] == kind and sec["lg"] == lo["nr"]:
+                    sec["kokku"] = total
+    out = []
+    for sec in sections:
+        key = next((k for pat, k in KS_KEYS if re.search(pat, sec["title"], re.I)), None) or re.sub(r"[^a-z0-9]+", "-", norm_ascii(sec["title"])).strip("-")
+        note = ks_notes.get(key, {})
+        tot = next((r["v"] for r in sec["rows"] if r["v"] and r["v"] != "0"), None)
+        out.append({
+            "t": "q", "k": key, "cat": sec["kind"], "n": note.get("n", sec["title"]), "sn": note.get("sn", sec["title"]),
+            "title": sec["title"], "vl": sec["vl"], "par": f'{par["nr"]} {sec["lg"]}', "url": met["url"] + "#" + sec["a"],
+            "rows": sec["rows"], "kokku": sec.get("kokku"), "notes": note.get("notes"), "syn": list(note.get("syn", [])),
+            "known": key in ks_notes,
+        })
+    ov = ks_notes.get("ylevaade", {})
+    overview = {"t": "q", "k": "ylevaade", "cat": "ylevaade", "n": ov.get("n", "Perearsti kvaliteedisüsteem"), "sn": ov.get("sn", "Kvaliteedisüsteem"),
+                "par": par["nr"], "url": met["url"] + "#" + par["id"], "notes": ov.get("notes"), "syn": list(ov.get("syn", [])), "rows": []}
+    return out, overview
+
+
+def norm_ascii(s):
+    import unicodedata
+    return unicodedata.normalize("NFD", s.lower()).encode("ascii", "ignore").decode()
+
+
+def tk_ks_docs(prev_meta):
+    """Tervisekassa kvaliteedisüsteemi lehelt iga dokumendiliigi uusim aasta."""
+    cats = [("ind", r"indikaatorite kirjeldused", "Indikaatorite kirjeldused"),
+            ("juhis", r"rakendusjuhis|krooniliste haigete jälgimise tulemusliku töö ja erialase", "Lisatasude rakendusjuhis"),
+            ("atc", r"atc koodide", "ATC koodide loendid"),
+            ("audit", r"auditeerimise indikaatorid", "Auditeerimise indikaatorid (keskuse juhtimine)"),
+            ("tulemused", r"kvaliteedisüsteemis saavutatud tulemused", "Saavutatud tulemused ja lisatasud"),
+            ("kkk", r"^kkk$", "Kvaliteedisüsteemi KKK")]
+    try:
+        page = http_get(TK_KS_PAGE, timeout=60, tries=2).decode("utf-8", "replace")
+    except Exception as e:  # noqa: BLE001
+        print(f"[hoiatus] Tervisekassa KS lehte ei saanud: {e}")
+        return (prev_meta or {}).get("tk")
+    page = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", page, flags=re.S)
+    best = {}
+    for href, inner in re.findall(r'<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>', page, re.S):
+        txt = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", inner)).strip()
+        txt = lhtml.fromstring(f"<span>{txt}</span>").text_content() if txt else txt
+        if not re.search(r"\.(pdf|xlsx|docx|xls)$", href, re.I):
+            continue
+        for k, pat, name in cats:
+            if re.search(pat, txt, re.I):
+                ym = re.search(r"(20\d\d)", txt) or re.search(r"(20\d\d)", href)
+                year = int(ym.group(1)) if ym else 0
+                url = href if href.startswith("http") else "https://tervisekassa.ee" + href
+                if k not in best or year > best[k]["aasta"]:
+                    best[k] = {"k": k, "n": name, "u": url, "aasta": year}
+                break
+    docs = [best[k] for k, _, _ in cats if k in best]
+    return {"page": TK_KS_PAGE, "docs": docs}
+
+
 # ----------------------------------------------------------------- ehitus
 
 def make_sate(src_key, src, par, kind="säte"):
@@ -351,7 +506,7 @@ def build(args):
 
     toru_dir = os.path.join(HERE, "toru")
     aux_hash = hashlib.sha256()
-    for fn in ["synonyms.json", "links.json", "build.py"]:
+    for fn in ["synonyms.json", "links.json", "build.py", "ks_notes.json"]:
         with open(os.path.join(HERE, fn), "rb") as f:
             aux_hash.update(f.read())
     toru_loaded = load_toru_rows(toru_dir)  # xlsx olemasolul uuendab väljavõtet
@@ -359,13 +514,16 @@ def build(args):
     if os.path.exists(ex_path):
         with open(ex_path, "rb") as f:
             aux_hash.update(f.read())
-    fingerprint = "|".join([BUILD_VERSION] + [f"{k}:{v['id']}:{','.join(x['id'] for x in v['tulevased'])}" for k, v in sorted(sources.items())] + [aux_hash.hexdigest()[:16]])
 
     out_path = os.path.join(ROOT, "data", "data.json")
     prev = None
     if os.path.exists(out_path):
         with open(out_path, encoding="utf-8") as f:
             prev = json.load(f)
+    tk = tk_ks_docs(prev["meta"] if prev else None)
+    if tk:
+        aux_hash.update(json.dumps(tk["docs"], sort_keys=True).encode())
+    fingerprint = "|".join([BUILD_VERSION] + [f"{k}:{v['id']}:{','.join(x['id'] for x in v['tulevased'])}" for k, v in sorted(sources.items())] + [aux_hash.hexdigest()[:16]])
     if prev and prev["meta"].get("fingerprint") == fingerprint and not args.force:
         print("Muudatusi ei ole.")
         write_output(args, changed=False)
@@ -496,6 +654,28 @@ def build(args):
     # 5. Toru
     toru_meta = merge_toru(toru_loaded, by_code, items)
 
+    # 5b. kvaliteedisüsteem (metoodika § 8) ja lisapädevused
+    with open(os.path.join(HERE, "ks_notes.json"), encoding="utf-8") as f:
+        ks_notes = json.load(f)
+    ks_items, ks_overview = parse_ks(met_pars, met, ks_notes)
+    for q in ks_items:
+        for r in q["rows"]:
+            for c in r["c"] + [c + suf for c in r["c"] for suf in ("K", "V") if c + suf in by_code]:
+                it = by_code.get(c)
+                if it is None:
+                    it = {"t": "s", "c": c, "n": r["d"], "p": None, "src": "metoodika", "url": q["url"]}
+                    by_code[c] = it
+                    items.append(it)
+                kl = it.setdefault("ks", [])
+                if q["k"] not in kl:
+                    kl.append(q["k"])
+    if ks_overview:
+        ks_overview["lisatasud"] = [[c, by_code[c]["n"], by_code[c].get("p")] for c in ["3061", "3069", "3062", "3083"] if c in by_code]
+        ks_overview["docs"] = (tk or {}).get("docs", [])
+        ks_overview["tkPage"] = TK_KS_PAGE
+        items.append(ks_overview)
+    items.extend(ks_items)
+
     # 6. abivahendid
     abiv = sources["abivahendid"]
     ab_pars, _ = walk_act(xmls["abivahendid"])
@@ -549,7 +729,9 @@ def build(args):
         "toru": toru_meta,
         "abivCols": ab_cols,
         "starRule": star_rule,
-        "counts": {t: sum(1 for x in items if x["t"] == t) for t in ["s", "f", "l", "a", "k"]},
+        "counts": {t: sum(1 for x in items if x["t"] == t) for t in ["s", "f", "l", "a", "k", "q"]},
+        "tk": tk,
+        "ksNotes": ks_notes.get("_meta"),
     }
     data = {"meta": meta, "items": items, "rules": rules}
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
@@ -786,12 +968,33 @@ def make_report(prev, data, missing):
         ach = [c for c in na if c in pa and pa[c]["v"] != na[c]["v"]]
         lines.append(f"## Abivahendid: {len(ach)} muudetud, {len(set(na) - set(pa))} uut, {len(set(pa) - set(na))} eemaldatud")
         lines.append("")
+    kn = data["meta"].get("ksNotes") or {}
+    tkd = (data["meta"].get("tk") or {}).get("docs", [])
+    newest = max([d["aasta"] for d in tkd if d["k"] in ("ind", "juhis")] or [0])
+    unknown = [q["title"] for q in data["items"] if q["t"] == "q" and q.get("known") is False]
+    if newest and kn.get("aasta") and newest > kn["aasta"]:
+        lines.append(f"## NB: Tervisekassa on avaldanud kvaliteedisüsteemi {newest}. aasta juhendid")
+        lines.append(f"Märkused failis build/ks_notes.json põhinevad {kn['aasta']}. aasta juhenditel; vaata need üle.")
+        lines.append("")
+    if unknown:
+        lines.append("## Uued kvaliteedisüsteemi jaotised metoodika § 8-s (märkused puuduvad)")
+        lines.append(", ".join(unknown))
+        lines.append("")
+    if prev:
+        pq = {q["k"]: q for q in prev["items"] if q["t"] == "q"}
+        for q in data["items"]:
+            if q["t"] == "q" and q["k"] in pq and pq[q["k"]].get("rows") != q.get("rows"):
+                lines.append(f"- Kvaliteedisüsteem muutus: {q['n']}")
+        pdocs = {d["u"] for d in ((prev["meta"].get("tk") or {}).get("docs", []))}
+        for d in tkd:
+            if pdocs and d["u"] not in pdocs:
+                lines.append(f"- Tervisekassa uus dokument: [{d['n']} {d['aasta']}]({d['u']})")
     if missing:
         lines.append("## Sünonüümide sihid, mida ei leitud")
         lines.append(", ".join(missing))
     c = data["meta"]["counts"]
     lines.append("")
-    lines.append(f"Kokku: {c['s']} teenust, {c['a']} abivahendit, {c['l']} sätet, {c['f']} fondi, {c['k']} linki.")
+    lines.append(f"Kokku: {c['s']} teenust, {c['a']} abivahendit, {c['l']} sätet, {c['f']} fondi, {c.get('q', 0)} kvaliteedisüsteemi jaotist, {c['k']} linki.")
     return "\n".join(lines) + "\n"
 
 

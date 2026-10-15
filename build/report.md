@@ -10,5 +10,6 @@
 ## Teenused: 0 hinnamuutust, 0 uut, 0 eemaldatud, 0 fondimuutust
 ## Abivahendid: 0 muudetud, 0 uut, 0 eemaldatud
 
+- Kvaliteedisüsteem muutus: Jämesoolevähi sõeluuring
 
-Kokku: 2644 teenust, 326 abivahendit, 36 sätet, 3 fondi, 12 linki.
+Kokku: 2644 teenust, 326 abivahendit, 36 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 12 linki.

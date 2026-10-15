@@ -20,6 +20,7 @@
   --c-sate: #6b5e4e;
   --c-juhi: #b0432c;
   --c-link: #5d6963;
+  --c-ks: #a3195b;
 
   --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -33,7 +34,7 @@
     --bg: #0f1513; --surface: #161e1b; --surface-2: #1e2824; --ink: #e5ece8; --muted: #9aa8a0; --line: #2b3732;
     --accent: #8fc0dc; --accent-ink: #0f1513; --mark: #6b5310; --warn-bg: #3a2c0c; --warn-ink: #f3cf85;
     --c-f37: #6cc48c; --c-lisaks: #e3a646; --c-f13: #b39be8; --c-teenus: #7fb3d1; --c-abiv: #4fc7c2;
-    --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8;
+    --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3;
     color-scheme: dark;
   }
 }
@@ -41,7 +42,7 @@
   --bg: #0f1513; --surface: #161e1b; --surface-2: #1e2824; --ink: #e5ece8; --muted: #9aa8a0; --line: #2b3732;
   --accent: #8fc0dc; --accent-ink: #0f1513; --mark: #6b5310; --warn-bg: #3a2c0c; --warn-ink: #f3cf85;
   --c-f37: #6cc48c; --c-lisaks: #e3a646; --c-f13: #b39be8; --c-teenus: #7fb3d1; --c-abiv: #4fc7c2;
-  --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8;
+  --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3;
   color-scheme: dark;
 }
 
@@ -134,6 +135,7 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 18px; }
 .row.sate { --stripe: var(--c-sate); }
 .row.juhi { --stripe: var(--c-juhi); }
 .row.link { --stripe: var(--c-link); }
+.row.ks { --stripe: var(--c-ks); }
 .row > .head {
   display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: start;
   width: 100%; text-align: left; background: none; border: 0; padding: 9px 12px; cursor: pointer; border-radius: 8px;
@@ -155,6 +157,7 @@ main .wrap { padding-block: 14px 48px; display: grid; gap: 18px; }
 .badge.f13 { color: var(--c-f13); }
 .badge.lisaks { color: var(--c-lisaks); }
 .badge.abiv { color: var(--c-abiv); }
+.badge.ks { color: var(--c-ks); background: transparent; cursor: pointer; font: inherit; font-size: 0.74rem; font-weight: 500; }
 .badge.plain { color: var(--muted); }
 .badge.warn { color: var(--warn-ink); background: var(--warn-bg); border-color: transparent; }
 .via { font-size: 0.78rem; color: var(--muted); }
@@ -212,6 +215,11 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1
 .qbtn.juhi { border-left: 4px solid var(--c-juhi); }
 .qbtn.abiv { border-left: 4px solid var(--c-abiv); }
 .qbtn.sate { border-left: 4px solid var(--c-sate); }
+.qbtn.ks { border-left: 4px solid var(--c-ks); }
+.chip.kschip { border-color: var(--c-ks); color: var(--c-ks); }
+.chip.kschip[aria-pressed="true"] { background: var(--c-ks); color: var(--surface); }
+button.code { border: 0; cursor: pointer; }
+button.badge { text-align: left; border-radius: 8px; padding: 1px 8px; line-height: 1.4; }
 .examples { display: flex; flex-wrap: wrap; gap: 6px; }
 .status { display: grid; gap: 4px; font-size: 0.86rem; }
 .status .src { display: grid; grid-template-columns: 1fr auto; gap: 8px; border-bottom: 1px solid var(--line); padding: 5px 0; }

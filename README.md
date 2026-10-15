@@ -12,6 +12,7 @@ Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, abivahendite
 | Tasu maksmise kohustuse ülevõtmise kord ja metoodika | § 6 fondid (uuringufond kuni 37%, tegevusfond raviarvega lisaks, teraapiafond kuni 13%), perearstiabi peatükk (§ 4–8¹) |
 | Abivahendite loetelu, tõendi ja kaardi andmed | Määruse tekst ja lisa (abivahendite loetelu) |
 | Mootorsõidukijuhi tervisekontroll ja tervisenõuded | Kogu määruse tekst |
+| Metoodika § 8 ja Tervisekassa kvaliteedisüsteemi leht | Kvaliteedisüsteemi kriteeriumid, koodid, punktid ja lisapädevuste koodiloetelud; Tervisekassa uusimad juhendid |
 | Toru (Tervisekassa) | Hinna kehtivuse algus, eelmine hind, koodid, mida loetelu tabelites ei ole |
 | Sotsiaalkindlustusamet | Lingid juhenditele ja vormidele |
 
@@ -29,6 +30,10 @@ Toru toorfaili repos ei hoita, sest repo on avalik. Repos on ainult sellest teht
 
 1. Anna fail Claude'ile, mis teeb uue väljavõtte.
 2. Kui Toru fail on avalik, laadi see GitHubis kausta `build/toru/` (Add file → Upload files). Kui kaustas on mitu faili, valitakse see, mille hinnaread on kõige uuemad.
+
+## Kvaliteedisüsteem
+
+Kriteeriumid, koodid, punktid ja koefitsiendid loetakse automaatselt metoodika § 8 tabelitest, nii et need uuenevad koos määrusega. Tervisekassa juhendites olevad lisaselgitused (vanused, kodeerimisreeglid, lisapädevuse lävendid) on failis `build/ks_notes.json`. Kontroll vaatab iga kuu ka Tervisekassa kvaliteedisüsteemi lehte. Kui seal ilmuvad uue aasta juhendid, märgib ta selle teavitusse ja `ks_notes.json` tuleb üle vaadata.
 
 ## Sünonüümid
 
