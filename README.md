@@ -9,7 +9,7 @@ Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, abivahendite
 | Allikas | Mida sealt võetakse |
 |---|---|
 | Tervisekassa tervishoiuteenuste loetelu | Kõik koodid ja piirhinnad, rakendamise tingimused, perearstiabi peatükk |
-| Tasu maksmise kohustuse ülevõtmise kord ja metoodika | § 6 fondid (kuni 37%, kuni 13%, raviarvega lisaks), perearstiabi peatükk (§ 4–8¹) |
+| Tasu maksmise kohustuse ülevõtmise kord ja metoodika | § 6 fondid (kuni 37%, teraapiafond kuni 13%, tegevusfond raviarvega lisaks), perearstiabi peatükk (§ 4–8¹) |
 | Abivahendite loetelu, tõendi ja kaardi andmed | Määruse tekst ja lisa (abivahendite loetelu) |
 | Mootorsõidukijuhi tervisekontroll ja tervisenõuded | Kogu määruse tekst |
 | Toru (Tervisekassa) | Hinna kehtivuse algus, eelmine hind, koodid, mida loetelu tabelites ei ole |

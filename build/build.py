@@ -35,6 +35,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 SUP = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
 TODAY = dt.date.today()
+# Fondide argikeelsed nimed (määruse tekstis neid ei ole)
+FUND_NAMES = {"lisaks": "Tegevusfond", "f13": "Teraapiafond"}
 
 
 # ----------------------------------------------------------------- võrk
@@ -435,9 +437,11 @@ def build(args):
             if mp and tbls:
                 fund_key = f"f{mp.group(1)}"
                 label = f"Kuni {mp.group(1)}% pearahast"
+                if fund_key in FUND_NAMES:
+                    label = f"{FUND_NAMES[fund_key]} · kuni {mp.group(1)}% pearahast"
             elif tbls and "raviarve" in txt and "täiendavalt" in txt:
                 fund_key = "lisaks"
-                label = "Raviarvega lisaks pearahale"
+                label = f"{FUND_NAMES['lisaks']} · raviarvega lisaks pearahale"
             if fund_key:
                 codes = []
                 for b in tbls:

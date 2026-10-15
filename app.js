@@ -17,7 +17,7 @@
     mootorsoidukijuht: 'Mootorsõidukijuhi tervisenõuded',
     toru: 'Toru',
   };
-  const FUND_SHORT = { f37: '37% fond', f13: '13% fond', lisaks: 'Lisaks fondile' };
+  const FUND_SHORT = { f37: '37% fond', f13: 'Teraapiafond 13%', lisaks: 'Tegevusfond' };
   const FUND_HELP = {
     f37: 'Tasutakse kuni 37% ulatuses nimistu pearahadeks arvestatud summast aastas (nn uuringufond).',
     f13: 'Tasutakse kuni 13% ulatuses nimistu pearahadeks arvestatud summast aastas.',
@@ -344,7 +344,7 @@
       <section class="section"><h2>Proovi otsida</h2><div class="examples">${ex.map((w) => `<button class="chip" data-q="${esc(w)}">${esc(w)}</button>`).join('')}</div></section>
       <section class="section"><h2>Andmete seis</h2><div class="status" id="status"></div></section>
       <section class="section"><h2>Värvid</h2><div class="legend">
-        <span><i style="--k:var(--c-f37)"></i>37% fond</span><span><i style="--k:var(--c-lisaks)"></i>lisaks fondile</span><span><i style="--k:var(--c-f13)"></i>13% fond</span>
+        <span><i style="--k:var(--c-f37)"></i>37% fond</span><span><i style="--k:var(--c-lisaks)"></i>tegevusfond</span><span><i style="--k:var(--c-f13)"></i>teraapiafond 13%</span>
         <span><i style="--k:var(--c-teenus)"></i>muu teenus</span><span><i style="--k:var(--c-abiv)"></i>abivahend</span><span><i style="--k:var(--c-sate)"></i>säte</span><span><i style="--k:var(--c-juhi)"></i>juhi tervisenõuded</span>
       </div></section>
       <section class="section info"><h2>Kasutamine</h2>

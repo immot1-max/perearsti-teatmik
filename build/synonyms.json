@@ -59,13 +59,13 @@
   "22.06.15": ["kuuldeaparaat", "kuulmisaparaat"],
 
   "fond:f37": ["uuringufond", "37%", "uuringute fond", "pearaha arvel lisaks"],
-  "fond:f13": ["13%", "psühholoogi fond", "füsioteraapia fond", "logopeed"],
-  "fond:lisaks": ["väljaspool fondi", "lisaks fondile", "raviarvega", "eraldi arve"],
+  "fond:f13": ["teraapiafond", "13%", "psühholoogi fond", "füsioteraapia fond", "logopeed"],
+  "fond:lisaks": ["tegevusfond", "väljaspool fondi", "lisaks fondile", "raviarvega", "eraldi arve"],
 
   "sate:ttl:§ 2": ["pearaha", "nimistuülene", "teenusekorralduse komponent"],
   "sate:ttl:§ 3": ["baasraha", "lisatasu"],
   "sate:metoodika:§ 5": ["pearaha arvel", "mis kuulub pearaha sisse"],
-  "sate:metoodika:§ 6": ["fondid", "uuringufond", "tegevusfond", "täiendavalt tasutavad"],
+  "sate:metoodika:§ 6": ["fondid", "uuringufond", "tegevusfond", "teraapiafond", "täiendavalt tasutavad"],
   "sate:metoodika:§ 8": ["kvaliteedisüsteem", "kvaliteeditasu", "tulemustasu", "lisatasu"],
   "sate:abivahendid:§ 2¹": ["abivahendi tõend", "tõendi andmed"],
   "sate:abivahendid:§ 3": ["abivahendi kaart", "isikliku abivahendi kaart"],
