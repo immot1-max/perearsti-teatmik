@@ -23,6 +23,7 @@
   --c-ks: #a3195b;
   --c-lab: #3d5a9e;
   --c-ms: #5f7a1e;
+  --c-soel: #4b3fc4;
 
   --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -36,7 +37,7 @@
     --bg: #0f1513; --surface: #161e1b; --surface-2: #1e2824; --ink: #e5ece8; --muted: #9aa8a0; --line: #2b3732;
     --accent: #8fc0dc; --accent-ink: #0f1513; --mark: #6b5310; --warn-bg: #3a2c0c; --warn-ink: #f3cf85;
     --c-f37: #6cc48c; --c-lisaks: #e3a646; --c-f13: #b39be8; --c-teenus: #7fb3d1; --c-abiv: #4fc7c2;
-    --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a;
+    --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a; --c-soel: #aaa3f5;
     color-scheme: dark;
   }
 }
@@ -44,7 +45,7 @@
   --bg: #0f1513; --surface: #161e1b; --surface-2: #1e2824; --ink: #e5ece8; --muted: #9aa8a0; --line: #2b3732;
   --accent: #8fc0dc; --accent-ink: #0f1513; --mark: #6b5310; --warn-bg: #3a2c0c; --warn-ink: #f3cf85;
   --c-f37: #6cc48c; --c-lisaks: #e3a646; --c-f13: #b39be8; --c-teenus: #7fb3d1; --c-abiv: #4fc7c2;
-  --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a;
+  --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a; --c-soel: #aaa3f5;
   color-scheme: dark;
 }
 
@@ -87,6 +88,34 @@ button { font: inherit; color: inherit; }
 .foot p { margin: 0; max-width: 80ch; }
 .row.lab { --stripe: var(--c-lab); }
 .row.ms { --stripe: var(--c-ms); }
+.row.soel { --stripe: var(--c-soel); }
+.badge.soel { color: var(--c-soel); background: transparent; cursor: pointer; font: inherit; font-size: 0.74rem; font-weight: 500; }
+.chip.soelchip { border-color: var(--c-soel); color: var(--c-soel); }
+.chip.soelchip[aria-pressed="true"] { background: var(--c-soel); color: var(--surface); }
+.soel { display: grid; gap: 6px; }
+.srow {
+  display: grid; grid-template-columns: minmax(11em, 15em) 1fr; gap: 4px 14px; align-items: baseline;
+  text-align: left; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--c-soel);
+  border-radius: 8px; padding: 8px 12px; cursor: pointer; min-width: 0;
+}
+.srow .sn { display: grid; }
+.srow .sn b { font-weight: 600; }
+.srow .sn small { color: var(--muted); font-size: 0.78rem; }
+.srow .sy { font-family: var(--font-mono); font-size: 0.86rem; font-variant-numeric: tabular-nums; word-spacing: 0.25em; overflow-wrap: anywhere; }
+.srow .sy.txt { font-family: var(--font-ui); word-spacing: normal; color: var(--muted); }
+.tbl td.num small { font-family: var(--font-ui); color: var(--muted); }
+.search input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.hint { font-size: 0.82rem; color: var(--muted); margin: 6px 0 0; }
+.years { display: flex; flex-wrap: wrap; gap: 4px; }
+.years span { font-family: var(--font-mono); font-size: 0.84rem; background: var(--surface-2); border-radius: 5px; padding: 0 6px; }
+.ycard { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--c-soel); border-radius: 8px; padding: 10px 12px; display: grid; gap: 6px; }
+.ycard .yh { font-size: 0.95rem; }
+.ycard .yh b { font-family: var(--font-mono); }
+.yl { display: grid; text-align: left; background: none; border: 0; border-top: 1px dashed var(--line); padding: 6px 0 0; cursor: pointer; }
+.yl b { font-weight: 500; }
+.yl.yes b { color: var(--c-soel); font-weight: 600; }
+.yl.no b, .yl.maybe b { color: var(--muted); }
+.yl small, .yl-none { color: var(--muted); font-size: 0.8rem; margin: 0; }
 .badge.msb { color: var(--c-ms); }
 .chip.mschip { border-color: var(--c-ms); color: var(--c-ms); }
 .chip.mschip[aria-pressed="true"] { background: var(--c-ms); color: var(--surface); }
@@ -268,5 +297,6 @@ button.badge { text-align: left; border-radius: 8px; padding: 1px 8px; line-heig
   .brand h1 span { display: none; }
   .kv > div { grid-template-columns: 1fr; gap: 0; }
   .search input { font-size: 1rem; }
+  .srow { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }

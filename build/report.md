@@ -12,5 +12,11 @@
 ## Teenused: 0 hinnamuutust, 0 uut, 0 eemaldatud, 0 fondimuutust
 ## Abivahendid: 0 muudetud, 0 uut, 0 eemaldatud
 
+## Vähi sõeluuringud (terviseportaal)
+- Rinnavähi sõeluuring 2026: 50–74 a, iga 2 a; sünniaastad 1952, 1954, 1956, 1958, 1960, 1962, 1964, 1966, 1968, 1970, 1972, 1974, 1976
+- Emakakaelavähi sõeluuring 2026: 30–65 a, iga 5 a; sünniaastad 1961, 1966, 1971, 1976, 1981, 1986, 1991, 1996
+- Soolevähi sõeluuring 2026: 56–68 a, iga 2 a; sünniaastad 1958, 1960, 1962, 1964, 1966, 1968, 1970
+- Kopsuvähi sõeluuring (KVSU): [tegevusjuhend](https://tervisekassa.ee/sites/default/files/riikliku_kopsuvahi_soeluuringu_piirkondliku_laienemise_tegevusjuhend_2026.pdf)
 
-Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 42 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 13 linki.
+
+Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 42 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 13 linki.

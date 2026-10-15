@@ -1,0 +1,110 @@
+{
+  "_meta": {
+    "kommentaar": "Vähi sõeluuringud. Sihtrühm (vanus, intervall, sünniaastad) loetakse igal ehitusel terviseportaalist; siin on ainult püsiv lisainfo (koodid, raviarve, märkused). 'erinevus' kuvatakse ainult siis, kui terviseportaali aasta võrdub 'aasta' väärtusega.",
+    "leht": "https://www.terviseportaal.ee/haiguste-ennetus/soeluuringud",
+    "yld": [
+      "Sõeluuringul osalemine on tasuta kõikidele ravikindlustatud ja -kindlustamata inimestele, kes kuuluvad antud aastal sõeluuringu sihtrühma; tasuta on ka edasised vajalikud uuringud ja ravi (terviseportaal).",
+      "Kutse saadab vähi sõeluuringute register (Tervise Arengu Instituut). Kutse-saatekiri on terviseportaalis „Vastuvõtud ja saatekirjad“ all ja kehtib kalendriaasta lõpuni. Kutset ei pea ootama: sihtrühma kuuluv inimene võib ise pöörduda (terviseportaal).",
+      "Tervisekassa teavitab perearste nende nimistusse kuuluvatest jämesoolevähi, emakakaelavähi ja rinnavähi sõeluuringu sihtrühma isikutest (kvaliteedisüsteemi rakendusjuhis 2026)."
+    ]
+  },
+  "programmid": [
+    {
+      "k": "rinnavahk",
+      "tyvi": "rinnavähi",
+      "n": "Rinnavähi sõeluuring",
+      "sn": "Rinnavähk",
+      "alamleht": "https://www.terviseportaal.ee/haiguste-ennetus/soeluuringud/rinnavahk",
+      "codes": [
+        ["7937", "mammograafia sõeluuringus; teeb radioloogiaüksus või mammograafiabuss"],
+        ["9410", "statistiline kood"]
+      ],
+      "notes": [
+        "Naine broneerib aja ise endale sobivasse tervishoiuasutusse või mammograafiabussi; kutse-saatekiri on terviseportaalis.",
+        "Uuringu päeval ei tohiks kasutada deodoranti, kehakreemi ega -puudrit. Menstruatsiooniga naistel sobib tsükli 5.–15. päev. Uuring võtab umbes 20 minutit, vastus tuleb kahe nädala jooksul terviseportaali; negatiivse tulemuse korral eraldi ühendust ei võeta (terviseportaal).",
+        "Koodi 7937 piirhind sisaldab kahe radioloogi hinnangut ja kirjaliku vastuse saatmist (tervishoiuteenuste loetelu § 17 lg 3)."
+      ],
+      "syn": ["mammograafia", "mammo", "rinnavähk", "rinnavähi sõeluuring", "rinnanäärmevähk", "mammograafiabuss", "rv"]
+    },
+    {
+      "k": "emakakaelavahk",
+      "tyvi": "emakakaelavähi",
+      "n": "Emakakaelavähi sõeluuring",
+      "sn": "Emakakaelavähk",
+      "alamleht": "https://www.terviseportaal.ee/haiguste-ennetus/soeluuringud/emakakaelavahk",
+      "dg": "Z12.4",
+      "dgAllikas": "kvaliteedisüsteemi rakendusjuhis 2026: HPV-test kaebusteta isikul ennetuse eesmärgil",
+      "codes": [
+        ["66644", "HPV-test, sõeluuringu esmane test"],
+        ["66821", "vedelikupõhine tsütoloogia positiivse HPV-testi (66644) järel"],
+        ["66650", "HPV kodutest (kodutesti tellimiskeskkonna kaudu)"],
+        ["66820", "vedelikupõhine tsütoloogia positiivse HPV kodutesti (66650) järel"],
+        ["9411", "statistiline kood"],
+        ["9049", "HPV vaktsineerimine (12–18-aastased, riiklik immuniseerimiskava)"]
+      ],
+      "notes": [
+        "Koodide 66644, 66821 ja 66820 eest tasub Tervisekassa riiklikul emakakaelavähi sõeluuringul osalevate patsientide puhul; juhinduda tuleb Tervisekassa emakakaelavähi sõeluuringu tegevusjuhendist (metoodika § 6 lg 6³). Perearsti fondides on need Tegevusfondis.",
+        "Tasuta HPV-kodutesti saab tellida koju (patsient.kliinikum.ee/hpv) või küsida apteegist (terviseportaal).",
+        "Alates 1.02.2024 vaktsineeritakse 12–18-aastaseid tüdrukuid ja poisse HPV vastu tasuta riikliku immuniseerimiskava alusel (terviseportaal)."
+      ],
+      "syn": ["pap", "pap-test", "papanicolaou", "hpv", "hpv test", "hpv kodutest", "kodutest", "emakakaelavähk", "ekv", "günekotsütoloogia", "tsütoloogia", "lbc", "z12.4"]
+    },
+    {
+      "k": "soolevahk",
+      "tyvi": "soolevähi",
+      "n": "Soolevähi sõeluuring",
+      "sn": "Soolevähk",
+      "alamleht": "https://www.terviseportaal.ee/haiguste-ennetus/soeluuringud/soolevahk",
+      "dg": "Z12.1",
+      "dgAllikas": "kvaliteedisüsteemi rakendusjuhis 2026; teenuse tüüp 1",
+      "ks": ["jvs"],
+      "codes": [
+        ["9038", "jämesoolevähi sõeluuringu nõustamine"],
+        ["9039", "peitvere testi komplekti kätteandmine"],
+        ["9047", "soolepuhastuspreparaat"],
+        ["9048", "sõeluuringust keeldumine"],
+        ["66224", "peitvere test (FIT), laborianalüüs"],
+        ["7597", "sõeluuringu koloskoopia positiivse peitvere testi järel"],
+        ["3083", "lisatasu jämesoolevähi ennetuse eest (kvaliteedisüsteem)"],
+        ["9412", "statistiline kood"]
+      ],
+      "notes": [
+        "Raviarvel diagnoos Z12.1 ja teenuse tüüp 1; ravikindlustuseta isikul lisaks 3002 (esmane) või 3004 (korduv vastuvõtt) (rakendusjuhis 2026).",
+        "Peitvere testi (66224) eest tasub Tervisekassa perearstile lisaks pearahale loetelu piirhinna alusel (metoodika § 6 lg 4¹).",
+        "Perearsti või -õe vastuvõtul antakse peitvere testi komplekt; proov võetakse kodus ja saadetakse postiga või pakiautomaadiga laborisse, postikulu on tasutud (terviseportaal).",
+        "Kutset ei saa inimesed, kellel on elu jooksul diagnoositud soolevähk (C18–C20), ega need, kes on viimase 10 aasta jooksul käinud sõelkoloskoopial (7597) (terviseportaal; indikaatorite kirjeldus 2026)."
+      ],
+      "erinevus": {
+        "aasta": 2026,
+        "s": "Vanus erineb allikati. Terviseportaali järgi on 2026. aasta sihtrühm 56–68-aastased (sünniaastad 1958–1970). Tervisekassa kvaliteedisüsteemi rakendusjuhis 2026 nimetab vanuseks 60–68. Indikaatorite kirjeldus 2026 nimetab pealkirjas 58–69 ja sihtrühma all 60–69 ning märgib aastaks 2025, kuid sünniaastate loend (1958, 1960 … 1970) on sama. Sihtrühm määratakse sünniaasta järgi."
+      },
+      "syn": ["fit", "peitveri", "peitveretest", "peitvere test", "jvs", "jämesoolevähk", "soolevähk", "kolorektaalvähk", "jämesoolevähi sõeluuring", "z12.1"]
+    },
+    {
+      "k": "kopsuvahk",
+      "staatiline": true,
+      "n": "Kopsuvähi sõeluuring (KVSU)",
+      "sn": "Kopsuvähk",
+      "kes": "suurenenud kopsuvähi riskiga inimesed KVSU-ga liitunud piirkondades (Tartu ja Viljandi maakond)",
+      "vanus": [55, 75],
+      "intervall": "negatiivse leiu korral kordusuuring 12 kuu pärast",
+      "luhike": "riskihinnangu järgi · Tartu ja Viljandi maakond",
+      "leht": "https://tervisekassa.ee/kopsuvahi-soeluuring",
+      "dg": "Z13.8",
+      "dgAllikas": "tegevusjuhend 2026; raskusaste 1 = madal risk, 2 = kõrge risk",
+      "codes": [
+        ["9155", "kopsuvähi sõeluuringu nõustamine ja riskihindamine"],
+        ["7875", "madaladoosiline rindkere KT (MDKT); teeb haigla"]
+      ],
+      "notes": [
+        "Riiklik kopsuvähi sõeluuring laieneb piirkonniti: Tartumaal jätkub katseprojekt ja piirkondlik laienemine algas Viljandi maakonnast; MDKT teevad TÜ Kliinikum ja SA Viljandi Haigla (Tervisekassa leht, tegevusjuhend 2026).",
+        "KVSU-ga liitunud perearstinimistule saadab Tervisekassa 55–75-aastaste nimekirja (sünniaasta järgi). Perearst, pereõde või piirkonna koordinaator võtab ühendust ja hindab riski mudeliga PLCOm2012noRace; suurenenud risk on riskiskoor üle 1,5%.",
+        "Välja jäävad eluaegsed mittesuitsetajad (alla 100 sigareti elu jooksul), viimase 5 aasta jooksul kopsuvähi (C34) diagnoosi saanud, need, kelle üldseisund ei võimalda kasvajavastast ravi (ECOG > 2), ja need, kellel on viimase aasta jooksul tehtud rindkere KT.",
+        "Iga riskihinnatud patsiendi kohta esitatakse raviarve: põhidiagnoos Z13.8, raskusaste 1 (madal risk) või 2 (kõrge risk) ja nõustamise korral pearahasisene kood 9155.",
+        "Kõrge riski ja nõusoleku korral vormistab perearst saatekirja MDKT uuringule (dokumendi tüüp „Saatekiri uuringule“, kood 63.5) ja märgib sellele riskiskoori.",
+        "Edasi jälgib koordinaator: ebaselge leiu korral kordusuuring 3–6 kuu pärast, positiivse leiu korral pulmonoloogi või torakaalkirurgi konsultatsioon."
+      ],
+      "syn": ["kvsu", "kopsuvähk", "kopsuvähi sõeluuring", "mdkt", "ldct", "madaladoosiline kt", "plco", "plcom2012", "suitsetaja", "z13.8"]
+    }
+  ]
+}

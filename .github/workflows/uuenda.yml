@@ -13,6 +13,7 @@ on:
       - "build/sources.json"
       - "build/ks_notes.json"
       - "build/ms_ryhmakoodid.json"
+      - "build/soeluuringud.json"
       - "build/build.py"
 
 permissions:

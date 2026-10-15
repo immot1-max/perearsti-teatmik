@@ -41,6 +41,37 @@
     if (/STAT/.test(hk)) return 'statistiline';
     return null;
   }
+  // ------------------------------------------------------------ sõeluuringud
+  const soelItems = () => (state.data ? state.data.items.filter((x) => x.t === 'v') : []);
+  const soelYear = () => Math.max(0, ...soelItems().map((v) => v.aasta || 0)) || new Date().getFullYear();
+  const ageRange = (v) => (v.vanus ? `${v.vanus[0]}–${v.vanus[1]} a` : '');
+  const intText = (v) => (typeof v.int === 'number' ? `iga ${v.int} a` : '');
+  // Sünniaasta otsingus: millise sõeluuringu sihtrühma inimene sel aastal kuulub.
+  function birthYearCard(toks) {
+    const year = soelYear();
+    const y = toks.map((t) => (/^(19|20)\d\d$/.test(t) ? +t : 0)).find((n) => n && n >= year - 100 && n <= year - 18);
+    if (!y) return '';
+    const age = year - y;
+    const lines = [];
+    let hits = 0;
+    for (const v of soelItems()) {
+      const inAge = v.vanus && age >= v.vanus[0] && age <= v.vanus[1];
+      if (v.sy) {
+        if (v.sy.includes(y)) {
+          hits++;
+          lines.push(`<button class="yl yes" data-focus="${v._id}"><b>✓ ${esc(v.n)}</b><small>${esc(v.kes || '')} · ${esc(ageRange(v))} · ${esc(intText(v))}</small></button>`);
+        } else if (inAge) {
+          lines.push(`<button class="yl no" data-focus="${v._id}"><b>– ${esc(v.n)}</b><small>vanus sobib, kuid ${y} ei ole ${v.aasta}. aasta kutsutute seas</small></button>`);
+        }
+      } else if (inAge) {
+        lines.push(`<button class="yl maybe" data-focus="${v._id}"><b>? ${esc(v.n)}</b><small>vanus sobib (${esc(ageRange(v))}); ${esc(v.lyh || 'riskihinnangu järgi')}</small></button>`);
+      }
+    }
+    const none = hits ? '' : `<p class="yl-none">${year}. aastal ei kuulu ühegi sünniaasta põhise vähi sõeluuringu sihtrühma.</p>`;
+    const stale = new Date().getFullYear() > year ? `<p class="note">Terviseportaalis on veel ${year}. aasta sihtrühmad.</p>` : '';
+    return `<div class="ycard"><div class="yh"><b>Sünniaasta ${y}</b> · ${year}. aastal saab ${age}-aastaseks</div>${none}${lines.join('')}${stale}</div>`;
+  }
+
   const AB_LABEL = {
     2: 'Täpsustus', 3: 'Kasutusaeg', 4: 'Tehingu liik', 5: 'Koguseline piirlimiit', 6: 'Individuaalne', 7: 'Seotud hooldusteenusega',
     8: 'Soodustus', 9: 'Piirhind (üür/kuu)', 10: 'Piirhind (müük)', 11: 'Ühik', 12: 'Kellele ja millal', 13: 'Eelduskood',
@@ -95,6 +126,7 @@
       else if (it.t === 'q') cls = 'ks';
       else if (it.t === 'b') cls = 'lab';
       else if (it.t === 'm') cls = 'ms';
+      else if (it.t === 'v') cls = 'soel';
       it._cls = cls;
       let name = it.n || '';
       let ctx = '', txt = '', code = '';
@@ -134,6 +166,11 @@
         ctx = `${KS_CAT[it.cat] || ''} ${it.title || ''} kvaliteedisüsteem ${it.par || ''}`;
         txt = (it.rows || []).map((r) => `${r.s || ''} ${r.d} ${r.c.join(' ')}`).join(' ') + ' ' + (it.notes || []).join(' ');
         boost += 45;
+      } else if (it.t === 'v') {
+        name = `${it.n} ${it.sn || ''}`;
+        ctx = `vähi sõeluuring ${it.kes || ''} ${(it.sy || []).join(' ')}`;
+        txt = (it.notes || []).join(' ') + ' ' + (it.osale || '') + ' ' + (it.codes || []).map((c) => c.join(' ')).join(' ');
+        boost += 50;
       }
       const syn = (it.syn || []).map(norm);
       if (it.t === 'b' && it.ab) {
@@ -171,6 +208,7 @@
     if (state.filter === 'q') return t === 'q';
     if (state.filter === 'b') return t === 'b';
     if (state.filter === 'm') return t === 'm';
+    if (state.filter === 'v') return t === 'v';
     return t === state.filter;
   }
 
@@ -261,9 +299,13 @@
     if (fundItem) {
       html += `<div class="row ${fundItem.k}"><div class="detail" style="border-top:0"><div class="text"><p><strong>${esc(fundItem.n)}</strong> · metoodika ${esc(fundItem.par)}</p><p>${esc(FUND_HELP[fundItem.k] || '')}</p>${state.data.meta.starRule && fundItem.k === 'f37' ? `<p>* ${esc(state.data.meta.starRule)}</p>` : ''}</div><div class="actions"><a href="${esc(fundItem.url)}" target="_blank" rel="noopener">Säte Riigi Teatajas ↗</a></div></div></div>`;
     }
+    const yCard = q && !state.fund && (state.filter === 'all' || state.filter === 'v') ? birthYearCard(norm(q).split(' ')) : '';
+    html += yCard;
     html += `<div class="summary"><span>${total ? `${total} vastet` : ''}${q && total > state.limit ? `, näitan ${state.limit}` : ''}</span>${q || state.fund || state.filter !== 'all' ? '<button class="btn" data-act="home">Tühjenda</button>' : ''}</div>`;
     if (hidden && state.pa) html += `<div class="hidden-note">${hidden} vastet väljaspool perearstiabi on peidetud.<button class="btn" data-act="pa-off">Näita kõiki</button></div>`;
-    if (!total) {
+    if (!total && yCard) {
+      // sünniaasta kaart on vastus
+    } else if (!total) {
       html += `<p class="empty">Midagi ei leitud. Proovi lühemat sõna või koodi algust.</p>`;
       if (q && (state.fund || state.filter !== 'all')) html += '<button class="btn solid" data-act="all">Otsi kõigist kategooriatest</button>';
     } else {
@@ -322,6 +364,10 @@
         <span class="meta"><span class="code" data-copy="${esc(it.c)}" title="Kopeeri kood">${esc(it.c)}</span>${v['8'] ? `<span class="badge plain">${esc(v['8'])}</span>` : ''}${pe}${it.grp ? '<span class="badge plain">rühm</span>' : ''}<span>${esc((it.g || []).slice(-1)[0] || '')}</span>${via ? '<span class="via">· vaste kirjelduses</span>' : ''}</span>`;
     } else if (it.t === 'l') {
       head = `<span class="name">${esc(it.par)} ${hl(it.n, re)}</span><span></span><span class="meta"><span>${esc(SRC[it.src])}</span>${via ? '<span class="via">· vaste tekstis</span>' : ''}</span>`;
+    } else if (it.t === 'v') {
+      const yrs = it.sy ? `${it.aasta}: ${it.sy.length} sünniaastat` : (it.lyh || '');
+      head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${esc(ageRange(it))}</small></span>
+        <span class="meta"><span class="badge soel">sõeluuring</span>${it.sy ? `<span>${esc(it.kes || '')}</span>` : ''}${intText(it) ? `<span>${esc(intText(it))}</span>` : ''}<span>${esc(yrs)}</span>${via ? '<span class="via">· vaste sisus</span>' : ''}</span>`;
     }
     return `<article class="row ${it._cls}"><button class="head" data-open="${it._id}" aria-expanded="${open}">${head}</button>${open ? `<div class="detail">${detail(it)}</div>` : ''}</article>`;
   }
@@ -470,6 +516,9 @@
         if (it.kokku) h += `<tr><td>Lõige kokku</td><td></td><td class="num">${esc(it.kokku)}</td></tr>`;
         h += '</table></div>';
       }
+      for (const v of d.items.filter((x) => x.t === 'v' && x.sy && (x.ks || []).includes(it.k))) {
+        h += `<div class="rules"><h4>Sihtrühm ${v.aasta} (terviseportaal)</h4><div class="rule">Sünniaastad ${v.sy.join(', ')} (${esc(ageRange(v))}, ${esc(intText(v))}). <button class="badge soel" data-focus="${v._id}">${esc(v.n)}</button></div></div>`;
+      }
       if (it.notes && it.notes.length) {
         const src = d.meta.ksNotes && d.meta.ksNotes.allikas ? d.meta.ksNotes.allikas : 'Tervisekassa juhendid';
         h += `<div class="rules"><h4>Selgitused (${esc(src)})</h4>${it.notes.map((n) => `<div class="rule">${hl(n, re)}</div>`).join('')}</div>`;
@@ -479,6 +528,38 @@
         + docs.filter((x) => it.k === 'ylevaade' || x.k === 'ind' || x.k === 'juhis').map((x) => `<a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.n)}${x.aasta ? ' ' + x.aasta : ''} ↗</a>`).join('')
         + (it.k === 'ylevaade' && d.meta.tk ? `<a href="${esc(d.meta.tk.page)}" target="_blank" rel="noopener">Tervisekassa kvaliteedisüsteemi leht ↗</a>` : '')
         + '</div>';
+      return h;
+    }
+    if (it.t === 'v') {
+      let h = '<dl class="kv">';
+      h += `<div><dt>Kellele</dt><dd>${esc(it.kes || '')}</dd></div>`;
+      if (it.vanus) h += `<div><dt>Vanus</dt><dd>${it.vanus[0]}–${it.vanus[1]} aastat (sünniaasta järgi)</dd></div>`;
+      if (it.int) h += `<div><dt>Intervall</dt><dd>${typeof it.int === 'number' ? `iga ${it.int} aasta järel` : esc(it.int)}</dd></div>`;
+      if (it.sy) h += `<div><dt>Sünniaastad ${it.aasta}</dt><dd><span class="years">${it.sy.map((y) => `<span>${hl(String(y), re)}</span>`).join('')}</span></dd></div>`;
+      if (it.osale) h += `<div><dt>Osalemine</dt><dd>${esc(it.osale)}</dd></div>`;
+      if (it.dg) h += `<div><dt>Raviarve</dt><dd>diagnoos <b>${esc(it.dg)}</b>${it.dgAllikas ? ` <span class="inh">(${esc(it.dgAllikas)})</span>` : ''}</dd></div>`;
+      for (const k of it.ks || []) {
+        const qq = state.qByKey[k];
+        if (qq) h += `<div><dt>Kvaliteedisüsteem</dt><dd><button class="badge ks" data-focus="${qq._id}">${esc(qq.n)}</button>${ksValue(qq) ? ` <span class="inh">${esc(ksValue(qq))}</span>` : ''}</dd></div>`;
+      }
+      h += '</dl>';
+      if (it.sy && new Date().getFullYear() > it.aasta) h += `<p class="note">Terviseportaalis on veel ${it.aasta}. aasta sihtrühmad. Uue aasta sünniaastad tulevad siia automaatselt, kui terviseportaal need avaldab.</p>`;
+      if (it.erinevus) h += `<p class="note">${esc(it.erinevus)}</p>`;
+      if ((it.codes || []).length) {
+        h += '<h4>Koodid</h4><div class="tbl"><table><tr><td>Kood</td><td>Tegevus</td><td>Piirhind</td></tr>' + it.codes.map(([c, role]) => {
+          const s = state.byCode[c];
+          const zl = s ? zeroLabel(s) : null;
+          const price = !s ? '' : zl ? `<small>${esc(zl)}</small>` : s.p != null ? fmtEur(s.p) : '';
+          const fund = s ? (s.f || []).map((f) => `<span class="badge ${f}">${esc(FUND_SHORT[f])}</span>`).join(' ') : '';
+          const same = s && (norm(role).includes(norm(s.n)) || norm(s.n).includes(norm(role)));
+          return `<tr><td><button class="code" data-q="${esc(c)}" title="Ava kood">${esc(c)}</button></td><td>${hl(role, re)}${s && !same ? `<br><small class="inh">${esc(s.n)}</small>` : ''}${fund ? '<br>' + fund : ''}</td><td class="num">${price}</td></tr>`;
+        }).join('') + '</table></div>';
+      }
+      const notes = (it.notes || []).concat(it.sy ? ((d.meta.soel || {}).yld || []) : []);
+      if (notes.length) h += `<div class="rules"><h4>Selgitused</h4>${notes.map((n) => `<div class="rule">${hl(n, re)}</div>`).join('')}</div>`;
+      h += `<div class="actions"><a href="${esc(it.url)}" target="_blank" rel="noopener">${it.src === 'terviseportaal' ? 'Terviseportaal' : 'Tervisekassa'} ↗</a>`
+        + (it.juhend ? `<a href="${esc(it.juhend)}" target="_blank" rel="noopener">Tegevusjuhend (PDF) ↗</a>` : '')
+        + (it.uuendatud ? `<span class="inh">leht uuendatud ${fmtDate(it.uuendatud)}</span>` : '') + '</div>';
       return h;
     }
     if (it.t === 'l') {
@@ -517,24 +598,32 @@
       const it = q(src, par);
       return it ? `<button class="qbtn ${cls}" data-focus="${it._id}"><b>${esc(t)}</b><small>${esc(SRC[src])} ${esc(par)} · ${esc(sub)}</small></button>` : '';
     }).join('');
-    const ex = ['holter', 'IGRA', 'HCV', 'jalaortoos', '7115', 'hüpertoonia', 'ratastool', 'juhiload'];
+    const ex = ['holter', 'IGRA', 'HCV', 'jalaortoos', '7115', 'hüpertoonia', '1966', 'mammograafia', 'ratastool', 'juhiload'];
+    const sv = d.items.filter((x) => x.t === 'v');
+    const sy0 = soelYear();
+    const soelHtml = !sv.length ? '' : `<section class="section"><h2>Vähi sõeluuringud ${sy0}</h2><div class="soel">`
+      + sv.map((v) => `<button class="srow" data-focus="${v._id}"><span class="sn"><b>${esc(v.sn)}</b><small>${v.sy ? `${esc(v.kes || '')} · ${esc(ageRange(v))} · ${esc(intText(v))}` : esc(ageRange(v))}</small></span>${v.sy ? `<span class="sy">${v.sy.join(' ')}</span>` : `<span class="sy txt">${esc(v.lyh || '')}</span>`}</button>`).join('')
+      + `</div><p class="hint">Sisesta otsingusse sünniaasta (nt 1966): näed, millise sõeluuringu sihtrühma inimene ${sy0}. aastal kuulub.</p>`
+      + (new Date().getFullYear() > sy0 ? `<p class="note">Terviseportaalis on veel ${sy0}. aasta sihtrühmad.</p>` : '') + '</section>';
     const ksCards = d.items.filter((x) => x.t === 'q').sort((a, b) => KS_ORDER.indexOf(a.cat) - KS_ORDER.indexOf(b.cat))
       .map((x) => `<button class="qbtn ks" data-focus="${x._id}"><b>${esc(x.k === 'ylevaade' ? 'Ülevaade ja lisatasud' : x.sn)}</b><small>${esc(KS_CAT[x.cat])}${ksValue(x) ? ' · ' + esc(ksValue(x)) : ''} · ${esc(x.par)}</small></button>`).join('');
     el.results.innerHTML = `
       <section class="section"><h2>Rahastus (metoodika § 6)</h2><div class="funds">
         ${funds.map((f) => `<button class="fund ${f.k}" data-fund="${f.k}"><strong>${esc(f.n)}</strong><span>${esc(FUND_HELP[f.k] || '')}</span><span class="cnt">${f.cnt} teenust · ${esc(f.par)}</span></button>`).join('')}
       </div></section>
+      ${soelHtml}
       <section class="section"><h2>Kvaliteedisüsteem (metoodika § 8)</h2><div class="quick">${ksCards}</div></section>
       <section class="section"><h2>Kiirvalikud</h2><div class="quick">${quick}<button class="qbtn msq" data-filter="m"><b>Meditsiiniseadmed (9MS)</b><small>${d.meta.counts.m || 0} rühma · ortoosid, testribad, sensorid, kompressioontooted jm</small></button></div></section>
       <section class="section"><h2>Proovi otsida</h2><div class="examples">${ex.map((w) => `<button class="chip" data-q="${esc(w)}">${esc(w)}</button>`).join('')}</div></section>
       <section class="section"><h2>Andmete seis</h2><div class="status" id="status"></div></section>
       <section class="section"><h2>Värvid</h2><div class="legend">
         <span><i style="--k:var(--c-f37)"></i>uuringufond 37%</span><span><i style="--k:var(--c-lisaks)"></i>tegevusfond</span><span><i style="--k:var(--c-f13)"></i>teraapiafond 13%</span>
-        <span><i style="--k:var(--c-teenus)"></i>muu teenus</span><span><i style="--k:var(--c-abiv)"></i>abivahend</span><span><i style="--k:var(--c-sate)"></i>säte</span><span><i style="--k:var(--c-juhi)"></i>juhi tervisenõuded</span><span><i style="--k:var(--c-ks)"></i>kvaliteedisüsteem</span><span><i style="--k:var(--c-lab)"></i>SYNLABi analüüs</span><span><i style="--k:var(--c-ms)"></i>meditsiiniseade</span>
+        <span><i style="--k:var(--c-teenus)"></i>muu teenus</span><span><i style="--k:var(--c-abiv)"></i>abivahend</span><span><i style="--k:var(--c-sate)"></i>säte</span><span><i style="--k:var(--c-juhi)"></i>juhi tervisenõuded</span><span><i style="--k:var(--c-ks)"></i>kvaliteedisüsteem</span><span><i style="--k:var(--c-lab)"></i>SYNLABi analüüs</span><span><i style="--k:var(--c-ms)"></i>meditsiiniseade</span><span><i style="--k:var(--c-soel)"></i>sõeluuring</span>
       </div></section>
       <section class="section info"><h2>Kasutamine</h2>
         <p>Otsi nimetuse, koodi, lühendi või argisõnaga (nt „holter“, „TSH“, „6417“). Täpitähti pole vaja. Koodil klõpsates kopeerub see.</p>
         <p>Laborianalüüsi saab otsida SYNLABi nime või lühendiga (nt „IGRA“, „HCV“). Vastes on Tervisekassa kood ja see, kas analüüs kuulub perearsti fondi. Koodi avades on näha kõik selle koodi alla kuuluvad SYNLABi analüüsid.</p>
+        <p>Sünniaasta otsing (nt „1966“) näitab, millise rinna-, emakakaela- või soolevähi sõeluuringu sihtrühma inimene sel aastal kuulub. Sünniaastad tulevad terviseportaalist ja neid kontrollitakse kord kuus.</p>
         <p>Linnuke „Ainult perearstiabi“ peidab teenused, mis ei kuulu perearsti fondidesse, kvaliteedisüsteemi ega perearstiabi peatükki (nt operatsioonid). Täpse koodi otsing näitab koodi alati.</p>
         <p>Rakendus töötab pärast esimest avamist ka võrguta. Telefonis lisa see avakuvale: iPhone'is Safari jagamismenüü → „Lisa avakuvale“, Androidis Chrome'i menüü → „Installi rakendus“.</p>
         <p>Andmed tulevad Riigi Teataja avalikust liidesest ja neid kontrollitakse automaatselt kord kuus. Õiguslikult kehtib alati Riigi Teatajas avaldatud tekst.</p>
@@ -556,6 +645,8 @@
     }
     if (m.toru) h += `<div class="src"><span>Toru (${esc(m.toru.file)})</span><span>seis ${fmtDate(m.toru.seisuga)}</span></div>`;
     if (m.synlab) h += `<div class="src"><span><a href="${esc(m.synlab.page)}" target="_blank" rel="noopener">SYNLABi hinnakiri</a></span><span>kehtib alates ${esc(m.synlab.seisuga || '')}</span></div>`;
+    const sv = d.items.filter((x) => x.t === 'v' && x.aasta);
+    if (sv.length && m.soel) h += `<div class="src"><span><a href="${esc(m.soel.page)}" target="_blank" rel="noopener">Vähi sõeluuringud (terviseportaal)</a></span><span>${Math.max(...sv.map((x) => x.aasta))}. aasta sihtrühmad</span></div>`;
     h += `<div class="src"><span>Viimati kontrollitud</span><span>${fmtDate(m.date)}</span></div>`;
     box.innerHTML = h;
   }
@@ -570,6 +661,7 @@
     el.chips.innerHTML = [['all', 'Kõik', null], ['s', 'Teenused', state.pa ? d.meta.countsPa || c.s : c.s]].map(cat).join('')
       + funds.map(fund).join('')
       + (c.q ? `<button class="chip kschip" data-filter="q" aria-pressed="${!state.fund && state.filter === 'q'}">Kvaliteedisüsteem<span class="n">${c.q - 1}</span></button>` : '')
+      + (c.v ? `<button class="chip soelchip" data-filter="v" aria-pressed="${!state.fund && state.filter === 'v'}">Sõeluuringud<span class="n">${c.v}</span></button>` : '')
       + (c.b ? `<button class="chip labchip" data-filter="b" aria-pressed="${!state.fund && state.filter === 'b'}">Labor (SYNLAB)<span class="n">${c.b}</span></button>` : '')
       + [['a', 'Abivahendid', c.a]].map(cat).join('')
       + (c.m ? `<button class="chip mschip" data-filter="m" aria-pressed="${!state.fund && state.filter === 'm'}">Meditsiiniseadmed<span class="n">${c.m}</span></button>` : '')

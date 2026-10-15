@@ -496,6 +496,104 @@ def synlab_labs(prev):
     return out, {"page": SYNLAB_PAGE, "seisuga": m.group(1) if m else None, "title": title, "count": len(out)}
 
 
+# ----------------------------------------------------------------- sõeluuringud
+
+SOEL_PAGE = "https://www.terviseportaal.ee/haiguste-ennetus/soeluuringud"
+KVSU_PAGE = "https://tervisekassa.ee/kopsuvahi-soeluuring"
+NUM_WORDS = {"ühe": 1, "kahe": 2, "kolme": 3, "nelja": 4, "viie": 5, "kuue": 6, "kümne": 10}
+YEARS_RE = r"((?:(?:19|20)\d\d(?:\s*,\s*|\s+ja\s+)?)+)"
+
+
+def page_text(url):
+    raw = http_get(url, timeout=60, tries=2).decode("utf-8", "replace")
+    doc = lhtml.fromstring(raw)
+    for s in doc.xpath("//script|//style|//noscript"):
+        s.drop_tree()
+    return doc, re.sub(r"\s+", " ", doc.text_content().replace(" ", " "))
+
+
+def years_of(s):
+    return [int(y) for y in re.findall(r"(?:19|20)\d\d", s)]
+
+
+def soeluuringud(prev, cfg):
+    """Vähi sõeluuringute sihtrühmad terviseportaalist (vanus, intervall, kutsutavad sünniaastad)
+    ja püsiv lisainfo failist soeluuringud.json. Kui lehte ei saa või see ei parsi, jääb eelmine seis."""
+    prev_v = {x["k"]: x for x in (prev or {}).get("items", []) if x["t"] == "v"}
+    warn, items = [], []
+    try:
+        _, txt = page_text(SOEL_PAGE)
+    except Exception as e:  # noqa: BLE001
+        txt = None
+        warn.append(f"Terviseportaali sõeluuringute lehte ei saanud ({e}); kasutan eelmist seisu.")
+    for p in cfg["programmid"]:
+        it = {"t": "v", "k": p["k"], "n": p["n"], "sn": p["sn"], "codes": p["codes"], "notes": p.get("notes", []),
+              "syn": ["sõeluuring", "vähi sõeluuring", "skriining"] + p.get("syn", [])}
+        for key in ("dg", "dgAllikas", "ks"):
+            if p.get(key):
+                it[key] = p[key]
+        if p.get("staatiline"):
+            it.update({"kes": p["kes"], "vanus": p["vanus"], "int": p.get("intervall"), "lyh": p.get("luhike"), "url": p["leht"], "src": "tervisekassa"})
+            try:
+                doc, ktxt = page_text(p["leht"])
+                pdf = next((h for h in doc.xpath("//a/@href") if re.search(r"kopsuvahi.*juhend.*\.pdf$", h, re.I)), None)
+                if pdf:
+                    it["juhend"] = pdf if pdf.startswith("http") else "https://tervisekassa.ee" + pdf
+                mu = re.search(r"Viimati uuendatud:\s*(\d\d)\.(\d\d)\.(\d\d)", ktxt)
+                if mu:
+                    it["uuendatud"] = f"20{mu.group(3)}-{mu.group(2)}-{mu.group(1)}"
+            except Exception as e:  # noqa: BLE001
+                old = prev_v.get(p["k"], {})
+                for key in ("juhend", "uuendatud"):
+                    if old.get(key):
+                        it[key] = old[key]
+                warn.append(f"Tervisekassa kopsuvähi sõeluuringu lehte ei saanud ({e}).")
+            items.append(it)
+            continue
+        it.update({"url": p["alamleht"], "src": "terviseportaal"})
+        stem = p["tyvi"]
+        m_age = re.search(stem + r" sõeluuringule oodatakse kõiki (\d+)\s*[-–]\s*(\d+)[\s-]*aastaseid (.+?) iga (\S+) aasta järel", txt or "", re.I)
+        m_yrs = re.search(r"(20\d\d)\. aastal on " + stem + r" sõeluuringule kutsutud (.+?) sünniaastatega\s*" + YEARS_RE, txt or "", re.I)
+        if not (m_age and m_yrs):
+            old = prev_v.get(p["k"])
+            if txt is not None:
+                warn.append(f"{p['n']}: terviseportaali tekst ei vastanud oodatud mustrile; kasutan eelmist seisu.")
+            if old:
+                for key in ("kes", "vanus", "int", "aasta", "sy", "osale", "kontroll"):
+                    if key in old:
+                        it[key] = old[key]
+            items.append(it)
+            continue
+        lo, hi = int(m_age.group(1)), int(m_age.group(2))
+        iw = m_age.group(4).lower()
+        interval = NUM_WORDS.get(iw) or (int(iw) if iw.isdigit() else None)
+        year = int(m_yrs.group(1))
+        sy = sorted(set(years_of(m_yrs.group(3))))
+        rest = (txt or "")[m_yrs.end():m_yrs.end() + 400]
+        m_os = re.match(r"\s*\.?\s*([A-ZÕÄÖÜ][^.!?]*[.!?])", rest)
+        it.update({"kes": m_yrs.group(2).strip(), "vanus": [lo, hi], "int": interval, "aasta": year, "sy": sy,
+                   "osale": m_os.group(1).strip() if m_os else None, "kontroll": TODAY.isoformat()})
+        ages = [year - y for y in sy]
+        if ages and (min(ages) != lo or max(ages) != hi):
+            warn.append(f"{p['n']}: {year}. aasta sünniaastate vanused ({min(ages)}–{max(ages)}) ei klapi lehel nimetatud vanusega {lo}–{hi}.")
+        steps = {b - a for a, b in zip(sy, sy[1:])}
+        if interval and steps and steps != {interval}:
+            warn.append(f"{p['n']}: sünniaastate vahe {sorted(steps)} ei vasta intervallile {interval} a.")
+        try:
+            _, st = page_text(p["alamleht"])
+            ms = re.search(r"(20\d\d)\. aastal [^.]*?sõeluuringule [^.]*?sünniaasta\w*\s*" + YEARS_RE, st)
+            if ms and (int(ms.group(1)) != year or sorted(set(years_of(ms.group(2)))) != sy):
+                warn.append(f"{p['n']}: alamlehe sünniaastad ({ms.group(1)}: {ms.group(2).strip()}) erinevad koondlehest.")
+        except Exception:  # noqa: BLE001
+            pass
+        er = p.get("erinevus")
+        if er and er.get("aasta") == year:
+            it["erinevus"] = er["s"]
+        items.append(it)
+    meta = {"page": SOEL_PAGE, "yld": cfg["_meta"].get("yld", []), "warn": warn}
+    return items, meta
+
+
 # ----------------------------------------------------------------- meditsiiniseadmed
 
 def lisa_pdf(xml, pattern=r"lisa"):
@@ -597,7 +695,7 @@ def build(args):
 
     toru_dir = os.path.join(HERE, "toru")
     aux_hash = hashlib.sha256()
-    for fn in ["synonyms.json", "links.json", "build.py", "ks_notes.json", "ms_ryhmakoodid.json"]:
+    for fn in ["synonyms.json", "links.json", "build.py", "ks_notes.json", "ms_ryhmakoodid.json", "soeluuringud.json"]:
         with open(os.path.join(HERE, fn), "rb") as f:
             aux_hash.update(f.read())
     toru_loaded = load_toru_rows(toru_dir)  # xlsx olemasolul uuendab väljavõtet
@@ -616,6 +714,11 @@ def build(args):
         aux_hash.update(json.dumps(tk["docs"], sort_keys=True).encode())
     labs, synlab_meta = synlab_labs(prev)
     aux_hash.update(json.dumps([[x["n"], x["ab"], x["tk"], x["p"]] for x in labs], ensure_ascii=False).encode())
+    with open(os.path.join(HERE, "soeluuringud.json"), encoding="utf-8") as f:
+        soel_cfg = json.load(f)
+    soel_items, soel_meta = soeluuringud(prev, soel_cfg)
+    aux_hash.update(json.dumps([[x["k"], x.get("aasta"), x.get("sy"), x.get("vanus"), x.get("int"), x.get("kes"), x.get("osale"), x.get("juhend")]
+                                for x in soel_items] + [soel_meta["warn"]], ensure_ascii=False).encode())
     fingerprint = "|".join([BUILD_VERSION] + [f"{k}:{v['id']}:{','.join(x['id'] for x in v['tulevased'])}" for k, v in sorted(sources.items())] + [aux_hash.hexdigest()[:16]])
     if prev and prev["meta"].get("fingerprint") == fingerprint and not args.force:
         print("Muudatusi ei ole.")
@@ -825,6 +928,9 @@ def build(args):
     for par in mj_pars:
         items.append(make_sate("mootorsoidukijuht", mj, par))
 
+    # 7b. sõeluuringud
+    items.extend(soel_items)
+
     # 8. fondid, lingid, sünonüümid
     items.extend(funds)
     with open(os.path.join(HERE, "links.json"), encoding="utf-8") as f:
@@ -867,7 +973,8 @@ def build(args):
         "toru": toru_meta,
         "abivCols": ab_cols,
         "starRule": star_rule,
-        "counts": {t: sum(1 for x in items if x["t"] == t) for t in ["s", "f", "l", "a", "k", "q", "b", "m"]},
+        "counts": {t: sum(1 for x in items if x["t"] == t) for t in ["s", "f", "l", "a", "k", "q", "b", "m", "v"]},
+        "soel": soel_meta,
         "msUnmapped": ms_unmapped,
         "countsPa": sum(1 for x in items if x["t"] == "s" and x.get("pa")),
         "synlab": synlab_meta,
@@ -1120,6 +1227,22 @@ def make_report(prev, data, missing):
         lines.append(f"## NB: Tervisekassa on avaldanud kvaliteedisüsteemi {newest}. aasta juhendid")
         lines.append(f"Märkused failis build/ks_notes.json põhinevad {kn['aasta']}. aasta juhenditel; vaata need üle.")
         lines.append("")
+    sv = [x for x in data["items"] if x["t"] == "v"]
+    if sv:
+        pv = {x["k"]: x for x in (prev or {}).get("items", []) if x["t"] == "v"}
+        lines.append("## Vähi sõeluuringud (terviseportaal)")
+        for x in sv:
+            if x.get("sy"):
+                old = pv.get(x["k"])
+                mark = " **(muutus)**" if old and (old.get("aasta"), old.get("sy")) != (x.get("aasta"), x.get("sy")) else ""
+                lines.append(f'- {x["n"]} {x.get("aasta")}: {x["vanus"][0]}–{x["vanus"][1]} a, iga {x.get("int")} a; sünniaastad {", ".join(map(str, x["sy"]))}{mark}')
+            elif x.get("juhend"):
+                old = pv.get(x["k"]) or {}
+                mark = " **(uus juhend)**" if old.get("juhend") and old.get("juhend") != x["juhend"] else ""
+                lines.append(f'- {x["n"]}: [tegevusjuhend]({x["juhend"]}){mark}')
+        for w in (data["meta"].get("soel") or {}).get("warn", []):
+            lines.append(f"- NB: {w}")
+        lines.append("")
     if data["meta"].get("msUnmapped"):
         lines.append("## Meditsiiniseadme rühmad, millel puudub 9MS kood")
         lines.append(", ".join(data["meta"]["msUnmapped"]) + " (lisa kood faili build/ms_ryhmakoodid.json)")
@@ -1142,7 +1265,7 @@ def make_report(prev, data, missing):
         lines.append(", ".join(missing))
     c = data["meta"]["counts"]
     lines.append("")
-    lines.append(f"Kokku: {c['s']} teenust, {c.get('m', 0)} meditsiiniseadmete rühma, {c.get('b', 0)} SYNLABi analüüsi, {c['a']} abivahendit, {c['l']} sätet, {c['f']} fondi, {c.get('q', 0)} kvaliteedisüsteemi jaotist, {c['k']} linki.")
+    lines.append(f"Kokku: {c['s']} teenust, {c.get('m', 0)} meditsiiniseadmete rühma, {c.get('b', 0)} SYNLABi analüüsi, {c['a']} abivahendit, {c['l']} sätet, {c['f']} fondi, {c.get('q', 0)} kvaliteedisüsteemi jaotist, {c.get('v', 0)} sõeluuringut, {c['k']} linki.")
     return "\n".join(lines) + "\n"
 
 

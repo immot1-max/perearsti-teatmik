@@ -113,7 +113,8 @@
     "sn": "JVS",
     "syn": ["jvs", "jämesoolevähk", "jämesoolevähi sõeluuring", "peitveri", "sõeluuring", "z12.1"],
     "notes": [
-      "Sihtrühm: 60–68-aastased sõeluuringu sihtrühma isikud; peitvere test 66224.",
+      "Sihtrühm: nimistu patsiendid, kes on saanud kutse jämesoolevähi sõeluuringule; sihtrühm määratakse sünniaasta järgi (vt allpool). Välja jäävad välismaal elavad, elu jooksul C18–C20 diagnoosi saanud ja viimase 120 kuu jooksul sõelkoloskoopia (7597) teinud isikud (indikaatorite kirjeldus 2026).",
+      "Allikad erinevad: rakendusjuhise tabelis on esimene variant „9038 ja 9047/9039“ (sisaldab ka soolepuhastuspreparaati 9047), metoodika § 8 lg 11¹ ja indikaatorite kirjelduses on „9038 ja 9039“. Õiguslikult kehtib metoodika.",
       "Raviarvel diagnoos Z12.1, teenuse tüüp 1. Pearahasisesed koodid: 9038 nõustamine, 9039 peitvere testi komplekt, 9047 soolepuhastuspreparaat, 9048 sõeluuringust keeldumine. Ravikindlustuseta isikul lisaks 3002 (esmane) või 3004 (korduv vastuvõtt).",
       "Lisatasu kood 3083: koefitsient 0,8 kui täidetud vähemalt 80%, 1,0 kui vähemalt 90%."
     ]

@@ -15,6 +15,8 @@ Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, abivahendite
 | Metoodika § 8 ja Tervisekassa kvaliteedisüsteemi leht | Kvaliteedisüsteemi kriteeriumid, koodid, punktid ja lisapädevuste koodiloetelud; Tervisekassa uusimad juhendid |
 | Tervisekassa meditsiiniseadmete loetelu (tervise- ja tööministri määrus nr 86) | 64 rühma: hüvitamise tingimused (§ 4–63⁴), alarühmad ja tooted koos piirhindadega; rühmakoodid 9MS failist `build/ms_ryhmakoodid.json` |
 | SYNLABi hinnakiri (tervishoiuteenuse pakkujale) | Analüüsi nimi, lühend, Tervisekassa kood ja hind; analüüsilt koodini ja koodilt analüüsideni |
+| Terviseportaal: vähi sõeluuringud | Rinna-, emakakaela- ja soolevähi sõeluuringu vanus, intervall ja jooksva aasta sünniaastad; koodid ja raviarve info failist `build/soeluuringud.json` |
+| Tervisekassa: kopsuvähi sõeluuring | Tegevusjuhendi link ja lehe uuendamise kuupäev; sihtrühm ja kodeerimine failist `build/soeluuringud.json` |
 | Toru (Tervisekassa) | Hinna kehtivuse algus, eelmine hind, koodid, mida loetelu tabelites ei ole |
 | Sotsiaalkindlustusamet | Lingid juhenditele ja vormidele |
 
@@ -36,6 +38,12 @@ Toru toorfaili repos ei hoita, sest repo on avalik. Repos on ainult sellest teht
 ## Kvaliteedisüsteem
 
 Kriteeriumid, koodid, punktid ja koefitsiendid loetakse automaatselt metoodika § 8 tabelitest, nii et need uuenevad koos määrusega. Tervisekassa juhendites olevad lisaselgitused (vanused, kodeerimisreeglid, lisapädevuse lävendid) on failis `build/ks_notes.json`. Kontroll vaatab iga kuu ka Tervisekassa kvaliteedisüsteemi lehte. Kui seal ilmuvad uue aasta juhendid, märgib ta selle teavitusse ja `ks_notes.json` tuleb üle vaadata.
+
+## Sõeluuringud
+
+Igal kontrollil loetakse terviseportaali lehelt https://www.terviseportaal.ee/haiguste-ennetus/soeluuringud iga programmi vanusevahemik, intervall ja kutsutavad sünniaastad. Skript kontrollib, et sünniaastatest arvutatud vanused klapivad lehel nimetatud vanusega, et sünniaastate vahe vastab intervallile ja et alamlehe sünniaastad ühtivad koondlehega. Kui midagi ei klapi või lehte ei saa, jääb alles eelmine seis ja teavitusse tuleb märkus. Uue aasta sünniaastad jõuavad rakendusse järgmisel kuukontrollil pärast seda, kui terviseportaal need avaldab.
+
+Rakenduses näitab sünniaasta otsing (nt „1966“), millise sõeluuringu sihtrühma inimene sel aastal kuulub.
 
 ## Sünonüümid
 
