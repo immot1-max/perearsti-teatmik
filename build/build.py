@@ -178,7 +178,7 @@ def text_of(el):
 
     def rec(e):
         tag = e.tag.replace(NS, "")
-        if tag in ("muutmismarge", "kuvatavNr", "loigeNr", "alampunktNr", "paragrahvNr"):
+        if tag in ("muutmismarge", "kuvatavNr", "loigeNr", "alampunktNr", "paragrahvNr", "viideURID", "viideURI"):
             return
         if tag == "sup":
             parts.append((e.text or "").translate(SUP))
@@ -865,7 +865,7 @@ def build_teemad(cfg, sources, par_text, dyn, lisad):
                 if ek:
                     tabs.append({"n": "Saatekirja ja vastuse nõuded erialade kaupa (metoodika lisad)",
                                  "pais": ["E-konsultatsioon", "Saatja", "Nõuded"],
-                                 "read": [[n + (f" ({note})" if note else ""), saatja, [f"Lisa {nr}", u]] for n, saatja, note, nr, u in ek],
+                                 "read": [[n + (f", {note}" if note else ""), saatja, [f"Lisa {nr}", u]] for n, saatja, note, nr, u in ek],
                                  "markus": "Saatja on lisa pealkirjas nimetatud suunaja. Lisad loetakse kehtivast metoodikast igal andmekontrollil.",
                                  "a": [ref(["metoodika", "§ 6"])]})
                 else:
@@ -1581,8 +1581,14 @@ def make_report(prev, data, missing):
             for lab, key in (("uut koodi", "uus"), ("kadunud koodi", "kadunud"), ("hinnamuutust", "hind")):
                 if k.get(key):
                     parts.append(f"{len(k[key])} {lab}")
+            if x.get("fondPct"):
+                parts.append("fondi protsent: " + ", ".join(f"{k} {v[0]}% → {v[1]}%" for k, v in x["fondPct"].items()))
             if x.get("fond"):
                 parts.append(f'{len(x["fond"])} fondimuutust')
+            if x.get("abiv"):
+                parts.append(f'{sum(len(v) for v in x["abiv"].values())} abivahendi muutust')
+            if x.get("ms"):
+                parts.append(f'{sum(len(v) for v in x["ms"].values())} meditsiiniseadme toote muutust')
             if x.get("pars"):
                 parts.append(f'{len(x["pars"])} sätet')
             if x.get("lisad"):

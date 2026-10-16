@@ -42,7 +42,6 @@
     "tk-hambaravi": {"n": "Tervisekassa: täiskasvanu hambaravihüvitis", "u": "https://tervisekassa.ee/inimesele/hambaravi/taiskasvanute-hambaravi/hambaravihuvitis"},
     "tk-proteesid": {"n": "Tervisekassa: hambaproteeside hüvitis", "u": "https://tervisekassa.ee/inimesele/hambaravi/taiskasvanute-hambaravi/hambaproteeside-huvitis"},
     "rt-ravimite-loetelu": {"n": "Tervisekassa ravimite loetelu (Riigi Teataja, kehtiv redaktsioon)", "u": "https://www.riigiteataja.ee/akt/126032025010?leiaKehtiv"},
-    "rt-haiguste-loetelu": {"n": "Haigused, mille ravim kantakse loetellu soodustusega 100 või 75% (Riigi Teataja)", "u": "https://www.riigiteataja.ee/akt/109122022019?leiaKehtiv"},
     "ravimiregister": {"n": "Ravimiregister (Ravimiamet): müügiload, infolehed, ravimi omaduste kokkuvõtted", "u": "https://www.ravimiregister.ee/"},
     "raviminfo": {"n": "raviminfo.ee: ravimiotsing (eraleht, mitte ametlik allikas)", "u": "https://ravimiinfo.ee/"}
   },
@@ -616,10 +615,12 @@
         {"p": "Erandkorras", "s": "Ravimit, mis ravimite loetelus pole, võib Tervisekassa hüvitada erandkorras patsiendi taotlusel; taotlusele lisatakse raviarsti kirjalik seisukoht.",
          "allikas": [["raks", "§ 41"], "tk-erandkorras"],
          "kontroll": [["raks", "§ 41", "kui taotlusele on lisatud kindlustatud isikut raviva arsti kirjalik seisukoht"]]},
-        {"p": "Kust leida", "s": "Kehtiv ravimite loetelu koos soodustuse protsendi ja väljakirjutamise tingimustega (näiteks „ravi alustab eriarst“) on Tervisekassa soodusravimite lehel (PDF ja kokkuvõtlik Exceli tabel); õiguslik alus on Tervisekassa ravimite loetelu määrus ja haiguste loetelu soodustusega 100 või 75%. Loetelu muutub tavaliselt 1. jaanuaril, aprillil, juulil ja oktoobril.",
-         "allikas": ["tk-soodusravimid", "rt-ravimite-loetelu", "rt-haiguste-loetelu"]}
+        {"p": "Kust leida", "s": "Kehtiv ravimite loetelu koos soodustuse protsendi ja väljakirjutamise tingimustega (näiteks „ravi alustab eriarst“) on Tervisekassa soodusravimite lehel (PDF ja kokkuvõtlik Exceli tabel); õiguslik alus on Tervisekassa ravimite loetelu määrus. Alates 01.05.2026 on haigused, mille korral soodustus on 100 või 75%, märgitud ravimite loetelus endas ja need andmed on siduvad; varasem eraldi haiguste loetelu määrus kaotas kehtivuse. Loetelu muutub tavaliselt 1. jaanuaril, aprillil, juulil ja oktoobril.",
+         "allikas": ["tk-soodusravimid", "rt-ravimite-loetelu", ["raks", "§ 43"]],
+         "kontroll": [["raks", "§ 43", "punktides 4–7 nimetatud andmed on siduvad"]]}
       ],
-      "lingid": ["tk-soodusravimid", "rt-ravimite-loetelu", "rt-haiguste-loetelu", "tk-erandkorras", "tk-ravimihuvitis", "ravimiregister", "raviminfo"]
+      "tulevik": [{"alates": "2027-02-01", "s": "Soodustuse 90% vanuserühm laieneb: 4–16-aastased → 4–18-aastased (RaKS § 44 lg 4 redaktsioon alates 01.02.2027).", "allikas": [["raks", "§ 44"]]}],
+      "lingid": ["tk-soodusravimid", "rt-ravimite-loetelu", "tk-erandkorras", "tk-ravimihuvitis", "ravimiregister", "raviminfo"]
     },
     {
       "k": "ekons",
@@ -627,6 +628,7 @@
       "n": "E-konsultatsioon ja saatekiri",
       "sn": "E-konsultatsioon",
       "dyn": ["ekons"],
+      "tabelid_lopus": true,
       "seotud": ["patsiendihuvitised"],
       "syn": ["e-konsultatsioon", "ekonsultatsioon", "e-konsult", "ekons", "konsultatsioon", "saatekiri", "e-saatekiri", "suunamine", "saatekirjata", "eriarst", "visiiditasu"],
       "read": [

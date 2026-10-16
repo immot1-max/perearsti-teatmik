@@ -23,6 +23,8 @@
 - Tervise infosüsteemi põhimäärus (andmete esitamise tähtajad): [128032026002](https://www.riigiteataja.ee/akt/128032026002) kehtib alates 01.04.2026
 - Immuniseerimiskava: [115072026005](https://www.riigiteataja.ee/akt/115072026005) kehtib alates 18.07.2026; tulevikus jõustub: [111072026171](https://www.riigiteataja.ee/akt/111072026171) alates 01.01.2028
 - Immuniseerimise korraldamise nõuded: [123052023016](https://www.riigiteataja.ee/akt/123052023016) kehtib alates 26.05.2023; tulevikus jõustub: [111072026170](https://www.riigiteataja.ee/akt/111072026170) alates 01.01.2028
+- Ravimite väljakirjutamine ja apteekidest väljastamine: [107072026011](https://www.riigiteataja.ee/akt/107072026011) kehtib alates 10.07.2026
+- Meremehe ja mereõppeasutusse õppima asuja tervisenõuded ja tervisekontroll: [115122021011](https://www.riigiteataja.ee/akt/115122021011) kehtib alates 18.12.2021
 - SYNLABi hinnakiri: 949 analüüsi, SYNLAB Eesti OÜ analüüside hinnakiri ja koondtabel tervishoiuteenuse pakkujale (al 01.04.2026) - SYNLAB Eesti
 - Toru: toru_2026jul.xlsx (viimane muudatus 01.07.2026), hinnaerinevusi loeteluga: 3
 
@@ -36,7 +38,7 @@
 - Kopsuvähi sõeluuring (KVSU): [tegevusjuhend](https://tervisekassa.ee/sites/default/files/riikliku_kopsuvahi_soeluuringu_piirkondliku_laienemise_tegevusjuhend_2026.pdf)
 
 ## Igapäevatöö teemakaardid
-- Kõik teemakaartide tekstikontrollid läbitud.
+- NB: Standardkulu lisa: 1 rida ei õnnestunud lugeda (koodid 52625).
 
 
-Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 164 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 14 teemakaarti, 30 linki.
+Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 183 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 19 teemakaarti, 38 linki.

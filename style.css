@@ -380,7 +380,7 @@ details.udiff summary { cursor: pointer; font-size: 0.88rem; }
 .ud-old, .ud-new { font-size: 0.85rem; line-height: 1.45; padding: 4px 8px; border-radius: 4px; }
 .ud-old { background: var(--surface-2); color: var(--muted); }
 .ud-new { background: color-mix(in srgb, var(--c-muutus) 8%, var(--surface)); }
-.ud-old > span, .ud-new > span { display: inline-block; min-width: 3.6em; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
+.ud-old > span, .ud-new > span { display: inline-block; min-width: 3.6em; margin-right: 0.4em; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
 .ud-old del { background: color-mix(in srgb, var(--c-juhi) 18%, transparent); text-decoration: line-through; text-decoration-color: var(--c-juhi); color: var(--ink); }
 .ud-new ins { background: color-mix(in srgb, var(--c-f37) 22%, transparent); text-decoration: none; border-radius: 2px; }
 td.ud-old, td.ud-new { padding: 3px 8px; border-radius: 0; }

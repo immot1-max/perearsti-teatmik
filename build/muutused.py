@@ -16,7 +16,13 @@ import base64
 import hashlib
 import re
 
-VERSION = 1
+VERSION = 2
+# Allika põhine versioon: kui mõne akti võrdlusloogika muutub, arvutatakse ainult selle kirjed uuesti.
+SRC_VERSION = {"metoodika": 3}
+
+
+def version(src):
+    return SRC_VERSION.get(src, VERSION)
 MAX_PARS = 40       # muutunud paragrahve ühe kirje kohta
 MAX_LO = 6          # muutunud lõikeid paragrahvi kohta
 TXT = 700           # lõike teksti pikkus
@@ -59,7 +65,7 @@ def par_texts(pars, want=None, tables=False):
                 parts.append(pt["nr"] + " " + " ".join(b.get("s", "") for b in pt["blocks"] if b["t"] == "p"))
                 if tables:
                     parts += [" | ".join(" / ".join(r) for r in b["rows"]) for b in pt["blocks"] if b["t"] == "tbl"]
-            t = re.sub(r"\[RT[^\]]*\]", "", norm(" ".join(parts))).strip()
+            t = norm(re.sub(r"\[RT[^\]]*\]|\./dyn=\d+&id=\d+|\./\.\./vaheleht\.html", "", norm(" ".join(parts))))
             if t:
                 los[lo["nr"] or "-"] = t
         if los:
@@ -132,8 +138,10 @@ def ttl_codes(B, pars):
 
 
 def met_funds(B, pars):
-    """Sama loogika nagu build.py fondide tuvastamisel."""
-    funds = {}
+    """Fondid rolli järgi: suurema protsendiga fond on uuringufond, väiksemaga teraapiafond,
+    raviarvega lisaks tasutav on tegevusfond. Tagastab ({roll: {kood: nimi}}, {roll: protsent}).
+    Protsent võib redaktsiooniti muutuda (nt 39% → 37%), roll jääb samaks."""
+    funds, pcts = {}, {}
     for par in pars:
         if not par["ptk"].startswith("2."):
             continue
@@ -144,7 +152,7 @@ def met_funds(B, pars):
                 continue
             mp = re.search(r"kuni (\d+)\s*% perearsti nimistule pearahadeks arvestatud summast", txt)
             if mp:
-                key = f"f{mp.group(1)}"
+                key = f"pct{mp.group(1)}"
             elif "raviarve" in txt and "täiendavalt" in txt:
                 key = "lisaks"
             else:
@@ -154,7 +162,15 @@ def met_funds(B, pars):
                 for e in B.table_entries(b["rows"]):
                     for c in e["codes"]:
                         s.setdefault(c, e["name"])
-    return funds
+    pk = sorted((int(k[3:]) for k in funds if k.startswith("pct")), reverse=True)
+    roles = {}
+    for i, v in enumerate(pk):
+        role = "uuring" if i == 0 else "teraapia" if i == 1 else f"pct{v}"
+        roles[role] = funds[f"pct{v}"]
+        pcts[role] = v
+    if "lisaks" in funds:
+        roles["lisaks"] = funds["lisaks"]
+    return roles, pcts
 
 
 def ms_products(B, xml):
@@ -178,7 +194,7 @@ def diff_pair(B, key, cfg, a, b, xa, xb):
     url_a, url_b = B.RT + a["id"], B.RT + b["id"]
     pa, _ = B.walk_act(xa)
     pb, _ = B.walk_act(xb)
-    e = {"v": VERSION, "k": f'{key}:{a["id"]}:{b["id"]}', "src": key, "id": b["id"], "eid": a["id"],
+    e = {"v": version(key), "k": f'{key}:{a["id"]}:{b["id"]}', "src": key, "id": b["id"], "eid": a["id"],
          "alates": b["alates"], "ealates": a["alates"], "u": url_b, "eu": url_a}
     if key == "ttl":
         ca, cb = ttl_codes(B, pa), ttl_codes(B, pb)
@@ -192,7 +208,7 @@ def diff_pair(B, key, cfg, a, b, xa, xb):
             e["kood"] = kood
         e["pars"] = diff_pars(par_texts(pa), par_texts(pb), url_b, url_a)
     elif key == "metoodika":
-        fa, fb = met_funds(B, pa), met_funds(B, pb)
+        (fa, pcta), (fb, pctb) = met_funds(B, pa), met_funds(B, pb)
         fond = []
         for fk in sorted(set(fa) | set(fb)):
             sa, sb = fa.get(fk, {}), fb.get(fk, {})
@@ -200,6 +216,9 @@ def diff_pair(B, key, cfg, a, b, xa, xb):
             fond += [[fk, "-", c, sa[c]] for c in sa if c not in sb]
         if fond:
             e["fond"] = fond
+        fp = {k: [pcta.get(k), pctb.get(k)] for k in set(pcta) | set(pctb) if pcta.get(k) != pctb.get(k)}
+        if fp:
+            e["fondPct"] = fp
         # § 8 (kvaliteedisüsteem) koos tabelitega, muu tekst ilma fonditabeliteta
         ta = par_texts(pa)
         tb = par_texts(pb)
@@ -241,7 +260,7 @@ def diff_pair(B, key, cfg, a, b, xa, xb):
     lis = diff_lisad(xa, xb, B, b["id"], a["id"])
     if lis:
         e["lisad"] = lis
-    if not any(k in e for k in ("kood", "fond", "abiv", "ms", "pars", "lisad")):
+    if not any(k in e for k in ("kood", "fond", "fondPct", "abiv", "ms", "pars", "lisad")):
         return None
     return e
 
@@ -250,7 +269,7 @@ def compute(B, sources_cfg, sources, chains, cache, prev_list, today, days=365):
     """Arvutab kõik kirjed. chains[key] = sisuga redaktsioonid kuupäeva järgi (ka tulevased)."""
     import datetime as dt
     cutoff = (today - dt.timedelta(days=days)).isoformat()
-    prev = {x["k"]: x for x in (prev_list or []) if x.get("v") == VERSION}
+    prev = {x["k"]: x for x in (prev_list or []) if x.get("v") == version(x.get("src"))}
     out, warn = [], []
     for key, cfg in sources_cfg.items():
         chain = chains.get(key) or []
@@ -269,7 +288,7 @@ def compute(B, sources_cfg, sources, chains, cache, prev_list, today, days=365):
                 warn.append(f'{sources[key].get("lyh") or key} {a["id"]}→{b["id"]}: võrdlus ebaõnnestus ({str(ex)[:120]})')
                 continue
             if e is None:
-                e = {"v": VERSION, "k": k, "src": key, "id": b["id"], "eid": a["id"], "alates": b["alates"], "ealates": a["alates"],
+                e = {"v": version(key), "k": k, "src": key, "id": b["id"], "eid": a["id"], "alates": b["alates"], "ealates": a["alates"],
                      "u": B.RT + b["id"], "eu": B.RT + a["id"], "tyhi": True}
             out.append(e)
             print(f"[muutus] {key} {a['alates']} → {b['alates']}", flush=True)

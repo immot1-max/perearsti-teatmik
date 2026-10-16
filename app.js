@@ -26,6 +26,8 @@
   // Küsimuse abisõnad, mida otsingus ei nõuta (nt „kui kaua haigusleht“).
   const STOP = new Set(['kui', 'kaua', 'pikalt', 'mis', 'kes', 'kas', 'ja', 'on', 'mitu', 'palju', 'millal', 'kuidas', 'viisil', 'moodi', 'see', 'ning', 'saab', 'tohib', 'mida', 'kus', 'mille', 'ma', 'me', 'ei', 'vaja', 'tuleb', 'peab', 'ka', 'aga', 'et', 'oma', 'seda', 'selle', 'mul', 'meil', 'kelle', 'mitme', 'miks']);
   const FUND_SHORT = { f37: 'Uuringufond 37%', f13: 'Teraapiafond 13%', lisaks: 'Tegevusfond' };
+  // Muudatuste vaates on fondid rolli järgi (protsent võib redaktsiooniti muutuda).
+  const FUND_ROLE = { uuring: ['f37', 'Uuringufond'], teraapia: ['f13', 'Teraapiafond'], lisaks: ['lisaks', 'Tegevusfond'] };
   const FUND_HELP = {
     f37: 'Tasutakse kuni 37% ulatuses nimistu pearahadeks arvestatud summast aastas.',
     f13: 'Tasutakse kuni 13% ulatuses nimistu pearahadeks arvestatud summast aastas.',
@@ -143,7 +145,7 @@
     state.data = data;
     // Muudatuste kirjed (data.muutused) on rakenduses tavalised kirjed liigiga 'u'.
     if (!data._uAdded) {
-      for (const m of data.muutused || []) data.items.push(Object.assign({ t: 'u' }, m));
+      for (const m of data.muutused || []) if (!m.tyhi) data.items.push(Object.assign({ t: 'u' }, m));
       data._uAdded = true;
     }
     const items = data.items;
@@ -498,6 +500,7 @@
     add(k.kadunud, 'kadunud kood', 'kadunud koodi');
     add(k.nimi, 'nimemuutus', 'nimemuutust');
     const n1 = (n, one, many) => { if (n) p.push(`${n} ${n === 1 ? one : many}`); };
+    if (it.fondPct) p.push('fondi protsent muutus');
     n1((it.fond || []).length, 'fondimuutus', 'fondimuutust');
     if (it.abiv) n1(it.abiv.uus.length + it.abiv.kadunud.length + it.abiv.muut.length, 'abivahendi muutus', 'abivahendi muutust');
     if (it.ms) n1(it.ms.uus.length + it.ms.kadunud.length + it.ms.hind.length + it.ms.pct.length, 'toote muutus', 'toote muutust');
@@ -563,7 +566,10 @@
     h += uTable(it, 'uus', 'Uued koodid', ['Kood', 'Teenus', 'Piirhind'], k.uus, ([c, n, p]) => `<tr><td>${codeBtn(c)}</td><td>${esc(n)}</td><td class="num">${p != null ? fmtEur(p) : ''}</td></tr>`, { pa: true });
     h += uTable(it, 'kadunud', 'Loetelust välja jäänud koodid', ['Kood', 'Teenus', 'Viimane piirhind'], k.kadunud, ([c, n, p]) => `<tr><td><span class="code">${esc(c)}</span></td><td>${esc(n)}</td><td class="num">${p != null ? fmtEur(p) : ''}</td></tr>`);
     h += uTable(it, 'nimi', 'Nimetuse muutused', ['Kood', 'Varem', 'Nüüd'], k.nimi, ([c, a, b]) => { const [da, db] = wordDiff(a, b); return `<tr><td>${codeBtn(c)}</td><td class="ud-old">${da}</td><td class="ud-new">${db}</td></tr>`; }, { pa: true });
-    h += uTable(it, 'fond', 'Fondide koodid', ['Fond', '', 'Kood', 'Teenus'], it.fond, ([f, sgn, c, n]) => `<tr><td><span class="badge ${esc(f)}">${esc(FUND_SHORT[f] || f)}</span></td><td>${sgn === '+' ? '<b class="plus">lisandus</b>' : '<b class="minus">välja</b>'}</td><td>${codeBtn(c)}</td><td>${esc(n)}</td></tr>`);
+    if (it.fondPct) {
+      h += `<p class="note">${Object.entries(it.fondPct).map(([f, [a, b]]) => `${esc((FUND_ROLE[f] || [f, f])[1])}: kuni ${a ?? '–'}% → kuni ${b ?? '–'}% nimistu pearahadeks arvestatud summast`).join('<br>')}</p>`;
+    }
+    h += uTable(it, 'fond', 'Fondide koodid', ['Fond', '', 'Kood', 'Teenus'], it.fond, ([f, sgn, c, n]) => `<tr><td><span class="badge ${esc((FUND_ROLE[f] || [f])[0])}">${esc((FUND_ROLE[f] || [f, f])[1])}</span></td><td>${sgn === '+' ? '<b class="plus">lisandus</b>' : '<b class="minus">välja</b>'}</td><td>${codeBtn(c)}</td><td>${esc(n)}</td></tr>`);
     if (it.abiv) {
       const fl = (f) => f.map((x) => AB_LABEL[x] || x).join(', ');
       h += uTable(it, 'ab-muut', 'Muudetud abivahendid', ['Kood', 'Abivahend', 'Muutunud'], it.abiv.muut, ([c, n, f]) => `<tr><td><button class="code" data-q="${esc(c)}">${esc(c)}</button></td><td>${esc(n)}</td><td>${esc(fl(f))}</td></tr>`);
@@ -577,7 +583,7 @@
       h += uTable(it, 'ms-kadunud', 'Loetelust välja jäänud tooted', ['Kood', 'Toode', 'Rühm'], it.ms.kadunud, ([c, n, g]) => `<tr><td><span class="code">${esc(c)}</span></td><td>${esc(n)}</td><td>${esc(g)}</td></tr>`);
     }
     if ((it.pars || []).length) {
-      const openAll = it.pars.length <= 3;
+      const openAll = it.pars.length <= 5;
       h += `<h4>Muutunud sätted (${it.pars.length + (it.parsVeel || 0)})</h4>` + it.pars.map((p) => {
         const los = p.lo.map(([nr, a, b]) => {
           const [da, db] = wordDiff(a, b);
@@ -941,12 +947,12 @@
     const teemaHtml = !tj.length ? '' : `<section class="section"><h2>Igapäevatöö reeglid</h2><div class="tgroups">`
       + groups.map((g) => `<div class="tgroup"><h3>${esc(g)}</h3><div class="quick">`
         + tj.filter((x) => x.g === g).map((x) => `<button class="qbtn teema" data-focus="${x._id}"><b>${esc(x.sn)}</b><small>${x.n !== x.sn ? esc(x.n) + ' · ' : ''}${(x.r || []).length} punkti${(x.e || []).length ? ' · ⚠ ' + x.e.length : ''}</small></button>`).join('')
-        + (g === 'Tervisetõendid' && juhi ? `<button class="qbtn juhi" data-focus="${juhi._id}"><b>Juhi tervisetõend</b><small>Mootorsõidukijuhi tervisenõuded § 7 · kes teeb, siit edasi § 2–10</small></button>` : '')
+        + (g === 'Tervisetõendid' && juhi ? `<button class="qbtn juhi" data-focus="${juhi._id}"><b>Juhi tervisetõend</b><small>Kes teeb tervisekontrolli (§ 7); grupid ja nõuded § 2–10</small></button>` : '')
         + '</div></div>').join('') + '</div></section>';
     const uu = d.items.filter((x) => x.t === 'u' && !x.tyhi);
     const uFut = uu.filter((x) => x.tul).sort((a, b) => a.alates.localeCompare(b.alates));
     const uPast = uu.filter((x) => !x.tul).sort((a, b) => b.alates.localeCompare(a.alates));
-    const uShow = [...uFut, ...uPast].slice(0, Math.max(6, uFut.length));
+    const uShow = [...uFut, ...uPast.slice(0, 4)];
     const muutHtml = !uu.length ? '' : `<section class="section"><h2>Mis muutus</h2><div class="ulist">`
       + uShow.map((x) => `<button class="urow${x.tul ? ' fut' : ''}" data-focus="${x._id}"><span class="ud8">${x.tul ? 'jõustub<br>' : ''}${fmtDate(x.alates)}</span><span class="un"><b>${esc(x.n)}</b><small>${esc(uSummary(x))}</small></span></button>`).join('')
       + `</div><div class="actions"><button class="btn" data-filter="u">Kõik muudatused (${uu.length})</button></div></section>`;
@@ -1029,7 +1035,7 @@
       + (c.q ? `<button class="chip kschip" data-filter="q" aria-pressed="${!state.fund && state.filter === 'q'}">Kvaliteedisüsteem<span class="n">${c.q - 1}</span></button>` : '')
       + (c.v ? `<button class="chip soelchip" data-filter="v" aria-pressed="${!state.fund && state.filter === 'v'}">Sõeluuringud<span class="n">${c.v}</span></button>` : '')
       + (c.j ? `<button class="chip teemachip" data-filter="j" aria-pressed="${!state.fund && state.filter === 'j'}">Igapäevatöö reeglid<span class="n">${c.j}</span></button>` : '')
-      + ((d.muutused || []).length ? `<button class="chip uchip" data-filter="u" aria-pressed="${!state.fund && state.filter === 'u'}">Mis muutus<span class="n">${d.muutused.filter((x) => !x.tyhi).length}</span></button>` : '')
+      + ((d.muutused || []).some((x) => !x.tyhi) ? `<button class="chip uchip" data-filter="u" aria-pressed="${!state.fund && state.filter === 'u'}">Mis muutus<span class="n">${d.muutused.filter((x) => !x.tyhi).length}</span></button>` : '')
       + (c.b ? `<button class="chip labchip" data-filter="b" aria-pressed="${!state.fund && state.filter === 'b'}">Labor (SYNLAB)<span class="n">${c.b}</span></button>` : '')
       + [['a', 'Abivahendid', c.a]].map(cat).join('')
       + (c.m ? `<button class="chip mschip" data-filter="m" aria-pressed="${!state.fund && state.filter === 'm'}">Meditsiiniseadmed<span class="n">${c.m}</span></button>` : '')
