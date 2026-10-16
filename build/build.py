@@ -29,7 +29,7 @@ import openpyxl
 import pdfplumber
 from lxml import html as lhtml
 
-BUILD_VERSION = "1"
+BUILD_VERSION = "2"
 API = "https://www.riigiteataja.ee/public-api/api/v1"
 RT = "https://www.riigiteataja.ee/akt/"
 NS = "{maarus_1_10.02.2010}"
@@ -1068,6 +1068,14 @@ def build(args):
             elif tbls and "raviarve" in txt and "täiendavalt" in txt:
                 fund_key = "lisaks"
                 label = f"{FUND_NAMES['lisaks']} · raviarvega lisaks pearahale"
+            # Pearaha arvel tasutavad laboriuuringud (metoodika § 5 lg 3, nt glükoos 66101): mitte fond, vaid pearaha sees.
+            if not fund_key and tbls and re.search(r"\bpearaha arvel\b", txt):
+                ph = {"par": f'{par["nr"]} {lo["nr"]}'.strip(), "url": met["url"] + "#" + lo["id"]}
+                for b in tbls:
+                    for e in table_entries(b["rows"]):
+                        for c in e["codes"]:
+                            if c in by_code:
+                                by_code[c]["ph"] = ph
             if fund_key:
                 codes = []
                 for b in tbls:
@@ -1146,11 +1154,11 @@ def build(args):
 
     # 5c. perearstiabi tunnus ja SYNLABi analüüsid
     for it in items:
-        if it["t"] == "s" and (it.get("f") or it.get("ks") or (it.get("ptk") or "").startswith("2.")
+        if it["t"] == "s" and (it.get("f") or it.get("ph") or it.get("ks") or (it.get("ptk") or "").startswith("2.")
                                or (it.get("tp") or {}).get("hk") == "PEREARSTIABI" or it.get("src") == "metoodika"):
             it["pa"] = True
     for lb in labs:
-        for k in ("f", "ks", "miss"):
+        for k in ("f", "ks", "miss", "ph"):
             lb.pop(k, None)
         fl, kl, miss = [], [], []
         for c, _x in lb["c"]:
@@ -1164,6 +1172,8 @@ def build(args):
             for k in it.get("ks") or []:
                 if k not in kl:
                     kl.append(k)
+            if it.get("ph"):
+                lb["ph"] = it["ph"]
         if fl:
             lb["f"] = fl
         if kl:

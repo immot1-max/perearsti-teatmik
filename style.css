@@ -253,6 +253,7 @@ main .wrap { padding-block: 14px 32px; display: grid; gap: 18px; }
 .badge.f13 { color: var(--c-f13); }
 .badge.lisaks { color: var(--c-lisaks); }
 .badge.abiv { color: var(--c-abiv); }
+.badge.ph { color: var(--accent); }
 .badge.ks { color: var(--c-ks); background: transparent; cursor: pointer; font: inherit; font-size: 0.74rem; font-weight: 500; }
 .badge.plain { color: var(--muted); }
 .badge.warn { color: var(--warn-ink); background: var(--warn-bg); border-color: transparent; }

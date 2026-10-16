@@ -31,6 +31,8 @@
     f13: 'Tasutakse kuni 13% ulatuses nimistu pearahadeks arvestatud summast aastas.',
     lisaks: 'Tasutakse raviarvega lisaks pearahale, tervishoiuteenuste loetelu piirhinna alusel. Protsendilist piirmäära sellel lõikel ei ole.',
   };
+  // Pearaha arvel tasutav uuring (metoodika § 5 lg 3, nt glükoos 66101): § 6 fondides ei ole, kuid sisaldub pearahas.
+  const phBadge = (x) => (x && x.ph ? `<span class="badge ph" title="Tervisekassa tasub pearaha arvel (metoodika ${esc(x.ph.par)})">Pearaha ${esc(x.ph.par)}</span>` : '');
   const KS_CAT = { ylevaade: 'Ülevaade', ennetus: 'Ennetus', krooniline: 'Kroonilised haiged', jalgimine: 'Jälgimisindikaatorid', lisapadevus: 'Erialane lisapädevus', soeluuring: 'Sõeluuringud' };
   const KS_ORDER = ['ylevaade', 'ennetus', 'krooniline', 'jalgimine', 'lisapadevus', 'soeluuring'];
   const ksPrefix = (q) => (q.cat === 'lisapadevus' ? 'Lisapädevus' : 'KS');
@@ -398,7 +400,7 @@
       head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${esc(pct)}</small></span>
         <span class="meta">${it.c ? `<span class="code" data-copy="${esc(it.c)}" title="Kopeeri rühma kood">${esc(it.c)}</span>` : ''}<span class="badge msb">meditsiiniseade</span><span>${esc(it.par || '')} · ${(it.pr || []).length} toodet</span>${via ? '<span class="via">· vaste tingimustes või toodetes</span>' : ''}</span>`;
     } else if (it.t === 'b') {
-      const fund = (it.f || []).map((f) => `<span class="badge ${f}">${esc(FUND_SHORT[f] || f)}</span>`).join('') || '<span class="badge no">ei ole perearsti fondis</span>';
+      const fund = (it.f || []).map((f) => `<span class="badge ${f}">${esc(FUND_SHORT[f] || f)}</span>`).join('') || phBadge(it) || '<span class="badge no">ei ole perearsti fondis</span>';
       const ks = (it.ks || []).map((k) => state.qByKey[k]).filter(Boolean).map((qq) => `<span class="badge ks" data-focus="${qq._id}">${esc(ksPrefix(qq))}: ${esc(qq.sn)}</span>`).join('');
       const codes = (it.c || []).map(([c, x]) => `<span class="code" data-copy="${esc(c)}" title="Kopeeri TK kood">${esc(c)}${x > 1 ? ' ×' + x : ''}</span>`).join('');
       head = `<span class="name">${hl(it.n, re)}</span><span class="price">${it.p != null ? fmtEur(it.p) : ''}</span>
@@ -407,7 +409,7 @@
       head = `<span class="name">${hl(it.n, re)}</span><span class="price">${esc(ksValue(it))}</span>
         <span class="meta"><span class="badge ks">${esc(KS_CAT[it.cat] || '')}</span><span>metoodika ${esc(it.par)}</span>${via ? '<span class="via">· vaste sisus</span>' : ''}</span>`;
     } else if (it.t === 's') {
-      const fund = (it.f || []).map((f) => `<span class="badge ${f}">${esc(FUND_SHORT[f] || f)}</span>`).join('');
+      const fund = (it.f || []).map((f) => `<span class="badge ${f}">${esc(FUND_SHORT[f] || f)}</span>`).join('') || phBadge(it);
       const zl = zeroLabel(it);
       const price = zl ? `<small>${zl}</small>` : it.p != null ? fmtEur(it.p) : '';
       const ks = (it.ks || []).map((k) => state.qByKey[k]).filter(Boolean).map((qq) => `<span class="badge ks" data-focus="${qq._id}" title="Ava kvaliteedisüsteemi jaotis">${esc(ksPrefix(qq))}: ${esc(qq.sn)}</span>`).join('');
@@ -465,6 +467,8 @@
           const fi = d.items.find((x) => x.t === 'f' && x.k === f);
           h += `<div><dt>Rahastus</dt><dd><span class="badge ${f}">${esc(FUND_SHORT[f])}</span> ${esc(FUND_HELP[f] || '')}${fi ? ` <a href="${esc(fi.url)}" target="_blank" rel="noopener">metoodika ${esc(fi.par)} ↗</a>` : ''}</dd></div>`;
         }
+      } else if (it.ph) {
+        h += `<div><dt>Rahastus</dt><dd>${phBadge(it)} Tervisekassa tasub selle uuringu eest pearaha arvel, mitte § 6 fondidest. Kui perearst suunab haige eriarsti juurde seda uuringut tegemata, tasub ta selle eest eriarstiabi osutajale (metoodika § 5). <a href="${esc(it.ph.url)}" target="_blank" rel="noopener">metoodika ${esc(it.ph.par)} ↗</a></dd></div>`;
       } else if (it.src !== 'toru' || (it.tp && it.tp.hk === 'PEREARSTIABI')) {
         h += `<div><dt>Rahastus</dt><dd>Metoodika § 6 fondide loeteludes seda koodi ei ole.</dd></div>`;
       }
@@ -554,7 +558,7 @@
       if (it.ab) h += `<div><dt>Lühend</dt><dd>${esc(it.ab)}</dd></div>`;
       for (const [c, x] of it.c || []) {
         const s = state.byCode[c];
-        const fund = s && s.f ? s.f.map((f) => `<span class="badge ${f}">${esc(FUND_SHORT[f])}</span>`).join(' ') : '<span class="badge no">ei ole perearsti fondis</span>';
+        const fund = s && s.f ? s.f.map((f) => `<span class="badge ${f}">${esc(FUND_SHORT[f])}</span>`).join(' ') : s && s.ph ? phBadge(s) : '<span class="badge no">ei ole perearsti fondis</span>';
         h += `<div><dt>TK kood${x > 1 ? ` (×${x})` : ''}</dt><dd><button class="code" data-q="${esc(c)}" title="Ava kood">${esc(c)}</button> ${s ? esc(s.n) : ''}${s && s.p != null ? ` · ${fmtEur(s.p)}` : ''}<br>${fund}</dd></div>`;
       }
       if (!(it.c || []).length) h += '<div><dt>TK kood</dt><dd>Puudub. Tervisekassa seda analüüsi ei hüvita (tasuline).</dd></div>';
@@ -663,7 +667,7 @@
           const s = state.byCode[c];
           const zl = s ? zeroLabel(s) : null;
           const price = !s ? '' : zl ? `<small>${esc(zl)}</small>` : s.p != null ? fmtEur(s.p) : '';
-          const fund = s ? (s.f || []).map((f) => `<span class="badge ${f}">${esc(FUND_SHORT[f])}</span>`).join(' ') : '';
+          const fund = s ? (s.f || []).map((f) => `<span class="badge ${f}">${esc(FUND_SHORT[f])}</span>`).join(' ') || phBadge(s) : '';
           const same = s && (norm(role).includes(norm(s.n)) || norm(s.n).includes(norm(role)));
           return `<tr><td><button class="code" data-q="${esc(c)}" title="Ava kood">${esc(c)}</button></td><td>${hl(role, re)}${s && !same ? `<br><small class="inh">${esc(s.n)}</small>` : ''}${fund ? '<br>' + fund : ''}</td><td class="num">${price}</td></tr>`;
         }).join('') + '</table></div>';

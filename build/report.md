@@ -1,4 +1,4 @@
-# Andmete uuendus 15.10.2026
+# Andmete uuendus 16.10.2026
 
 ## Allikad
 - Tervisekassa tervishoiuteenuste loetelu: [116062026020](https://www.riigiteataja.ee/akt/116062026020) kehtib alates 01.07.2026
