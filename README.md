@@ -29,7 +29,7 @@ Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, sõeluuringu
 
 ## Mis muutus
 
-Vaade „Mis muutus“ (avalehel ja kategooriana) võrdleb iga jälgitava akti viimase 12 kuu jooksul jõustunud ja Riigi Teatajas juba avaldatud tulevasi redaktsioone eelmisega (`build/muutused.py`):
+Vaade „Mis muutus (seadused ja määrused)“ (avalehe lõpus ja kategooriana) võrdleb iga jälgitava seaduse ja määruse viimase 12 kuu jooksul jõustunud ja Riigi Teatajas juba avaldatud tulevasi redaktsioone eelmisega (`build/muutused.py`):
 
 - tervishoiuteenuste loetelu: uued ja kadunud koodid, hinna- ja nimetuse muutused (linnuke „Ainult perearstiabi“ kehtib ka siin);
 - metoodika: fondidesse lisandunud ja neist välja jäänud koodid ning muutunud sätted (§ 8 koos tabelitega);
@@ -75,6 +75,8 @@ Rakenduses näitab sünniaasta otsing (nt „1966“), millise sõeluuringu siht
 ## Igapäevatöö reeglid (teemakaardid)
 
 Haigus- ja hooldusleht, töövõimetuslehe vormistamine, P21, tervisetõendid (relvaluba, meremees, abipolitseinik, Kaitseliit, kaitsevägi, toidukäitleja jt nakkushaiguste tõend), nakkushaiguse teatis, vaktsineerimine, töökorraldus, nimistu, PADI, perearsti, erialata arsti ja pereõe õigused, retseptid ja ravimisoodustus, e-konsultatsioon ning patsiendi hüvitised ja omaosalus. Kaardid võivad viidata seotud kaartidele (väli `seotud`). Kokkuvõtted on failis `build/teemad.json`; need põhinevad Tommi allikaregistril (15.10.2026) ja on üle kontrollitud aktide kehtivast tekstist.
+
+Avalehel on kaardid viies värviga eristatud rühmas: töövõimetus; tervisetõendid (esimesena juhi tervisetõend eraldi 1. ja 2. grupi kohta, siis relvaluba, toidukäitleja jt, Kaitseliit, abipolitseinik, kaitsevägi, meremees; sama värv kui juhi tervisenõuetel); nakkushaigused ja vaktsineerimine; ravimid, suunamine ja hüvitised; töökorraldus ja nimistu. Rühmade ja kaartide järjekord tuleb failist `build/teemad.json`.
 
 Iga punkti juures on viide sättele (avaneb rakenduses) või allikale. Automaatne kontroll teeb igal kuul kolm asja:
 
