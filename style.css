@@ -173,10 +173,18 @@ details.lisa .pre { white-space: pre-wrap; font-size: 0.82rem; line-height: 1.45
   color: var(--ink);
 }
 .search input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+/* Tühjendusnupp on nähtav ainult siis, kui on midagi tühjendada (has-q). */
 .search .clear {
-  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
-  border: 0; background: transparent; color: var(--muted); font-size: 1.3rem; width: 32px; height: 32px; border-radius: 8px; cursor: pointer;
+  position: absolute; right: 7px; top: 50%; transform: translateY(-50%);
+  display: none; align-items: center; justify-content: center; gap: 6px;
+  height: 34px; padding: 0 13px 0 10px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+  font-size: 0.88rem; font-weight: 500; cursor: pointer;
 }
+.search .clear svg { width: 16px; height: 16px; flex: none; }
+.search .clear:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.search.has-q .clear { display: inline-flex; }
+.search.has-q input { padding-right: 132px; }
 .chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .chip {
   flex: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
@@ -190,6 +198,18 @@ details.lisa .pre { white-space: pre-wrap; font-size: 0.82rem; line-height: 1.45
 /* ---------- põhiosa ---------- */
 main .wrap { padding-block: 14px 32px; display: grid; gap: 18px; }
 .summary { font-size: 0.85rem; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+
+/* Avatud kirje tulemuste kohal */
+.pin { display: grid; gap: 6px; padding: 8px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); }
+.pin-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 2px 0 4px; }
+.pin-lbl { font-family: var(--font-display); font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+.pin-btns { display: inline-flex; gap: 6px; }
+.pin-btn {
+  display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  border-radius: 999px; padding: 3px 12px; font-size: 0.84rem; cursor: pointer;
+}
+.pin-btn span { font-size: 1.05rem; line-height: 1; }
+.pin-btn:hover { border-color: var(--accent); color: var(--accent); }
 .list { display: grid; gap: 6px; }
 .group-h {
   margin: 10px 0 2px; font-family: var(--font-display); font-size: 0.8rem; font-weight: 600;
@@ -320,6 +340,10 @@ button.badge { text-align: left; border-radius: 8px; padding: 1px 8px; line-heig
   .brand h1 span { display: none; }
   .kv > div { grid-template-columns: 1fr; gap: 0; }
   .search input { font-size: 1rem; }
+  .search .clear { width: 38px; height: 38px; padding: 0; right: 5px; }
+  .search .clear svg { width: 18px; height: 18px; }
+  .search .clear .lbl { display: none; }
+  .search.has-q input { padding-right: 50px; }
   .srow { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }

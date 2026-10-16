@@ -87,7 +87,9 @@
 
   let paPref = true;
   try { paPref = localStorage.getItem('teatmik-pa') !== '0'; } catch (e) { /* ignoreeri */ }
-  const state = { data: null, idx: [], filter: 'all', fund: null, q: '', open: new Set(), limit: 60, focus: null, pa: paPref, labsAll: new Set(), msAll: new Set() };
+  // focus = täisvaates avatud kirje. pin = kirje, mis oli avatud, kui kasutaja hakkas otsima või valis kategooria;
+  // see jääb tulemuste kohale eraldi reale, kuni kasutaja selle sulgeb või otsingu tühjendab (siis naaseb selle juurde).
+  const state = { data: null, idx: [], filter: 'all', fund: null, q: '', open: new Set(), limit: 60, focus: null, pin: null, pinOpen: false, pa: paPref, labsAll: new Set(), msAll: new Set() };
   const el = {};
 
   // ------------------------------------------------------------ andmed
@@ -311,13 +313,18 @@
     const r = el.results;
     const q = state.q.trim();
     state.hl = q ? hlRegex(norm(q).split(' ')) : null;
+    updateClear();
     if (state.focus != null) {
       const it = state.data.items[state.focus];
       state.open.add(it._id);
       r.innerHTML = `<div class="summary"><span>${esc(srcName(it.src) || '')}</span><button class="btn" data-act="home">← Avaleht</button></div><div class="list">${row(it)}</div>`;
       return;
     }
-    if (!q && !state.fund && state.filter === 'all') { renderHome(); return; }
+    if (!q && !state.fund && state.filter === 'all') {
+      // Otsingut ega kategooriat enam pole: tagasi avatud kirje juurde, kui see on alles.
+      if (state.pin != null) { state.focus = state.pin; state.pin = null; state.pinOpen = false; route(); return; }
+      renderHome(); return;
+    }
     let list;
     let hidden = 0;
     let dropped = [];
@@ -336,16 +343,17 @@
       }
       if (state.filter === 'q') list.sort((a, b) => KS_ORDER.indexOf(a.it.cat) - KS_ORDER.indexOf(b.it.cat));
     }
+    if (state.pin != null) list = list.filter((x) => x.it._id !== state.pin);
     const total = list.length;
     const shown = list.slice(0, state.limit);
-    let html = '';
+    let html = pinHtml();
     const fundItem = state.fund ? state.data.items.find((x) => x.t === 'f' && x.k === state.fund) : null;
     if (fundItem) {
       html += `<div class="row ${fundItem.k}"><div class="detail" style="border-top:0"><div class="text"><p><strong>${esc(fundItem.n)}</strong> · metoodika ${esc(fundItem.par)}</p><p>${esc(FUND_HELP[fundItem.k] || '')}</p>${state.data.meta.starRule && fundItem.k === 'f37' ? `<p>* ${esc(state.data.meta.starRule)}</p>` : ''}</div><div class="actions"><a href="${esc(fundItem.url)}" target="_blank" rel="noopener">Säte Riigi Teatajas ↗</a></div></div></div>`;
     }
     const yCard = q && !state.fund && (state.filter === 'all' || state.filter === 'v') ? birthYearCard(norm(q).split(' ')) : '';
     html += yCard;
-    html += `<div class="summary"><span>${total ? `${total} vastet` : ''}${q && total > state.limit ? `, näitan ${state.limit}` : ''}</span>${q || state.fund || state.filter !== 'all' ? '<button class="btn" data-act="home">Tühjenda</button>' : ''}</div>`;
+    html += `<div class="summary"><span>${total ? `${total} vastet` : ''}${q && total > state.limit ? `, näitan ${state.limit}` : ''}</span>${q || state.fund || state.filter !== 'all' ? '<button class="btn" data-act="clear">Tühjenda</button>' : ''}</div>`;
     if (dropped.length) html += `<div class="hidden-note">Neid sõnu ei leitud, otsisin ilma nendeta: ${dropped.map(esc).join(', ')}</div>`;
     if (hidden && state.pa) html += `<div class="hidden-note">${hidden} vastet väljaspool perearstiabi on peidetud.<button class="btn" data-act="pa-off">Näita kõiki</button></div>`;
     if (!total && yCard) {
@@ -371,8 +379,9 @@
     r.innerHTML = html;
   }
 
-  function row(it, via) {
-    const open = state.open.has(it._id);
+  // opt.pin: kirje on tulemuste kohal „Avatud“ real; avamise olek on state.pinOpen.
+  function row(it, via, opt = {}) {
+    const open = opt.pin ? state.pinOpen : state.open.has(it._id);
     const re = state.hl;
     if (it.t === 'k') {
       return `<article class="row link"><a class="head" href="${esc(it.u)}" target="_blank" rel="noopener"><span class="name">${hl(it.n, re)} ↗</span><span></span><span class="meta">${esc(it.d || '')}</span></a></article>`;
@@ -418,7 +427,21 @@
       head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${esc(ageRange(it))}</small></span>
         <span class="meta"><span class="badge soel">sõeluuring</span>${it.sy ? `<span>${esc(it.kes || '')}</span>` : ''}${intText(it) ? `<span>${esc(intText(it))}</span>` : ''}<span>${esc(yrs)}</span>${via ? '<span class="via">· vaste sisus</span>' : ''}</span>`;
     }
-    return `<article class="row ${it._cls}"><button class="head" data-open="${it._id}" aria-expanded="${open}">${head}</button>${open ? `<div class="detail">${detail(it)}</div>` : ''}</article>`;
+    const toggle = opt.pin ? 'data-act="pin-toggle"' : `data-open="${it._id}"`;
+    return `<article class="row ${it._cls}"><button class="head" ${toggle} aria-expanded="${open}">${head}</button>${open ? `<div class="detail">${detail(it)}</div>` : ''}</article>`;
+  }
+
+  function pinHtml() {
+    const it = state.pin != null && state.data ? state.data.items[state.pin] : null;
+    if (!it) return '';
+    return `<section class="pin" aria-label="Avatud kirje"><div class="pin-bar"><span class="pin-lbl">Avatud</span><span class="pin-btns">`
+      + `<button class="pin-btn" data-act="pin-toggle" aria-expanded="${state.pinOpen}">${state.pinOpen ? '▴ Peida' : '▾ Näita'}</button>`
+      + `<button class="pin-btn" data-act="unpin" title="Sulge avatud kirje">Sulge <span aria-hidden="true">×</span></button>`
+      + `</span></div>${row(it, false, { pin: true })}</section>`;
+  }
+  function rerenderPin() {
+    const p = $('.pin', el.results);
+    if (p) p.outerHTML = pinHtml(); else route();
   }
 
   function detail(it) {
@@ -716,6 +739,7 @@
       </div></section>
       <section class="section info"><h2>Kasutamine</h2>
         <p>Otsi nimetuse, koodi, lühendi või argisõnaga (nt „holter“, „TSH“, „6417“). Täpitähti pole vaja. Koodil klõpsates kopeerub see.</p>
+        <p>Kui avad kirje (nt „Hüpertooniatõbi“) ja otsid seejärel koodi või valid kategooria, jääb avatud kirje tulemuste kohale eraldi reale: „Näita“ avab selle sisu samas kohas, „Sulge“ eemaldab selle. Otsingu tühjendamine (× või Esc) viib tagasi avatud kirje juurde, „← Avaleht“ avalehele.</p>
         <p>Laborianalüüsi saab otsida SYNLABi nime või lühendiga (nt „IGRA“, „HCV“). Vastes on Tervisekassa kood ja see, kas analüüs kuulub perearsti fondi. Koodi avades on näha kõik selle koodi alla kuuluvad SYNLABi analüüsid.</p>
         <p>Sünniaasta otsing (nt „1966“) näitab, millise rinna-, emakakaela- või soolevähi sõeluuringu sihtrühma inimene sel aastal kuulub. Sünniaastad tulevad terviseportaalist ja neid kontrollitakse kord kuus.</p>
         <p>„Igapäevatöö reeglid“ koondavad haigus- ja hoolduslehe, P21, tervisetõendite, nakkushaiguse teatiste, vaktsineerimise, töökorralduse ja nimistu põhireeglid. Iga punkti juures on viide sättele; ⚠ märgib allikate omavahelisi erinevusi. Otsida võib ka küsimusena (nt „kui kaua makstakse haigushüvitist“).</p>
@@ -818,13 +842,31 @@
     }
   }
 
+  // Täisvaatest lahkudes (otsing, kategooria, fond) jääb avatud kirje tulemuste kohale.
+  function leaveFocus() {
+    if (state.focus != null) { state.pin = state.focus; state.focus = null; }
+    state.pinOpen = false;
+  }
   function setQuery(q) {
-    el.q.value = q; state.q = q; state.limit = 60; state.focus = null; state.open.clear();
-    route(); syncUrl();
+    el.q.value = q; state.q = q; state.limit = 60; leaveFocus(); state.open.clear();
+    route(); syncUrl(); window.scrollTo(0, 0);
   }
   function goHome() {
-    state.q = ''; el.q.value = ''; state.fund = null; state.filter = 'all'; state.focus = null; state.open.clear(); state.limit = 60;
+    state.q = ''; el.q.value = ''; state.fund = null; state.filter = 'all'; state.focus = null; state.pin = null; state.pinOpen = false; state.open.clear(); state.limit = 60;
     renderChips(); route(); syncUrl(); window.scrollTo(0, 0);
+  }
+  // Tühjenda / × / Esc: kui midagi oli avatud, naaseb selle juurde, muidu avalehele.
+  function clearSearch() {
+    if (state.pin == null) { goHome(); return; }
+    const id = state.pin;
+    state.q = ''; el.q.value = ''; state.fund = null; state.filter = 'all'; state.pin = null; state.pinOpen = false; state.open.clear(); state.limit = 60;
+    state.focus = id;
+    renderChips(); route(); syncUrl(); window.scrollTo(0, 0);
+  }
+  function updateClear() {
+    const box = el.q && el.q.parentElement;
+    if (!box) return;
+    box.classList.toggle('has-q', !!el.q.value || state.focus != null || state.pin != null || !!state.fund || state.filter !== 'all');
   }
   function syncUrl() {
     try {
@@ -845,11 +887,16 @@
     let deb;
     el.q.addEventListener('input', () => {
       clearTimeout(deb);
-      deb = setTimeout(() => { state.q = el.q.value; state.limit = 60; state.focus = null; state.open.clear(); route(); syncUrl(); }, 90);
+      updateClear();
+      deb = setTimeout(() => {
+        // Otsing kustutati tühjaks: tagasi avatud kirje juurde.
+        if (!el.q.value.trim() && state.pin != null && !state.fund && state.filter === 'all') { clearSearch(); el.q.focus(); return; }
+        state.q = el.q.value; state.limit = 60; leaveFocus(); state.open.clear(); route(); syncUrl();
+      }, 90);
     });
-    el.q.addEventListener('keydown', (e) => { if (e.key === 'Escape') goHome(); });
+    el.q.addEventListener('keydown', (e) => { if (e.key === 'Escape') clearSearch(); });
     document.addEventListener('change', (e) => { if (e.target && e.target.id === 'pa') setPa(e.target.checked); });
-    $('#clear').addEventListener('click', () => { goHome(); el.q.focus(); });
+    $('#clear').addEventListener('click', () => { clearSearch(); el.q.focus(); });
     document.addEventListener('keydown', (e) => {
       if (e.key === '/' && document.activeElement !== el.q) { e.preventDefault(); el.q.focus(); el.q.select(); }
     });
@@ -865,29 +912,35 @@
         art.outerHTML = row(it, art.querySelector('.via') ? true : false);
         return;
       }
-      if (t.dataset.fund) { state.fund = state.fund === t.dataset.fund ? null : t.dataset.fund; state.filter = 'all'; state.focus = null; state.open.clear(); state.limit = 200; renderChips(); route(); window.scrollTo(0, 0); return; }
-      if (t.dataset.filter) { state.filter = t.dataset.filter; state.fund = null; state.focus = null; state.open.clear(); state.limit = 60; renderChips(); route(); return; }
+      if (t.dataset.fund) { state.fund = state.fund === t.dataset.fund ? null : t.dataset.fund; state.filter = 'all'; leaveFocus(); state.open.clear(); state.limit = 200; renderChips(); route(); window.scrollTo(0, 0); return; }
+      if (t.dataset.filter === 'all' && !state.q.trim()) { goHome(); return; }
+      if (t.dataset.filter) { state.filter = t.dataset.filter; state.fund = null; leaveFocus(); state.open.clear(); state.limit = 60; renderChips(); route(); return; }
       if (t.dataset.q) { setQuery(t.dataset.q); return; }
-      if (t.dataset.focus) { state.focus = +t.dataset.focus; route(); window.scrollTo(0, 0); return; }
+      if (t.dataset.focus) { state.focus = +t.dataset.focus; state.pin = null; route(); window.scrollTo(0, 0); return; }
       if (t.dataset.goto) {
         const [src, par] = t.dataset.goto.split(':');
         const it = state.data.items.find((x) => x.t === 'l' && x.src === src && x.par === par);
-        if (it) { state.focus = it._id; route(); window.scrollTo(0, 0); }
+        if (it) { state.focus = it._id; state.pin = null; route(); window.scrollTo(0, 0); }
         return;
       }
       if (t.dataset.msAll) {
         state.msAll.add(+t.dataset.msAll);
+        if (t.closest('.pin')) { rerenderPin(); return; }
         const art = t.closest('article');
         art.outerHTML = row(state.data.items[+t.dataset.msAll]);
         return;
       }
       if (t.dataset.labsAll) {
         state.labsAll.add(t.dataset.labsAll);
+        if (t.closest('.pin')) { rerenderPin(); return; }
         const art = t.closest('article');
         const id = +art.querySelector('[data-open]').dataset.open;
         art.outerHTML = row(state.data.items[id]);
         return;
       }
+      if (t.dataset.act === 'pin-toggle') { state.pinOpen = !state.pinOpen; rerenderPin(); return; }
+      if (t.dataset.act === 'unpin') { state.pin = null; state.pinOpen = false; route(); return; }
+      if (t.dataset.act === 'clear') { clearSearch(); return; }
       if (t.dataset.act === 'pa-off') { setPa(false); return; }
       if (t.dataset.act === 'home') { goHome(); return; }
       if (t.dataset.act === 'all') { state.fund = null; state.filter = 'all'; state.limit = 60; renderChips(); route(); return; }
