@@ -613,21 +613,25 @@
       if (isDoctor(rc)) { docMin += m; docs.push(`${(res[rc] || [rc])[0]} ${fmtMin(m)} min`); }
     }
     let h = `<div class="rules kulu"><h4>Mis on hinnas (standardkulu)</h4><p class="kulu-sum">${docMin ? `Arsti aeg hinnas: <b>${fmtMin(docMin)} min</b> (${docs.map(esc).join(', ')})` : 'Arsti aega selle teenuse standardkulus ei ole.'}</p>`;
-    h += '<div class="tbl"><table><tr><td>Ressurss</td><td>Kogus</td><td>Ühiku hind</td><td>Kokku</td></tr>';
+    h += '<div class="tbl"><table><tr><td>Ressurss</td><td>Kogus × ühiku hind</td><td>Kokku</td></tr>';
     for (const [g, label] of KULU_GROUPS) {
       const gr = groups[g];
       if (!gr) continue;
       const gs = gr.reduce((a, r) => a + r[3], 0);
-      h += `<tr class="grp"><td colspan="3">${label}</td><td class="num">${fmtEur(gs)}</td></tr>`;
+      h += `<tr class="grp"><td colspan="2">${label}</td><td class="num">${fmtEur(gs)}</td></tr>`;
       for (const [rc, m, p, sum] of gr.sort((a, b) => b[3] - a[3])) {
         const [nm, unit] = res[rc] || [rc, ''];
         const u = g === 'per' ? 'min' : (unit && !/^(Kirjeldamata|Määratlemata)$/i.test(unit) ? unit.toLowerCase() : '');
-        h += `<tr><td>${esc(nm)}${isDoctor(rc) ? ' <span class="badge ks">arst</span>' : ''}</td><td class="num">${fmtMin(m)}${u ? ' <small>' + esc(u) + '</small>' : ''}</td><td class="num">${fmtEur(p)}</td><td class="num">${fmtEur(sum)}</td></tr>`;
+        h += `<tr><td>${esc(nm)}${isDoctor(rc) ? ' <span class="badge ks">arst</span>' : ''}</td><td class="num kq">${fmtMin(m)}${u ? ' <small>' + esc(u) + '</small>' : ''} <span class="x">×</span> ${fmtEur(p)}</td><td class="num">${fmtEur(sum)}</td></tr>`;
       }
     }
-    h += `<tr class="grp"><td colspan="3">Komponendid kokku</td><td class="num">${fmtEur(tot)}</td></tr></table></div>`;
-    const diff = it.p != null && Math.abs(tot - it.p) >= 0.01 ? ` Kehtiv piirhind on ${fmtEur(it.p)}.` : '';
-    h += `<p class="small">Metoodika lisa ${esc(km.lisa)} „Teenuste standardkulu komponendid“${km.son ? ' (' + esc(km.son) + ')' : ''}: iga ressursi keskmine maht korda ühe mõõtühiku maksumus.${diff} Piirhind võib komponentide summast veidi erineda.${(km.vigased || []).includes(it.c) ? ' NB: osa selle teenuse ridu ei õnnestunud PDF-ist lugeda, summa võib olla puudulik.' : ''} ${km.u ? `<a href="${esc(km.u)}" target="_blank" rel="noopener">Lisa ${esc(km.lisa)} (PDF) ↗</a>` : ''}</p></div>`;
+    h += `<tr class="grp"><td colspan="2">Komponendid kokku</td><td class="num">${fmtEur(tot)}</td></tr></table></div>`;
+    const pct = it.p != null && tot ? (it.p - tot) / tot * 100 : 0;
+    const diff = it.p == null ? '' : Math.abs(pct) >= 3
+      ? ` Kehtiv piirhind ${fmtEur(it.p)} on komponentide summast ${Math.abs(pct).toLocaleString('et-EE', { maximumFractionDigits: 1 })}% ${pct < 0 ? 'madalam' : 'kõrgem'}.`
+      : ` Kehtiv piirhind on ${fmtEur(it.p)}.`;
+    if (Math.abs(pct) >= 3) h = h.replace('<p class="kulu-sum">', `<p class="note">Piirhind (${fmtEur(it.p)}) on standardkulu komponentide summast (${fmtEur(tot)}) ${Math.abs(pct).toLocaleString('et-EE', { maximumFractionDigits: 1 })}% ${pct < 0 ? 'madalam' : 'kõrgem'}.</p><p class="kulu-sum">`);
+    h += `<p class="small">Metoodika lisa ${esc(km.lisa)} „Teenuste standardkulu komponendid“${km.son ? ' (' + esc(km.son) + ')' : ''}: iga ressursi keskmine maht korda ühe mõõtühiku maksumus.${diff} Piirhind ei pruugi standardkuluga kokku langeda, sest piirhinna kehtestab tervishoiuteenuste loetelu.${(km.vigased || []).includes(it.c) ? ' NB: osa selle teenuse ridu ei õnnestunud PDF-ist lugeda, summa võib olla puudulik.' : ''} ${km.u ? `<a href="${esc(km.u)}" target="_blank" rel="noopener">Lisa ${esc(km.lisa)} (PDF) ↗</a>` : ''}</p></div>`;
     return h;
   }
 

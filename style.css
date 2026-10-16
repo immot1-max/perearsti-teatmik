@@ -406,3 +406,6 @@ a.qbtn.linkq b { color: var(--accent); }
 details.tblbox { border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; margin: 8px 0; }
 details.tblbox > summary { cursor: pointer; font-size: 0.88rem; font-weight: 600; color: var(--accent); }
 details.tblbox[open] > summary { margin-bottom: 6px; }
+.tbl td.num.kq { white-space: normal; }
+.tbl td.num.kq .x { color: var(--muted); }
+@media (max-width: 480px) { .kulu .tbl table { font-size: 0.8rem; } .kulu .tbl td { padding: 3px 5px; } }
