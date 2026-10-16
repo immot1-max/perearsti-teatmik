@@ -1,6 +1,6 @@
 # Perearsti teatmik
 
-Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, sõeluuringute, haigus- ja hoolduslehtede, tervisetõendite, vaktsineerimise, abivahendite ja juhi tervisenõuete kohta. Töötab brauseris ja pärast esimest avamist ka võrguta.
+Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, sõeluuringute, haigus- ja hoolduslehtede, tervisetõendite, vaktsineerimise, retseptide, e-konsultatsiooni, patsiendi hüvitiste, abivahendite ja juhi tervisenõuete kohta. Näitab ka, mis allikates viimasel ajal muutus või peagi muutub. Töötab brauseris ja pärast esimest avamist ka võrguta.
 
 **Rakendus:** https://immot1-max.github.io/perearsti-teatmik/
 
@@ -9,7 +9,7 @@ Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, sõeluuringu
 | Allikas | Mida sealt võetakse |
 |---|---|
 | Tervisekassa tervishoiuteenuste loetelu | Kõik koodid ja piirhinnad, rakendamise tingimused, perearstiabi peatükk |
-| Tasu maksmise kohustuse ülevõtmise kord ja metoodika | § 6 fondid (uuringufond kuni 37%, tegevusfond raviarvega lisaks, teraapiafond kuni 13%), perearstiabi peatükk (§ 4–8¹) |
+| Tasu maksmise kohustuse ülevõtmise kord ja metoodika | § 6 fondid (uuringufond kuni 37%, tegevusfond raviarvega lisaks, teraapiafond kuni 13%), perearstiabi peatükk (§ 4–8¹); lisa „Teenuste standardkulu komponendid“ (iga koodi ressursid, sh arsti minutid) ja e-konsultatsiooni saatekirja nõuete lisad erialade kaupa |
 | Abivahendite loetelu, tõendi ja kaardi andmed | Määruse tekst ja lisa (abivahendite loetelu) |
 | Mootorsõidukijuhi tervisekontroll ja tervisenõuded | Kogu määruse tekst |
 | Metoodika § 8 ja Tervisekassa kvaliteedisüsteemi leht | Kvaliteedisüsteemi kriteeriumid, koodid, punktid ja lisapädevuste koodiloetelud; Tervisekassa uusimad juhendid |
@@ -20,10 +20,32 @@ Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, sõeluuringu
 | Riigi Teataja: töövõimetus | Ravikindlustuse seadus § 50–62, TTOS § 12², 12⁴, 12⁵, töövõimetuslehe määrus |
 | Riigi Teataja: tervisetõendid | Relvaseadus § 35, 35¹ ja relvaloa tervisekontrolli määrus, abipolitseiniku seadus § 6 ja määrus, Kaitseliidu seadus § 28, kaitseväe tervisehindamise määrus, NETS § 13 |
 | Riigi Teataja: nakkushaigused ja vaktsineerimine | Nakkushaiguste määrus, TIS-i põhimäärus § 5, NETS § 8, 10, 21, immuniseerimiskava koos lisadega, immuniseerimise korraldus |
-| Riigi Teataja: töökorraldus ja nimistu | Perearstiabi töökorralduse määrus (nr 14), nimistu määrus (nr 47), TTKS § 8, 8¹ |
+| Riigi Teataja: töökorraldus ja nimistu | Perearstiabi töökorralduse määrus (nr 14), nimistu määrus (nr 47), TTKS § 7, 8, 8¹, 35 |
+| Riigi Teataja: ravimid ja hüvitised | Ravimite väljakirjutamise määrus § 2 (pereõe retseptiõigus, kogused, korduvretsept, bensodiasepiinid), RaKS § 29, 33, 33¹, 41, 42, 44, 49¹, 69, 70, 72; tervishoiuteenuste loetelu § 77 ja § 80 (hambaravi- ja proteesihüvitis) |
+| Riigi Teataja: meremehe tervisenõuded | Meremehe ja mereõppeasutusse õppima asuja tervisenõuete määrus § 5, 6, 7, 12, 13 |
 | Tervisekassa: hüvitiste võrdlustabel | Haigus- ja hoolduslehe põhjused, kes maksab, määr, kestus ja päevane ülempiir (loetakse igal kontrollil) |
 | Toru (Tervisekassa) | Hinna kehtivuse algus, eelmine hind, koodid, mida loetelu tabelites ei ole |
 | Sotsiaalkindlustusamet | Lingid juhenditele ja vormidele |
+
+## Mis muutus
+
+Vaade „Mis muutus“ (avalehel ja kategooriana) võrdleb iga jälgitava akti viimase 12 kuu jooksul jõustunud ja Riigi Teatajas juba avaldatud tulevasi redaktsioone eelmisega (`build/muutused.py`):
+
+- tervishoiuteenuste loetelu: uued ja kadunud koodid, hinna- ja nimetuse muutused (linnuke „Ainult perearstiabi“ kehtib ka siin);
+- metoodika: fondidesse lisandunud ja neist välja jäänud koodid ning muutunud sätted (§ 8 koos tabelitega);
+- abivahendite ja meditsiiniseadmete loetelu: muudetud, uued ja kadunud read;
+- teised aktid: jälgitavate paragrahvide muutunud lõiked, varasem ja uus sõnastus koos esile tõstetud muutustega;
+- kõigil aktidel: uued, muudetud ja kehtetuks tunnistatud lisad.
+
+Tervishoiuteenuste loetelu antakse aasta jooksul välja uue aktina; eelmise akti grupp on failis `build/sources.json` väljal `eelmised` ja skript lisab selle automaatselt, kui akt asendatakse.
+
+## Mis on hinnas
+
+Teenuse koodi juures on plokk „Mis on hinnas“: metoodika lisa „Teenuste standardkulu komponendid“ (2026. aastal lisa 3) järgi iga ressurss (personal minutites, ruumid, seadmed, materjalid, muud kulud), selle keskmine maht ja ühiku maksumus. Ülal on kokku arsti aeg minutites. Komponentide summa võib piirhinnast veidi erineda. Lisa PDF (üle 300 lehekülje) parsitakse `build/met_lisad.py` abil ja tulemus hoitakse vahemälus redaktsiooni ID järgi.
+
+## Tagasiside
+
+Otsingutulemuste all on nupp „Ei leidnud?“, mis avab selle repo GitHubi *issue* vormi otsisõnaga. Vorm vajab GitHubi kontot. Aadressi saab muuta `app.js` konstandis `FEEDBACK_URL` (nt Google'i vormi vastu).
 
 ## Kuidas andmed uuenevad
 
@@ -52,7 +74,7 @@ Rakenduses näitab sünniaasta otsing (nt „1966“), millise sõeluuringu siht
 
 ## Igapäevatöö reeglid (teemakaardid)
 
-Haigus- ja hooldusleht, töövõimetuslehe vormistamine, P21, tervisetõendid (relvaluba, abipolitseinik, Kaitseliit, kaitsevägi, nakkushaiguste tõend), nakkushaiguse teatis, vaktsineerimine, töökorraldus, nimistu ja PADI. Kokkuvõtted on failis `build/teemad.json`; need põhinevad Tommi allikaregistril (15.10.2026) ja on üle kontrollitud aktide kehtivast tekstist.
+Haigus- ja hooldusleht, töövõimetuslehe vormistamine, P21, tervisetõendid (relvaluba, meremees, abipolitseinik, Kaitseliit, kaitsevägi, toidukäitleja jt nakkushaiguste tõend), nakkushaiguse teatis, vaktsineerimine, töökorraldus, nimistu, PADI, perearsti, erialata arsti ja pereõe õigused, retseptid ja ravimisoodustus, e-konsultatsioon ning patsiendi hüvitised ja omaosalus. Kaardid võivad viidata seotud kaartidele (väli `seotud`). Kokkuvõtted on failis `build/teemad.json`; need põhinevad Tommi allikaregistril (15.10.2026) ja on üle kontrollitud aktide kehtivast tekstist.
 
 Iga punkti juures on viide sättele (avaneb rakenduses) või allikale. Automaatne kontroll teeb igal kuul kolm asja:
 

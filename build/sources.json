@@ -2,7 +2,10 @@
   "ttl": {
     "nimi": "Tervisekassa tervishoiuteenuste loetelu",
     "grupiId": 1063168,
-    "lyh": "TTL"
+    "lyh": "TTL",
+    "eelmised": [
+      1062434
+    ]
   },
   "metoodika": {
     "nimi": "Tasu maksmise kohustuse ülevõtmise kord ja tasu arvutamise metoodika",
@@ -40,7 +43,9 @@
     "grupiId": 153395,
     "par": [
       "§ 8",
-      "§ 8¹"
+      "§ 8¹",
+      "§ 7",
+      "§ 35"
     ]
   },
   "tvl": {
@@ -65,7 +70,17 @@
       "§ 59",
       "§ 60",
       "§ 61",
-      "§ 62"
+      "§ 62",
+      "§ 29",
+      "§ 33",
+      "§ 33¹",
+      "§ 41",
+      "§ 42",
+      "§ 44",
+      "§ 49¹",
+      "§ 69",
+      "§ 70",
+      "§ 72"
     ]
   },
   "ttos": {
@@ -151,5 +166,25 @@
     "nimi": "Immuniseerimise korraldamise nõuded",
     "lyh": "Immuniseerimise korraldus",
     "grupiId": 1055635
+  },
+  "retsept": {
+    "nimi": "Ravimite väljakirjutamine ja apteekidest väljastamine",
+    "lyh": "Retseptimäärus",
+    "grupiId": 158511,
+    "par": [
+      "§ 2"
+    ]
+  },
+  "meremees": {
+    "nimi": "Meremehe ja mereõppeasutusse õppima asuja tervisenõuded ja tervisekontroll",
+    "lyh": "Meremehe tervisenõuded",
+    "grupiId": 158572,
+    "par": [
+      "§ 5",
+      "§ 6",
+      "§ 7",
+      "§ 12",
+      "§ 13"
+    ]
   }
 }

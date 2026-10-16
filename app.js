@@ -33,6 +33,22 @@
   };
   // Pearaha arvel tasutav uuring (metoodika § 5 lg 3, nt glükoos 66101): § 6 fondides ei ole, kuid sisaldub pearahas.
   const phBadge = (x) => (x && x.ph ? `<span class="badge ph" title="Tervisekassa tasub pearaha arvel (metoodika ${esc(x.ph.par)})">Pearaha ${esc(x.ph.par)}</span>` : '');
+  // Tagasiside: GitHubi issue-vorm otsisõnaga (e-posti aadressi lehel ei näidata).
+  const FEEDBACK_URL = (q) => 'https://github.com/immot1-max/perearsti-teatmik/issues/new?title='
+    + encodeURIComponent(`Ei leidnud: ${q}`.slice(0, 120))
+    + '&body=' + encodeURIComponent(`Otsisin: ${q}\n\nMida ootasin leida (kood, teenus, reegel, allikas):\n\n`);
+  // Ressursi koodi eesliide → rühm (metoodika standardkulu lisa)
+  const KULU_GROUPS = [['per', 'Personal'], ['pin', 'Ruumid'], ['sdm', 'Seadmed ja inventar'], ['mat', 'Materjalid ja ravimid'], ['muu', 'Muud kulud']];
+  function kuluGroup(rc) {
+    const p = (rc || '').toUpperCase();
+    if (p.startsWith('PER')) return 'per';
+    if (/^(PIN|ACT)/.test(p)) return 'pin';
+    if (/^(SDM|SMD|INV)/.test(p)) return 'sdm';
+    if (/^(YKM|KKM|RAVIM|INS|RES)/.test(p)) return 'mat';
+    return 'muu';
+  }
+  const isDoctor = (rc) => /^PER01\d\d$/i.test(rc || '');
+  const fmtMin = (v) => v.toLocaleString('et-EE', { maximumFractionDigits: 2 });
   const KS_CAT = { ylevaade: 'Ülevaade', ennetus: 'Ennetus', krooniline: 'Kroonilised haiged', jalgimine: 'Jälgimisindikaatorid', lisapadevus: 'Erialane lisapädevus', soeluuring: 'Sõeluuringud' };
   const KS_ORDER = ['ylevaade', 'ennetus', 'krooniline', 'jalgimine', 'lisapadevus', 'soeluuring'];
   const ksPrefix = (q) => (q.cat === 'lisapadevus' ? 'Lisapädevus' : 'KS');
@@ -94,7 +110,7 @@
   // tühjendab (siis naaseb sinna, kus kirje oli: täisvaatesse või samasse nimekirja). pinFrom = nimekirja olek (q, filter, fund).
   // Kui pin on olemas, näidatakse esialgu PIN_LIMIT vastet, et avatud kirje jääks lähedale.
   const PIN_LIMIT = 10;
-  const state = { data: null, idx: [], filter: 'all', fund: null, q: '', open: new Set(), limit: 60, focus: null, pin: null, pinFrom: null, pinOpen: false, lastOpen: null, pa: paPref, labsAll: new Set(), msAll: new Set() };
+  const state = { data: null, idx: [], filter: 'all', fund: null, q: '', open: new Set(), limit: 60, focus: null, pin: null, pinFrom: null, pinOpen: false, lastOpen: null, pa: paPref, labsAll: new Set(), msAll: new Set(), uAll: new Set() };
   const el = {};
 
   // ------------------------------------------------------------ andmed
@@ -125,6 +141,11 @@
 
   function setData(data) {
     state.data = data;
+    // Muudatuste kirjed (data.muutused) on rakenduses tavalised kirjed liigiga 'u'.
+    if (!data._uAdded) {
+      for (const m of data.muutused || []) data.items.push(Object.assign({ t: 'u' }, m));
+      data._uAdded = true;
+    }
     const items = data.items;
     const rules = data.rules;
     const codeSet = new Set(items.filter((x) => x.t === 's').map((x) => x.c));
@@ -141,6 +162,7 @@
       else if (it.t === 'm') cls = 'ms';
       else if (it.t === 'v') cls = 'soel';
       else if (it.t === 'j') cls = 'teema';
+      else if (it.t === 'u') cls = 'muutus';
       it._cls = cls;
       let name = it.n || '';
       let ctx = '', txt = '', code = '';
@@ -189,10 +211,17 @@
         name = `${it.n} ${it.sn || ''}`;
         ctx = `${it.g || ''} teema`;
         const tabTxt = (it.tab || []).map((tb) => [tb.n, tb.tekst || '', tb.markus || '', (tb.legend || []).join(' '),
-          (tb.read || []).map((r) => r.join(' ')).join(' '),
+          (tb.read || []).map((r) => r.map((c) => (Array.isArray(c) ? c[0] : c)).join(' ')).join(' '),
           (tb.rows || []).map((r) => [r.pohjus.join(' '), r.nr.join(' '), r.liik, r.kord.join(' '), r.kestus].join(' ')).join(' ')].join(' ')).join(' ');
-        txt = [...(it.r || []), ...(it.e || []), ...(it.tul || [])].map((r) => r.s + ' ' + (r.a || []).map((a) => a.n).join(' ')).join(' ') + ' ' + tabTxt;
+        txt = [...(it.r || []), ...(it.e || []), ...(it.tul || [])].map((r) => (r.p || '') + ' ' + r.s + ' ' + (r.a || []).map((a) => a.n).join(' ')).join(' ') + ' ' + tabTxt;
         boost += 45 + (it.boost || 0);
+      } else if (it.t === 'u') {
+        name = `${it.n} ${it.lyh || ''} ${fmtDate(it.alates)}`;
+        ctx = 'muutus muudatus muudatused mis muutus uus redaktsioon ' + (it.tul ? 'tulekul jõustub ' : 'jõustus ');
+        const k = it.kood || {};
+        txt = [...(k.uus || []), ...(k.kadunud || []), ...(k.hind || []), ...(it.fond || []).map((f) => [f[2], f[3]])].map((x) => x.join(' ')).join(' ')
+          + ' ' + (it.pars || []).map((p) => `${p.par} ${p.n}`).join(' ');
+        boost += 10;
       }
       const syn = (it.syn || []).map(norm);
       if (it.t === 'b' && it.ab) {
@@ -208,7 +237,9 @@
     state.qByKey = {};
     state.byCode = {};
     state.labsByCode = {};
+    state.teemaByKey = {};
     for (const it of items) {
+      if (it.t === 'j') state.teemaByKey[it.k] = it;
       if (it.t === 'q') state.qByKey[it.k] = it;
       if (it.t === 's') state.byCode[it.c] = it;
       if (it.t === 'b') for (const [c] of it.c || []) (state.labsByCode[c] = state.labsByCode[c] || []).push(it);
@@ -232,6 +263,7 @@
     if (state.filter === 'm') return t === 'm';
     if (state.filter === 'v') return t === 'v';
     if (state.filter === 'j') return t === 'j';
+    if (state.filter === 'u') return t === 'u';
     return t === state.filter;
   }
 
@@ -314,6 +346,13 @@
   const hl = (s, re) => (re ? esc(s).replace(re, '<mark>$1</mark>') : esc(s));
 
   // ------------------------------------------------------------ vaated
+  // Muudatused: tulevased jõustumise järjekorras, siis jõustunud uuemad eespool.
+  const uOrder = (a, b) => (b.it.tul - a.it.tul) || (a.it.tul ? a.it.alates.localeCompare(b.it.alates) : b.it.alates.localeCompare(a.it.alates));
+  function notFoundHtml(q, empty) {
+    return `<div class="notfound${empty ? ' strong' : ''}"><span>${empty ? 'Kas otsisid midagi, mida teatmikus pole?' : 'Ei leidnud, mida otsisid?'}</span>`
+      + `<a class="btn" href="${esc(FEEDBACK_URL(q))}" target="_blank" rel="noopener">Ei leidnud? Anna teada ↗</a>`
+      + '<small>Avaneb GitHubi tagasisidevorm (vajab GitHubi kontot), otsisõna on juba sees. Puuduvad sõnad lisatakse sünonüümidesse.</small></div>';
+  }
   function route() {
     const r = el.results;
     const q = state.q.trim();
@@ -347,6 +386,7 @@
         list.sort((a, b) => gk(a.it).localeCompare(gk(b.it), 'et') || a.it.n.localeCompare(b.it.n, 'et'));
       }
       if (state.filter === 'q') list.sort((a, b) => KS_ORDER.indexOf(a.it.cat) - KS_ORDER.indexOf(b.it.cat));
+      if (state.filter === 'u') list.sort(uOrder);
     }
     if (state.pin != null) list = list.filter((x) => x.it._id !== state.pin);
     const total = list.length;
@@ -354,7 +394,7 @@
     let html = '';
     const fundItem = state.fund ? state.data.items.find((x) => x.t === 'f' && x.k === state.fund) : null;
     if (fundItem) {
-      html += `<div class="row ${fundItem.k}"><div class="detail" style="border-top:0"><div class="text"><p><strong>${esc(fundItem.n)}</strong> · metoodika ${esc(fundItem.par)}</p><p>${esc(FUND_HELP[fundItem.k] || '')}</p>${state.data.meta.starRule && fundItem.k === 'f37' ? `<p>* ${esc(state.data.meta.starRule)}</p>` : ''}</div><div class="actions"><a href="${esc(fundItem.url)}" target="_blank" rel="noopener">Säte Riigi Teatajas ↗</a></div></div></div>`;
+      html += `<div class="row ${fundItem.k}"><div class="detail" style="border-top:0"><div class="text"><p><strong>${esc(fundItem.n)}</strong> · metoodika ${esc(fundItem.par)}</p><p>${esc(FUND_HELP[fundItem.k] || '')}</p>${state.data.meta.starRule && fundItem.k === 'f37' ? `<p>* ${esc(state.data.meta.starRule)}</p>` : ''}</div><div class="actions"><a href="${esc(fundItem.url)}" target="_blank" rel="noopener">Säte Riigi Teatajas ↗</a>${(() => { const ft = state.data.items.find((x) => x.t === 'k' && x.id === 'tk-fondid'); return ft ? `<a href="${esc(ft.u)}" target="_blank" rel="noopener">Fondide täitmised ↗</a>` : ''; })()}</div></div></div>`;
     }
     const yCard = q && !state.fund && (state.filter === 'all' || state.filter === 'v') ? birthYearCard(norm(q).split(' ')) : '';
     html += yCard;
@@ -368,12 +408,12 @@
       if (q && (state.fund || state.filter !== 'all')) html += '<button class="btn solid" data-act="all">Otsi kõigist kategooriatest</button>';
     } else {
       html += '<div class="list">';
-      const grouped = !q && (state.fund || state.filter === 'a' || state.filter === 'l' || state.filter === 'q' || state.filter === 'b' || state.filter === 's' || state.filter === 'm' || state.filter === 'j');
+      const grouped = !q && (state.fund || ['a', 'l', 'q', 'b', 's', 'm', 'j', 'u'].includes(state.filter));
       if (!q && state.filter === 'm') shown.sort((a, b) => a.it.n.localeCompare(b.it.n, 'et'));
       let lastG = null;
       for (const x of shown) {
         if (grouped) {
-          const g = x.it.t === 'j' ? x.it.g : x.it.t === 'm' ? 'Tervisekassa meditsiiniseadmed' : x.it.t === 'a' ? (x.it.g || [])[0] || x.it.n : x.it.t === 'l' ? srcName(x.it.src) : x.it.t === 'f' ? 'Fondid' : x.it.t === 'q' ? KS_CAT[x.it.cat] : x.it.t === 'b' ? x.it.cat : x.it.pt || (x.it.tp && x.it.tp.hk) || srcName(x.it.src);
+          const g = x.it.t === 'u' ? (x.it.tul ? 'Tulekul: avaldatud, veel jõustumata' : 'Jõustunud viimase aasta jooksul') : x.it.t === 'j' ? x.it.g : x.it.t === 'm' ? 'Tervisekassa meditsiiniseadmed' : x.it.t === 'a' ? (x.it.g || [])[0] || x.it.n : x.it.t === 'l' ? srcName(x.it.src) : x.it.t === 'f' ? 'Fondid' : x.it.t === 'q' ? KS_CAT[x.it.cat] : x.it.t === 'b' ? x.it.cat : x.it.pt || (x.it.tp && x.it.tp.hk) || srcName(x.it.src);
           if (g !== lastG) { html += `<div class="group-h">${esc(g)}</div>`; lastG = g; }
         }
         html += row(x.it, x.via);
@@ -381,6 +421,7 @@
       html += '</div>';
       if (total > shown.length) html += `<button class="btn more" data-act="more">Näita veel ${Math.min(60, total - shown.length)}</button>`;
     }
+    if (q) html += notFoundHtml(q, !total && !yCard);
     html += pinHtml();
     r.innerHTML = html;
   }
@@ -428,6 +469,9 @@
       const changed = (it.r || []).some((r) => r.muutus);
       head = `<span class="name">${hl(it.n, re)}</span><span></span>
         <span class="meta"><span class="badge teema">${esc(it.g || 'teema')}</span><span>${(it.r || []).length} punkti</span>${(it.e || []).length ? `<span class="badge warn">${it.e.length} erinevus${it.e.length > 1 ? 't' : ''} allikates</span>` : ''}${changed ? '<span class="badge warn">allikas muutunud</span>' : ''}${via ? '<span class="via">· vaste sisus</span>' : ''}</span>`;
+    } else if (it.t === 'u') {
+      head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${it.tul ? 'jõustub ' : ''}${fmtDate(it.alates)}</small></span>
+        <span class="meta">${it.tul ? '<span class="badge warn">tulekul</span>' : '<span class="badge muutus">jõustunud</span>'}<span>${esc(uSummary(it))}</span>${via ? '<span class="via">· vaste sisus</span>' : ''}</span>`;
     } else if (it.t === 'v') {
       const yrs = it.sy ? `${it.aasta}: ${it.sy.length} sünniaastat` : (it.lyh || '');
       head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${esc(ageRange(it))}</small></span>
@@ -435,6 +479,150 @@
     }
     const toggle = opt.pin ? 'data-act="pin-toggle"' : `data-open="${it._id}"`;
     return `<article class="row ${it._cls}"><button class="head" ${toggle} aria-expanded="${open}">${head}</button>${open ? `<div class="detail">${detail(it)}</div>` : ''}</article>`;
+  }
+
+  // ------------------------------------------------------------ mis muutus
+  function uCount(list) {
+    const rows = list || [];
+    return [rows.length, rows.filter((r) => (state.byCode[r[0]] || {}).pa).length];
+  }
+  function uSummary(it) {
+    const p = [];
+    const k = it.kood || {};
+    const add = (list, one, many) => {
+      const [a, pa] = uCount(list);
+      if (a) p.push(`${a} ${a === 1 ? one : many}${pa && pa !== a ? ` (perearstiabis ${pa})` : ''}`);
+    };
+    add(k.hind, 'hinnamuutus', 'hinnamuutust');
+    add(k.uus, 'uus kood', 'uut koodi');
+    add(k.kadunud, 'kadunud kood', 'kadunud koodi');
+    add(k.nimi, 'nimemuutus', 'nimemuutust');
+    const n1 = (n, one, many) => { if (n) p.push(`${n} ${n === 1 ? one : many}`); };
+    n1((it.fond || []).length, 'fondimuutus', 'fondimuutust');
+    if (it.abiv) n1(it.abiv.uus.length + it.abiv.kadunud.length + it.abiv.muut.length, 'abivahendi muutus', 'abivahendi muutust');
+    if (it.ms) n1(it.ms.uus.length + it.ms.kadunud.length + it.ms.hind.length + it.ms.pct.length, 'toote muutus', 'toote muutust');
+    n1((it.pars || []).length + (it.parsVeel || 0), 'säte', 'sätet');
+    n1((it.lisad || []).length, 'lisa', 'lisa');
+    if (it.tyhi) p.push('sisulist muutust ei leitud');
+    return p.join(' · ');
+  }
+  // Sõnapõhine vahe: kustutatud sõnad <del>, lisatud <ins>.
+  function wordDiff(a, b) {
+    const A = (a || '').split(/(\s+)/).filter((x) => x !== '');
+    const B = (b || '').split(/(\s+)/).filter((x) => x !== '');
+    if (A.length * B.length > 250000) return [esc(a || ''), esc(b || '')];
+    const n = A.length, m = B.length;
+    const L = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+    let i = 0, j = 0, oa = '', ob = '';
+    while (i < n && j < m) {
+      if (A[i] === B[j]) { oa += esc(A[i]); ob += esc(B[j]); i++; j++; }
+      else if (L[i + 1][j] >= L[i][j + 1]) { oa += /^\s+$/.test(A[i]) ? A[i] : `<del>${esc(A[i])}</del>`; i++; }
+      else { ob += /^\s+$/.test(B[j]) ? B[j] : `<ins>${esc(B[j])}</ins>`; j++; }
+    }
+    while (i < n) { oa += /^\s+$/.test(A[i]) ? A[i] : `<del>${esc(A[i])}</del>`; i++; }
+    while (j < m) { ob += /^\s+$/.test(B[j]) ? B[j] : `<ins>${esc(B[j])}</ins>`; j++; }
+    return [oa.replace(/<\/del>(\s*)<del>/g, '$1'), ob.replace(/<\/ins>(\s*)<ins>/g, '$1')];
+  }
+  function uTable(it, key, title, head, rows, cell, opt = {}) {
+    if (!rows || !rows.length) return '';
+    let list = rows;
+    let hidden = 0;
+    if (opt.pa && state.pa) {
+      list = rows.filter((r) => (state.byCode[r[0]] || {}).pa);
+      hidden = rows.length - list.length;
+    }
+    const all = state.uAll.has(it._id + ':' + key);
+    const LIM = 40;
+    const shown = all ? list : list.slice(0, LIM);
+    let h = `<h4>${esc(title)} (${list.length}${hidden ? ` perearstiabis, kokku ${rows.length}` : ''})</h4>`;
+    if (shown.length) {
+      h += `<div class="tbl"><table><tr>${head.map((c) => `<td>${esc(c)}</td>`).join('')}</tr>${shown.map(cell).join('')}</table></div>`;
+    } else {
+      h += '<p class="small">Perearstiabi koode selles loetelus ei ole.</p>';
+    }
+    const btns = [];
+    if (list.length > shown.length) btns.push(`<button class="btn" data-uall="${it._id}:${key}">Näita kõiki ${list.length}</button>`);
+    if (hidden) btns.push('<button class="btn" data-act="pa-off">Näita ka väljaspool perearstiabi</button>');
+    if (btns.length) h += `<div class="actions">${btns.join('')}</div>`;
+    return h;
+  }
+  function uDetail(it) {
+    const re = state.hl;
+    const codeBtn = (c) => `<button class="code" data-q="${esc(c)}" title="Ava kood">${esc(c)}</button>`;
+    const nameOf = (c, fb) => esc((state.byCode[c] || {}).n || fb || '');
+    let h = `<p class="small">${esc(it.n)}: <a href="${esc(it.eu)}" target="_blank" rel="noopener">eelmine redaktsioon (${fmtDate(it.ealates)})</a> → <a href="${esc(it.u)}" target="_blank" rel="noopener">${it.tul ? 'uus redaktsioon, jõustub' : 'redaktsioon'} ${fmtDate(it.alates)}</a>.</p>`;
+    if (it.tyhi) h += '<p class="small">Redaktsioonide võrdlusel sisulist muutust ei leitud (nt ainult vormistus või viited).</p>';
+    const k = it.kood || {};
+    const pct = (a, b) => (a ? (b - a) / a * 100 : null);
+    const hind = (k.hind || []).slice().sort((x, y) => Math.abs(pct(y[1], y[2]) || 0) - Math.abs(pct(x[1], x[2]) || 0));
+    h += uTable(it, 'hind', 'Hinnamuutused', ['Kood', 'Teenus', 'Piirhind', 'Muutus'], hind, ([c, a, b]) => {
+      const p = pct(a, b);
+      return `<tr><td>${codeBtn(c)}</td><td>${nameOf(c)}</td><td class="num">${a != null ? fmtEur(a) : '–'} → ${b != null ? fmtEur(b) : '–'}</td><td class="num">${p == null ? '' : (p > 0 ? '+' : '') + p.toLocaleString('et-EE', { maximumFractionDigits: 1 }) + '%'}</td></tr>`;
+    }, { pa: true });
+    h += uTable(it, 'uus', 'Uued koodid', ['Kood', 'Teenus', 'Piirhind'], k.uus, ([c, n, p]) => `<tr><td>${codeBtn(c)}</td><td>${esc(n)}</td><td class="num">${p != null ? fmtEur(p) : ''}</td></tr>`, { pa: true });
+    h += uTable(it, 'kadunud', 'Loetelust välja jäänud koodid', ['Kood', 'Teenus', 'Viimane piirhind'], k.kadunud, ([c, n, p]) => `<tr><td><span class="code">${esc(c)}</span></td><td>${esc(n)}</td><td class="num">${p != null ? fmtEur(p) : ''}</td></tr>`);
+    h += uTable(it, 'nimi', 'Nimetuse muutused', ['Kood', 'Varem', 'Nüüd'], k.nimi, ([c, a, b]) => { const [da, db] = wordDiff(a, b); return `<tr><td>${codeBtn(c)}</td><td class="ud-old">${da}</td><td class="ud-new">${db}</td></tr>`; }, { pa: true });
+    h += uTable(it, 'fond', 'Fondide koodid', ['Fond', '', 'Kood', 'Teenus'], it.fond, ([f, sgn, c, n]) => `<tr><td><span class="badge ${esc(f)}">${esc(FUND_SHORT[f] || f)}</span></td><td>${sgn === '+' ? '<b class="plus">lisandus</b>' : '<b class="minus">välja</b>'}</td><td>${codeBtn(c)}</td><td>${esc(n)}</td></tr>`);
+    if (it.abiv) {
+      const fl = (f) => f.map((x) => AB_LABEL[x] || x).join(', ');
+      h += uTable(it, 'ab-muut', 'Muudetud abivahendid', ['Kood', 'Abivahend', 'Muutunud'], it.abiv.muut, ([c, n, f]) => `<tr><td><button class="code" data-q="${esc(c)}">${esc(c)}</button></td><td>${esc(n)}</td><td>${esc(fl(f))}</td></tr>`);
+      h += uTable(it, 'ab-uus', 'Uued abivahendid', ['Kood', 'Abivahend'], it.abiv.uus, ([c, n]) => `<tr><td><button class="code" data-q="${esc(c)}">${esc(c)}</button></td><td>${esc(n)}</td></tr>`);
+      h += uTable(it, 'ab-kadunud', 'Loetelust välja jäänud abivahendid', ['Kood', 'Abivahend'], it.abiv.kadunud, ([c, n]) => `<tr><td><span class="code">${esc(c)}</span></td><td>${esc(n)}</td></tr>`);
+    }
+    if (it.ms) {
+      h += uTable(it, 'ms-hind', 'Meditsiiniseadmete hinnamuutused', ['Kood', 'Toode', 'TK piirhind'], it.ms.hind, ([c, n, a, b]) => `<tr><td><span class="code">${esc(c)}</span></td><td>${esc(n)}</td><td class="num">${a != null ? fmtEur(a) : '–'} → ${b != null ? fmtEur(b) : '–'}</td></tr>`);
+      h += uTable(it, 'ms-pct', 'Hüvitise määra muutused', ['Kood', 'Toode', 'Määr'], it.ms.pct, ([c, n, a, b]) => `<tr><td><span class="code">${esc(c)}</span></td><td>${esc(n)}</td><td class="num">${a ?? '–'}% → ${b ?? '–'}%</td></tr>`);
+      h += uTable(it, 'ms-uus', 'Uued tooted', ['Kood', 'Toode', 'Rühm'], it.ms.uus, ([c, n, g]) => `<tr><td><span class="code">${esc(c)}</span></td><td>${esc(n)}</td><td>${esc(g)}</td></tr>`);
+      h += uTable(it, 'ms-kadunud', 'Loetelust välja jäänud tooted', ['Kood', 'Toode', 'Rühm'], it.ms.kadunud, ([c, n, g]) => `<tr><td><span class="code">${esc(c)}</span></td><td>${esc(n)}</td><td>${esc(g)}</td></tr>`);
+    }
+    if ((it.pars || []).length) {
+      const openAll = it.pars.length <= 3;
+      h += `<h4>Muutunud sätted (${it.pars.length + (it.parsVeel || 0)})</h4>` + it.pars.map((p) => {
+        const los = p.lo.map(([nr, a, b]) => {
+          const [da, db] = wordDiff(a, b);
+          return `<div class="ud">${nr ? `<div class="ud-h">${esc(nr)}</div>` : ''}${a ? `<div class="ud-old"><span>Varem</span>${da}</div>` : ''}<div class="ud-new"><span>Nüüd</span>${b ? db : '<i>kehtetu</i>'}</div></div>`;
+        }).join('');
+        return `<details class="udiff"${openAll || (re && re.test(p.n)) ? ' open' : ''}><summary><b>${esc(p.par)}</b> ${hl(p.n, re)}${p.uus ? ' <span class="badge muutus">uus</span>' : ''}${p.kehtetu ? ' <span class="badge warn">kehtetu</span>' : ''}</summary>${los}${p.veel ? `<p class="small">… ja veel ${p.veel} lõiget</p>` : ''}<p class="small"><a href="${esc(p.u)}" target="_blank" rel="noopener">Ava säte Riigi Teatajas ↗</a></p></details>`;
+      }).join('') + (it.parsVeel ? `<p class="small">… ja veel ${it.parsVeel} paragrahvi (vaata Riigi Teatajast).</p>` : '');
+    }
+    if ((it.lisad || []).length) {
+      h += '<h4>Lisad</h4><div class="actions">' + it.lisad.map(([n, st, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}: ${esc(st)} ↗</a>`).join('') + '</div>';
+    }
+    h += '<p class="small">Võrdlus tehakse automaatselt kahe Riigi Teatajas avaldatud redaktsiooni tekstist. Õiguslikult kehtib alati Riigi Teataja tekst.</p>';
+    return h;
+  }
+  function kuluHtml(it, rows) {
+    const d = state.data;
+    const res = (d.kulu && d.kulu.res) || {};
+    const km = d.meta.kulu || {};
+    let tot = 0, docMin = 0;
+    const groups = {};
+    const docs = [];
+    for (const [rc, m, p] of rows) {
+      const sum = m * p;
+      tot += sum;
+      const g = kuluGroup(rc);
+      (groups[g] = groups[g] || []).push([rc, m, p, sum]);
+      if (isDoctor(rc)) { docMin += m; docs.push(`${(res[rc] || [rc])[0]} ${fmtMin(m)} min`); }
+    }
+    let h = `<div class="rules kulu"><h4>Mis on hinnas (standardkulu)</h4><p class="kulu-sum">${docMin ? `Arsti aeg hinnas: <b>${fmtMin(docMin)} min</b> (${docs.map(esc).join(', ')})` : 'Arsti aega selle teenuse standardkulus ei ole.'}</p>`;
+    h += '<div class="tbl"><table><tr><td>Ressurss</td><td>Kogus</td><td>Ühiku hind</td><td>Kokku</td></tr>';
+    for (const [g, label] of KULU_GROUPS) {
+      const gr = groups[g];
+      if (!gr) continue;
+      const gs = gr.reduce((a, r) => a + r[3], 0);
+      h += `<tr class="grp"><td colspan="3">${label}</td><td class="num">${fmtEur(gs)}</td></tr>`;
+      for (const [rc, m, p, sum] of gr.sort((a, b) => b[3] - a[3])) {
+        const [nm, unit] = res[rc] || [rc, ''];
+        const u = g === 'per' ? 'min' : (unit && !/^(Kirjeldamata|Määratlemata)$/i.test(unit) ? unit.toLowerCase() : '');
+        h += `<tr><td>${esc(nm)}${isDoctor(rc) ? ' <span class="badge ks">arst</span>' : ''}</td><td class="num">${fmtMin(m)}${u ? ' <small>' + esc(u) + '</small>' : ''}</td><td class="num">${fmtEur(p)}</td><td class="num">${fmtEur(sum)}</td></tr>`;
+      }
+    }
+    h += `<tr class="grp"><td colspan="3">Komponendid kokku</td><td class="num">${fmtEur(tot)}</td></tr></table></div>`;
+    const diff = it.p != null && Math.abs(tot - it.p) >= 0.01 ? ` Kehtiv piirhind on ${fmtEur(it.p)}.` : '';
+    h += `<p class="small">Metoodika lisa ${esc(km.lisa)} „Teenuste standardkulu komponendid“${km.son ? ' (' + esc(km.son) + ')' : ''}: iga ressursi keskmine maht korda ühe mõõtühiku maksumus.${diff} Piirhind võib komponentide summast veidi erineda.${(km.vigased || []).includes(it.c) ? ' NB: osa selle teenuse ridu ei õnnestunud PDF-ist lugeda, summa võib olla puudulik.' : ''} ${km.u ? `<a href="${esc(km.u)}" target="_blank" rel="noopener">Lisa ${esc(km.lisa)} (PDF) ↗</a>` : ''}</p></div>`;
+    return h;
   }
 
   function pinHtml() {
@@ -493,6 +681,8 @@
       if (it.muud) h += `<div><dt>Esineb ka</dt><dd>${it.muud.map((m) => esc(m.par)).join(', ')}</dd></div>`;
       h += '</dl>';
       if (it.tmis) h += `<p class="note">Toru failis on selle koodi hind ${fmtEur(it.tp.p)}, mis erineb kehtivast loetelust. Õiguslikult kehtib loetelu hind.</p>`;
+      const ku = d.kulu && d.kulu.c && d.kulu.c[it.c];
+      if (ku) h += kuluHtml(it, ku);
       const labs = state.labsByCode[it.c] || [];
       if (labs.length) {
         const showAll = state.labsAll.has(it.c) || labs.length <= 30;
@@ -615,30 +805,41 @@
         ? `<button class="badge srcb" data-goto="${esc(x.src)}:${esc(x.par)}" title="Ava säte">${esc(x.n)}</button>`
         : `<a class="badge srcb" href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.n)} ↗</a>`)).join(' ');
       let h = '';
+      const rel = (it.seotud || []).map((k) => state.teemaByKey[k]).filter(Boolean);
+      if (rel.length) h += `<div class="seotud"><span>Vaata ka</span>${rel.map((x) => `<button class="badge teema" data-focus="${x._id}">${esc(x.sn)}</button>`).join('')}</div>`;
       for (const f of it.tul || []) {
         if (f.alates <= new Date().toISOString().slice(0, 10)) continue;
         h += `<p class="note"><b>Alates ${fmtDate(f.alates)}:</b> ${hl(f.s, re)} ${chips(f.a)}</p>`;
       }
+      let th = '';
       for (const tb of it.tab || []) {
-        h += `<h4>${esc(tb.n)}</h4>`;
+        let t1 = '';
         if (tb.dyn === 'huvitised') {
-          h += '<div class="hv">' + tb.rows.map((r) => `<div class="hvr"><div class="hvh">${r.nr.map((n) => `<span class="code">${esc(n)}</span>`).join('')}<b>${r.pohjus.map((x) => hl(x, re)).join(' / ')}</b><small>${esc(r.liik)}</small></div>`
+          t1 += '<div class="hv">' + tb.rows.map((r) => `<div class="hvr"><div class="hvh">${r.nr.map((n) => `<span class="code">${esc(n)}</span>`).join('')}<b>${r.pohjus.map((x) => hl(x, re)).join(' / ')}</b><small>${esc(r.liik)}</small></div>`
             + `<div>${r.kord.map((x) => hl(x, re)).join(' ')}</div><div class="hvk">${hl(r.kestus, re)}</div></div>`).join('') + '</div>';
-          if (tb.uuendatud && tb.uuendatud.length) h += `<p class="small">Tervisekassa leht uuendatud ${tb.uuendatud.map(fmtDate).join(', ')}.</p>`;
+          if (tb.uuendatud && tb.uuendatud.length) t1 += `<p class="small">Tervisekassa leht uuendatud ${tb.uuendatud.map(fmtDate).join(', ')}.</p>`;
         } else if (tb.read) {
-          h += `<div class="tbl"><table><tr>${(tb.pais || []).map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`
-            + tb.read.map((r) => `<tr>${r.map((c) => `<td>${hl(c, re)}</td>`).join('')}</tr>`).join('') + '</table></div>';
+          t1 += `<div class="tbl"><table><tr>${(tb.pais || []).map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`
+            + tb.read.map((r) => `<tr>${r.map((c) => `<td>${Array.isArray(c) ? `<a href="${esc(c[1])}" target="_blank" rel="noopener">${esc(c[0])} ↗</a>` : hl(c, re)}</td>`).join('')}</tr>`).join('') + '</table></div>';
         } else if (tb.tekst) {
           const open = re && new RegExp(re.source, 'i').test(tb.tekst);
-          h += `<details class="lisa"${open ? ' open' : ''}><summary>Näita loetelu (PDF-i tekst)</summary><div class="pre">${hl(tb.tekst, re)}</div></details>`;
+          t1 += `<details class="lisa"${open ? ' open' : ''}><summary>Näita loetelu (PDF-i tekst)</summary><div class="pre">${hl(tb.tekst, re)}</div></details>`;
         }
-        if (tb.markus) h += `<p class="small">${hl(tb.markus, re).replace(/\n/g, '<br>')}</p>`;
-        if (tb.legend && tb.legend.length) h += `<p class="small">${tb.legend.map((x) => hl(x, re)).join('; ')}</p>`;
-        if (tb.a && tb.a.length) h += `<div class="srcs">${chips(tb.a)}</div>`;
+        if (tb.markus) t1 += `<p class="small">${hl(tb.markus, re).replace(/\n/g, '<br>')}</p>`;
+        if (tb.legend && tb.legend.length) t1 += `<p class="small">${tb.legend.map((x) => hl(x, re)).join('; ')}</p>`;
+        if (tb.a && tb.a.length) t1 += `<div class="srcs">${chips(tb.a)}</div>`;
+        if (tb.kinni) {
+          const open = re && new RegExp(re.source, 'i').test(t1.replace(/<[^>]+>/g, ' '));
+          th += `<details class="tblbox"${open ? ' open' : ''}><summary>${esc(tb.n)}</summary>${t1}</details>`;
+        } else {
+          th += `<h4>${esc(tb.n)}</h4>${t1}`;
+        }
       }
+      let rh = '';
       if ((it.r || []).length) {
-        h += '<div class="rules"><h4>Põhireeglid</h4>' + it.r.map((r) => `<div class="rule${r.muutus ? ' changed' : ''}">${r.muutus ? '<span class="badge warn">allika tekst muutunud, vaata üle</span> ' : ''}${hl(r.s, re)}<div class="srcs">${chips(r.a)}</div></div>`).join('') + '</div>';
+        rh = '<div class="rules"><h4>Põhireeglid</h4>' + it.r.map((r) => `<div class="rule${r.muutus ? ' changed' : ''}">${r.muutus ? '<span class="badge warn">allika tekst muutunud, vaata üle</span> ' : ''}${r.p ? `<b class="lead">${esc(r.p)}.</b> ` : ''}${hl(r.s, re)}<div class="srcs">${chips(r.a)}</div></div>`).join('') + '</div>';
       }
+      h += it.tl ? rh + (th ? `<div class="rules">${th}</div>` : '') : th + rh;
       if ((it.e || []).length) {
         h += '<div class="rules"><h4>Erinevused allikates</h4>' + it.e.map((r) => `<div class="note">${hl(r.s, re)}<div class="srcs">${chips(r.a)}</div></div>`).join('') + '</div>';
       }
@@ -648,6 +849,7 @@
       h += `<p class="small">Kokkuvõte on koostatud allikate põhjal (kontrollitud ${fmtDate(tm.kontrollitud)}). Automaatkontroll võrdleb igal kuul viidatud sätete teksti; õiguslikult kehtib alati allikas.</p>`;
       return h;
     }
+    if (it.t === 'u') return uDetail(it);
     if (it.t === 'v') {
       let h = '<dl class="kv">';
       h += `<div><dt>Kellele</dt><dd>${esc(it.kes || '')}</dd></div>`;
@@ -732,13 +934,28 @@
       const it = q(src, par);
       return it ? `<button class="qbtn ${cls}" data-focus="${it._id}"><b>${esc(t)}</b><small>${esc(srcName(src))} ${esc(par)} · ${esc(sub)}</small></button>` : '';
     }).join('');
-    const ex = ['holter', 'IGRA', 'HCV', 'jalaortoos', '7115', 'hüpertoonia', '1966', 'haigusleht', 'P21', 'relvaluba', 'nakkushaiguse teatis', 'ratastool', 'juhiload'];
+    const ex = ['holter', 'IGRA', 'HCV', 'jalaortoos', '7115', 'hüpertoonia', '1966', 'haigusleht', 'P21', 'relvaluba', 'meremees', 'nakkushaiguse teatis', 'õe retsept', 'hambaravihüvitis', 'e-konsultatsioon', 'ratastool', 'juhiload'];
     const tj = d.items.filter((x) => x.t === 'j');
     const groups = [...new Set(tj.map((x) => x.g))];
+    const juhi = q('mootorsoidukijuht', '§ 7');
     const teemaHtml = !tj.length ? '' : `<section class="section"><h2>Igapäevatöö reeglid</h2><div class="tgroups">`
       + groups.map((g) => `<div class="tgroup"><h3>${esc(g)}</h3><div class="quick">`
         + tj.filter((x) => x.g === g).map((x) => `<button class="qbtn teema" data-focus="${x._id}"><b>${esc(x.sn)}</b><small>${x.n !== x.sn ? esc(x.n) + ' · ' : ''}${(x.r || []).length} punkti${(x.e || []).length ? ' · ⚠ ' + x.e.length : ''}</small></button>`).join('')
+        + (g === 'Tervisetõendid' && juhi ? `<button class="qbtn juhi" data-focus="${juhi._id}"><b>Juhi tervisetõend</b><small>Mootorsõidukijuhi tervisenõuded § 7 · kes teeb, siit edasi § 2–10</small></button>` : '')
         + '</div></div>').join('') + '</div></section>';
+    const uu = d.items.filter((x) => x.t === 'u' && !x.tyhi);
+    const uFut = uu.filter((x) => x.tul).sort((a, b) => a.alates.localeCompare(b.alates));
+    const uPast = uu.filter((x) => !x.tul).sort((a, b) => b.alates.localeCompare(a.alates));
+    const uShow = [...uFut, ...uPast].slice(0, Math.max(6, uFut.length));
+    const muutHtml = !uu.length ? '' : `<section class="section"><h2>Mis muutus</h2><div class="ulist">`
+      + uShow.map((x) => `<button class="urow${x.tul ? ' fut' : ''}" data-focus="${x._id}"><span class="ud8">${x.tul ? 'jõustub<br>' : ''}${fmtDate(x.alates)}</span><span class="un"><b>${esc(x.n)}</b><small>${esc(uSummary(x))}</small></span></button>`).join('')
+      + `</div><div class="actions"><button class="btn" data-filter="u">Kõik muudatused (${uu.length})</button></div></section>`;
+    const linkBy = (id) => d.items.find((x) => x.t === 'k' && x.id === id);
+    const ftl = linkBy('tk-fondid');
+    const usefulIds = ['tk-fondid', 'ravijuhend', 'tk-soodusravimid', 'tk-ekons-erialad', 'ravimiregister'];
+    const useful = usefulIds.map(linkBy).filter(Boolean);
+    const linksHtml = !useful.length ? '' : `<section class="section"><h2>Kasulikud lingid</h2><div class="quick">`
+      + useful.map((x) => `<a class="qbtn linkq" href="${esc(x.u)}" target="_blank" rel="noopener"><b>${esc(x.n)} ↗</b><small>${esc(x.d || '')}</small></a>`).join('') + '</div></section>';
     const sv = d.items.filter((x) => x.t === 'v');
     const sy0 = soelYear();
     const soelHtml = !sv.length ? '' : `<section class="section"><h2>Vähi sõeluuringud ${sy0}</h2><div class="soel">`
@@ -750,22 +967,26 @@
     el.results.innerHTML = `
       <section class="section"><h2>Rahastus (metoodika § 6)</h2><div class="funds">
         ${funds.map((f) => `<button class="fund ${f.k}" data-fund="${f.k}"><strong>${esc(f.n)}</strong><span>${esc(FUND_HELP[f.k] || '')}</span><span class="cnt">${f.cnt} teenust · ${esc(f.par)}</span></button>`).join('')}
-      </div></section>
+      </div>${ftl ? `<p class="fundlink"><a href="${esc(ftl.u)}" target="_blank" rel="noopener">Perearstide fondide täitmised (Tervisekassa) ↗</a></p>` : ''}</section>
+      ${muutHtml}
       ${teemaHtml}
       <section class="section"><h2>Kvaliteedisüsteem (metoodika § 8)</h2><div class="quick">${ksCards}</div></section>
       ${soelHtml}
       <section class="section"><h2>Kiirvalikud</h2><div class="quick">${quick}<button class="qbtn msq" data-filter="m"><b>Meditsiiniseadmed (9MS)</b><small>${d.meta.counts.m || 0} rühma · ortoosid, testribad, sensorid, kompressioontooted jm</small></button></div></section>
+      ${linksHtml}
       <section class="section"><h2>Proovi otsida</h2><div class="examples">${ex.map((w) => `<button class="chip" data-q="${esc(w)}">${esc(w)}</button>`).join('')}</div></section>
       <section class="section"><h2>Andmete seis</h2><div class="status" id="status"></div></section>
       <section class="section"><h2>Värvid</h2><div class="legend">
         <span><i style="--k:var(--c-f37)"></i>uuringufond 37%</span><span><i style="--k:var(--c-lisaks)"></i>tegevusfond</span><span><i style="--k:var(--c-f13)"></i>teraapiafond 13%</span>
-        <span><i style="--k:var(--c-teenus)"></i>muu teenus</span><span><i style="--k:var(--c-abiv)"></i>abivahend</span><span><i style="--k:var(--c-sate)"></i>säte</span><span><i style="--k:var(--c-juhi)"></i>juhi tervisenõuded</span><span><i style="--k:var(--c-ks)"></i>kvaliteedisüsteem</span><span><i style="--k:var(--c-lab)"></i>SYNLABi analüüs</span><span><i style="--k:var(--c-ms)"></i>meditsiiniseade</span><span><i style="--k:var(--c-soel)"></i>sõeluuring</span><span><i style="--k:var(--c-teema)"></i>igapäevatöö reegel</span>
+        <span><i style="--k:var(--c-teenus)"></i>muu teenus</span><span><i style="--k:var(--c-abiv)"></i>abivahend</span><span><i style="--k:var(--c-sate)"></i>säte</span><span><i style="--k:var(--c-juhi)"></i>juhi tervisenõuded</span><span><i style="--k:var(--c-ks)"></i>kvaliteedisüsteem</span><span><i style="--k:var(--c-lab)"></i>SYNLABi analüüs</span><span><i style="--k:var(--c-ms)"></i>meditsiiniseade</span><span><i style="--k:var(--c-soel)"></i>sõeluuring</span><span><i style="--k:var(--c-teema)"></i>igapäevatöö reegel</span><span><i style="--k:var(--c-muutus)"></i>muudatus</span>
       </div></section>
       <section class="section info"><h2>Kasutamine</h2>
         <p>Otsi nimetuse, koodi, lühendi või argisõnaga (nt „holter“, „TSH“, „6417“). Täpitähti pole vaja. Koodil klõpsates kopeerub see.</p>
         <p>Kui avad kirje (nt „Hüpertooniatõbi“ avalehelt või „Diabeet II“ kvaliteedisüsteemi loetelust) ja otsid seejärel koodi või valid kategooria, tulevad vasted kõigist kategooriatest üles ja avatud kirje jääb lahtisena nende alla, nii et selle koode saab järjest edasi klõpsata. „Peida“ teeb selle üherealiseks, „Sulge“ eemaldab. Otsingu tühjendamine (× või Esc) viib tagasi sinna, kus kirje oli avatud, „← Avaleht“ avalehele.</p>
         <p>Laborianalüüsi saab otsida SYNLABi nime või lühendiga (nt „IGRA“, „HCV“). Vastes on Tervisekassa kood ja see, kas analüüs kuulub perearsti fondi. Koodi avades on näha kõik selle koodi alla kuuluvad SYNLABi analüüsid.</p>
         <p>Sünniaasta otsing (nt „1966“) näitab, millise rinna-, emakakaela- või soolevähi sõeluuringu sihtrühma inimene sel aastal kuulub. Sünniaastad tulevad terviseportaalist ja neid kontrollitakse kord kuus.</p>
+        <p>„Mis muutus“ näitab iga jälgitava akti viimase aasta jooksul jõustunud ja juba avaldatud tulevasi redaktsioone: uued ja kadunud koodid, hinnamuutused, fondide koodid ning muutunud sätete varasem ja uus sõnastus (muutunud sõnad on esile tõstetud).</p>
+        <p>Teenuse koodi avades on näha ka „Mis on hinnas“: metoodika standardkulu lisa järgi personal (sh arsti minutid), ruumid, seadmed ja materjalid.</p>
         <p>„Igapäevatöö reeglid“ koondavad haigus- ja hoolduslehe, P21, tervisetõendite, nakkushaiguse teatiste, vaktsineerimise, töökorralduse ja nimistu põhireeglid. Iga punkti juures on viide sättele; ⚠ märgib allikate omavahelisi erinevusi. Otsida võib ka küsimusena (nt „kui kaua makstakse haigushüvitist“).</p>
         <p>Linnuke „Ainult perearstiabi“ peidab teenused, mis ei kuulu perearsti fondidesse, kvaliteedisüsteemi ega perearstiabi peatükki (nt operatsioonid). Täpse koodi otsing näitab koodi alati.</p>
         <p>Rakendus töötab pärast esimest avamist ka võrguta. Telefonis lisa see avakuvale: iPhone'is Safari jagamismenüü → „Lisa avakuvale“, Androidis Chrome'i menüü → „Installi rakendus“.</p>
@@ -808,6 +1029,7 @@
       + (c.q ? `<button class="chip kschip" data-filter="q" aria-pressed="${!state.fund && state.filter === 'q'}">Kvaliteedisüsteem<span class="n">${c.q - 1}</span></button>` : '')
       + (c.v ? `<button class="chip soelchip" data-filter="v" aria-pressed="${!state.fund && state.filter === 'v'}">Sõeluuringud<span class="n">${c.v}</span></button>` : '')
       + (c.j ? `<button class="chip teemachip" data-filter="j" aria-pressed="${!state.fund && state.filter === 'j'}">Igapäevatöö reeglid<span class="n">${c.j}</span></button>` : '')
+      + ((d.muutused || []).length ? `<button class="chip uchip" data-filter="u" aria-pressed="${!state.fund && state.filter === 'u'}">Mis muutus<span class="n">${d.muutused.filter((x) => !x.tyhi).length}</span></button>` : '')
       + (c.b ? `<button class="chip labchip" data-filter="b" aria-pressed="${!state.fund && state.filter === 'b'}">Labor (SYNLAB)<span class="n">${c.b}</span></button>` : '')
       + [['a', 'Abivahendid', c.a]].map(cat).join('')
       + (c.m ? `<button class="chip mschip" data-filter="m" aria-pressed="${!state.fund && state.filter === 'm'}">Meditsiiniseadmed<span class="n">${c.m}</span></button>` : '')
@@ -952,7 +1174,7 @@
       if (e.key === '/' && document.activeElement !== el.q) { e.preventDefault(); el.q.focus(); el.q.select(); }
     });
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('[data-copy],[data-open],[data-fund],[data-filter],[data-q],[data-focus],[data-goto],[data-act],[data-labs-all],[data-ms-all]');
+      const t = e.target.closest('[data-copy],[data-open],[data-fund],[data-filter],[data-q],[data-focus],[data-goto],[data-act],[data-labs-all],[data-ms-all],[data-uall]');
       if (!t || !state.data) return;
       if (t.dataset.copy) { e.stopPropagation(); e.preventDefault(); copy(t.dataset.copy); return; }
       if (t.dataset.open) {
@@ -987,6 +1209,14 @@
         if (t.closest('.pin')) { rerenderPin(); return; }
         const art = t.closest('article');
         art.outerHTML = row(state.data.items[+t.dataset.msAll]);
+        return;
+      }
+      if (t.dataset.uall) {
+        state.uAll.add(t.dataset.uall);
+        const id = +t.dataset.uall.split(':')[0];
+        if (t.closest('.pin')) { rerenderPin(); return; }
+        const art = t.closest('article');
+        if (art) art.outerHTML = row(state.data.items[id]); else route();
         return;
       }
       if (t.dataset.labsAll) {

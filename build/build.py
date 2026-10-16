@@ -29,6 +29,9 @@ import openpyxl
 import pdfplumber
 from lxml import html as lhtml
 
+import met_lisad
+import muutused
+
 BUILD_VERSION = "2"
 API = "https://www.riigiteataja.ee/public-api/api/v1"
 RT = "https://www.riigiteataja.ee/akt/"
@@ -113,13 +116,22 @@ def utc_to_local_date(s):
     return d.date().isoformat()
 
 
-def resolve_current(grupi_id, cache_dir, depth=0):
+def content_chain(red):
+    """Grupi sisuga redaktsioonid (mitte kehtetuks tunnistamise märge) jõustumise järjekorras."""
+    out = [{"id": str(r["id"]), "alates": utc_to_local_date(r["kehtivuseAlgus"])} for r in red["redaktsioonid"]
+           if not r.get("kehtivKehtetus")]
+    return sorted(out, key=lambda x: x["alates"] or "")
+
+
+def resolve_current(grupi_id, cache_dir, depth=0, pre=None):
     """Leiab grupi kehtiva redaktsiooni. Kui akt on kehtetuks tunnistatud ja
     asendatud uue aktiga (nagu tervishoiuteenuste loeteluga juhtub), järgib
-    kehtetuks tunnistamise märget uue aktini."""
+    kehtetuks tunnistamise märget uue aktini. info["_chain"] on sisuga redaktsioonide
+    ahel koos asendatud akti(de) redaktsioonidega (muudatuste vaate jaoks)."""
     if depth > 4:
         raise RuntimeError("Liiga pikk asendusaktide ahel")
     red = api_json(f"/akt/{grupi_id}/redaktsioonid")
+    chain = (pre or []) + content_chain(red)
     kid = red["kehtivRedaktsioon"]
     meta = api_meta(kid, cache_dir)
     xml = fetch_xml(kid, cache_dir)
@@ -130,7 +142,7 @@ def resolve_current(grupi_id, cache_dir, depth=0):
     if is_repealed and m:
         new_id = re.search(r"<aktViide[^>]*>(\d+)</aktViide>", m.group(1)).group(1)
         new_meta = api_meta(new_id, cache_dir)
-        return resolve_current(new_meta["grupiId"], cache_dir, depth + 1)
+        return resolve_current(new_meta["grupiId"], cache_dir, depth + 1, pre=chain)
     future = []
     for r in red["redaktsioonid"]:
         alg = utc_to_local_date(r["kehtivuseAlgus"])
@@ -145,6 +157,7 @@ def resolve_current(grupi_id, cache_dir, depth=0):
         "kuni": utc_to_local_date(ap.get("kehtivuseLopp")),
         "tulevased": sorted(future, key=lambda x: x["alates"]),
         "url": RT + str(kid),
+        "_chain": chain,
     }, xml
 
 
@@ -818,6 +831,8 @@ def build_teemad(cfg, sources, par_text, dyn, lisad):
                 if "{ylempiir}" in s:
                     s = s.replace("{ylempiir}", f'{yl["aasta"]}. aastal on {yl["eur"]} eurot' if yl else "(vt Tervisekassa lehte)")
                 row = {"s": s, "a": [x for x in (ref(a) for a in r.get("allikas", [])) if x]}
+                if r.get("p"):
+                    row["p"] = r["p"]
                 if check(r, f'{t["sn"]} ({s[:50]}…)'):
                     row["muutus"] = True
                 out.append(row)
@@ -829,8 +844,9 @@ def build_teemad(cfg, sources, par_text, dyn, lisad):
         tabs = [dict(tb, a=[x for x in (ref(a) for a in tb.get("allikas", [])) if x]) for tb in t.get("tabelid", [])]
         for d in t.get("dyn", []):
             if d == "huvitised" and hu.get("rows"):
-                tabs.insert(0, {"n": "Hüvitiste võrdlustabel (Tervisekassa)", "dyn": "huvitised", "rows": hu["rows"],
-                                "a": [{"n": "Tervisekassa: haigushüvitis", "u": hu["page"]}], "uuendatud": hu.get("uuendatud")})
+                tabs.insert(0, {"n": "Tervisekassa hüvitiste võrdlustabel: kõik põhjuse koodid, kes maksab ja kui kaua", "dyn": "huvitised", "rows": hu["rows"],
+                                "a": [{"n": "Tervisekassa: haigushüvitis", "u": hu["page"]}], "uuendatud": hu.get("uuendatud"),
+                                "kinni": d in (t.get("dyn_kinni") or [])})
             elif d == "pohjused":
                 pr = tvl_pohjused((par_text.get("tvl") or {}).get("§ 2", {}).get("t", ""))
                 if pr:
@@ -844,12 +860,30 @@ def build_teemad(cfg, sources, par_text, dyn, lisad):
             elif d == "imm2" and dyn.get("imm2"):
                 for tb in dyn["imm2"]["tabelid"]:
                     tabs.append({"n": tb["n"], "tekst": tb["s"], "a": [ref(["immkava", "lisa 2"])]})
+            elif d == "ekons":
+                ek = dyn.get("ekons") or []
+                if ek:
+                    tabs.append({"n": "Saatekirja ja vastuse nõuded erialade kaupa (metoodika lisad)",
+                                 "pais": ["E-konsultatsioon", "Saatja", "Nõuded"],
+                                 "read": [[n + (f" ({note})" if note else ""), saatja, [f"Lisa {nr}", u]] for n, saatja, note, nr, u in ek],
+                                 "markus": "Saatja on lisa pealkirjas nimetatud suunaja. Lisad loetakse kehtivast metoodikast igal andmekontrollil.",
+                                 "a": [ref(["metoodika", "§ 6"])]})
+                else:
+                    warn.append("E-konsultatsiooni lisasid metoodikast ei leitud.")
         if tabs:
             it["tab"] = tabs
         if t.get("lisad"):
             it["lisad"] = lisad.get(t["lisad"], [])
         if t.get("lingid"):
             it["l"] = [x for x in (ref(a) for a in t["lingid"]) if x]
+        if t.get("tabelid_lopus"):
+            it["tl"] = True
+        if t.get("seotud"):
+            known = {x["k"] for x in cfg["teemad"]}
+            bad = [k for k in t["seotud"] if k not in known]
+            if bad:
+                warn.append(f'{t["sn"]}: tundmatu seotud kaart {", ".join(bad)}')
+            it["seotud"] = [k for k in t["seotud"] if k in known]
         items.append(it)
     return items, warn
 
@@ -943,22 +977,37 @@ def build(args):
         sources_cfg = json.load(f)
 
     # 1. kehtivad redaktsioonid
-    sources, xmls = {}, {}
+    sources, xmls, chains = {}, {}, {}
     for key, cfg in sources_cfg.items():
         print(f"[RT] {key}", flush=True)
+        old_gid = cfg["grupiId"]
         info, xml = resolve_current(cfg["grupiId"], cache)
+        chain = info.pop("_chain")
         info["nimi"] = cfg["nimi"]
         if cfg.get("lyh"):
             info["lyh"] = cfg["lyh"]
         sources[key] = info
         xmls[key] = xml
-        if str(info["grupiId"]) != str(cfg["grupiId"]):
+        if str(info["grupiId"]) != str(old_gid):
             cfg["grupiId"] = info["grupiId"]
+            # asendatud akti grupp jääb muudatuste vaate jaoks meelde
+            cfg["eelmised"] = list(dict.fromkeys((cfg.get("eelmised") or []) + [old_gid]))
             print(f"[info] {key}: akt asendati, uus grupi ID {info['grupiId']}")
+        else:
+            # varem asendatud aktide redaktsioonid ahela algusesse
+            pre = []
+            for g in cfg.get("eelmised") or []:
+                try:
+                    pre += content_chain(api_json(f"/akt/{g}/redaktsioonid"))
+                except Exception as e:  # noqa: BLE001
+                    print(f"[hoiatus] {key}: eelmise grupi {g} redaktsioone ei saanud: {e}")
+            known = {x["id"] for x in chain}
+            chain = sorted([x for x in pre if x["id"] not in known], key=lambda x: x["alates"] or "") + chain
+        chains[key] = chain
 
     toru_dir = os.path.join(HERE, "toru")
     aux_hash = hashlib.sha256()
-    for fn in ["synonyms.json", "links.json", "build.py", "ks_notes.json", "ms_ryhmakoodid.json", "soeluuringud.json", "teemad.json"]:
+    for fn in ["synonyms.json", "links.json", "build.py", "muutused.py", "met_lisad.py", "ks_notes.json", "ms_ryhmakoodid.json", "soeluuringud.json", "teemad.json"]:
         with open(os.path.join(HERE, fn), "rb") as f:
             aux_hash.update(f.read())
     toru_loaded = load_toru_rows(toru_dir)  # xlsx olemasolul uuendab väljavõtet
@@ -1237,9 +1286,17 @@ def build(args):
     dyn = {"huvitised": huvitised}
     imm, imm_warn = imm_lisad(xmls["immkava"]) if "immkava" in xmls else ({}, [])
     dyn.update(imm)
+    # metoodika lisad: teenuste standardkulu komponendid ja e-konsultatsiooni nõuded erialade kaupa
+    ml = met_lisad.lisad_info(xmls["metoodika"], met["id"], cache, aktilisa_url)
+    dyn["ekons"] = ml.get("ekons")
     teema_items, teema_warn = build_teemad(teemad_cfg, sources, par_text, dyn, lisad)
-    teema_warn = hu_warn + imm_warn + teema_warn
+    teema_warn = hu_warn + imm_warn + ml.get("warn", []) + teema_warn
     items.extend(teema_items)
+
+    # 7d. mis muutus: jõustunud (viimase aasta) ja avaldatud tulevaste redaktsioonide vahe
+    muut, muut_warn = muutused.compute(sys.modules[__name__], sources_cfg, sources, chains, cache,
+                                       (prev or {}).get("muutused"), TODAY)
+    teema_warn += muut_warn
 
     # 8. fondid, lingid, sünonüümid
     items.extend(funds)
@@ -1295,7 +1352,11 @@ def build(args):
         "tk": tk,
         "ksNotes": ks_notes.get("_meta"),
     }
-    data = {"meta": meta, "items": items, "rules": rules}
+    kulu = ml.get("kulu")
+    if kulu:
+        meta["kulu"] = {"lisa": kulu["lisa"], "u": kulu["u"], "son": kulu["son"], "vigased": kulu["vigased"]}
+    data = {"meta": meta, "items": items, "rules": rules, "muutused": muut,
+            "kulu": {"res": kulu["res"], "c": kulu["c"]} if kulu else None}
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
@@ -1510,6 +1571,24 @@ def make_report(prev, data, missing):
     if t:
         lines.append(f'- Toru: {t["file"]} (viimane muudatus {fmt_date(t["seisuga"])}), hinnaerinevusi loeteluga: {t["hinnaErinevusi"]}')
     lines.append("")
+    pk = {x["k"] for x in (prev or {}).get("muutused") or []}
+    newm = [x for x in data.get("muutused") or [] if x["k"] not in pk]
+    if newm:
+        lines.append("## Mis muutus: uued kirjed")
+        for x in newm:
+            parts = []
+            k = x.get("kood") or {}
+            for lab, key in (("uut koodi", "uus"), ("kadunud koodi", "kadunud"), ("hinnamuutust", "hind")):
+                if k.get(key):
+                    parts.append(f"{len(k[key])} {lab}")
+            if x.get("fond"):
+                parts.append(f'{len(x["fond"])} fondimuutust')
+            if x.get("pars"):
+                parts.append(f'{len(x["pars"])} sätet')
+            if x.get("lisad"):
+                parts.append(f'{len(x["lisad"])} lisa')
+            lines.append(f'- {x["lyh"]} {"jõustub" if x.get("tul") else "jõustus"} {fmt_date(x["alates"])}: {", ".join(parts) or "sisulist muutust ei leitud"}')
+        lines.append("")
     if prev:
         po = {x["c"]: x for x in prev["items"] if x["t"] == "s"}
         no = {x["c"]: x for x in data["items"] if x["t"] == "s"}

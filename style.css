@@ -25,6 +25,7 @@
   --c-ms: #5f7a1e;
   --c-soel: #4b3fc4;
   --c-teema: #34495e;
+  --c-muutus: #1565c0;
 
   --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -38,7 +39,7 @@
     --bg: #0f1513; --surface: #161e1b; --surface-2: #1e2824; --ink: #e5ece8; --muted: #9aa8a0; --line: #2b3732;
     --accent: #8fc0dc; --accent-ink: #0f1513; --mark: #6b5310; --warn-bg: #3a2c0c; --warn-ink: #f3cf85;
     --c-f37: #6cc48c; --c-lisaks: #e3a646; --c-f13: #b39be8; --c-teenus: #7fb3d1; --c-abiv: #4fc7c2;
-    --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a; --c-soel: #aaa3f5; --c-teema: #c3d0dd;
+    --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a; --c-soel: #aaa3f5; --c-teema: #c3d0dd; --c-muutus: #6cb2f2;
     color-scheme: dark;
   }
 }
@@ -46,7 +47,7 @@
   --bg: #0f1513; --surface: #161e1b; --surface-2: #1e2824; --ink: #e5ece8; --muted: #9aa8a0; --line: #2b3732;
   --accent: #8fc0dc; --accent-ink: #0f1513; --mark: #6b5310; --warn-bg: #3a2c0c; --warn-ink: #f3cf85;
   --c-f37: #6cc48c; --c-lisaks: #e3a646; --c-f13: #b39be8; --c-teenus: #7fb3d1; --c-abiv: #4fc7c2;
-  --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a; --c-soel: #aaa3f5; --c-teema: #c3d0dd;
+  --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a; --c-soel: #aaa3f5; --c-teema: #c3d0dd; --c-muutus: #6cb2f2;
   color-scheme: dark;
 }
 
@@ -354,3 +355,54 @@ button.badge { text-align: left; border-radius: 8px; padding: 1px 8px; line-heig
   .srow { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+/* ---------- mis muutus ---------- */
+.row.muutus { --stripe: var(--c-muutus); }
+.badge.muutus { color: var(--c-muutus); }
+.chip.uchip { border-color: var(--c-muutus); color: var(--c-muutus); }
+.chip.uchip[aria-pressed="true"] { background: var(--c-muutus); color: var(--surface); }
+.ulist { display: grid; gap: 6px; }
+.urow {
+  display: grid; grid-template-columns: 86px 1fr; gap: 10px; align-items: center; width: 100%;
+  text-align: left; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--c-muutus);
+  border-radius: 8px; padding: 8px 10px; cursor: pointer;
+}
+.urow.fut { border-left-color: var(--warn-ink); background: color-mix(in srgb, var(--warn-bg) 55%, var(--surface)); }
+.urow .ud8 { font-family: var(--font-mono); font-size: 0.82rem; font-variant-numeric: tabular-nums; color: var(--muted); line-height: 1.25; }
+.urow.fut .ud8 { color: var(--warn-ink); }
+.urow .un { display: grid; min-width: 0; }
+.urow .un b { font-weight: 600; }
+.urow .un small { color: var(--muted); font-size: 0.78rem; overflow-wrap: anywhere; }
+details.udiff { border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; margin: 4px 0; }
+details.udiff summary { cursor: pointer; font-size: 0.88rem; }
+.ud { margin: 6px 0 8px; display: grid; gap: 3px; }
+.ud-h { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
+.ud-old, .ud-new { font-size: 0.85rem; line-height: 1.45; padding: 4px 8px; border-radius: 4px; }
+.ud-old { background: var(--surface-2); color: var(--muted); }
+.ud-new { background: color-mix(in srgb, var(--c-muutus) 8%, var(--surface)); }
+.ud-old > span, .ud-new > span { display: inline-block; min-width: 3.6em; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
+.ud-old del { background: color-mix(in srgb, var(--c-juhi) 18%, transparent); text-decoration: line-through; text-decoration-color: var(--c-juhi); color: var(--ink); }
+.ud-new ins { background: color-mix(in srgb, var(--c-f37) 22%, transparent); text-decoration: none; border-radius: 2px; }
+td.ud-old, td.ud-new { padding: 3px 8px; border-radius: 0; }
+b.plus { color: var(--c-f37); font-weight: 600; }
+b.minus { color: var(--c-juhi); font-weight: 600; }
+
+/* ---------- mis on hinnas ---------- */
+.kulu .kulu-sum { margin: 0 0 4px; }
+.tbl tr.grp td { background: var(--surface-2); font-weight: 600; font-size: 0.8rem; }
+
+/* ---------- seotud kaardid, lingid, tagasiside ---------- */
+.seotud { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+.seotud > span { font-size: 0.78rem; color: var(--muted); }
+.seotud .badge { cursor: pointer; font: inherit; font-size: 0.78rem; font-weight: 500; background: transparent; }
+a.qbtn.linkq { text-decoration: none; color: inherit; border-left: 4px solid var(--c-link); }
+a.qbtn.linkq b { color: var(--accent); }
+.fundlink { margin: 8px 0 0; font-size: 0.88rem; }
+.notfound { margin: 14px 0 4px; padding: 10px 12px; border: 1px dashed var(--line); border-radius: 8px; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: 0.88rem; color: var(--muted); }
+.notfound.strong { border-style: solid; background: var(--surface); color: var(--ink); }
+.notfound a.btn { text-decoration: none; }
+.notfound small { flex-basis: 100%; font-size: 0.76rem; }
+.rule b.lead { font-weight: 600; }
+details.tblbox { border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; margin: 8px 0; }
+details.tblbox > summary { cursor: pointer; font-size: 0.88rem; font-weight: 600; color: var(--accent); }
+details.tblbox[open] > summary { margin-bottom: 6px; }

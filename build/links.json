@@ -46,5 +46,41 @@
     "n": "Sotsiaalkindlustusameti iseteenindus",
     "u": "https://iseteenindus.sotsiaalkindlustusamet.ee/",
     "d": "Isiku abivahendi tehingud ja erandi taotluse esitamine."
+  },
+  {
+    "id": "tk-fondid",
+    "n": "Perearstide fondide täitmised (Tervisekassa)",
+    "u": "https://tervisekassa.ee/perearstide-fondide-taitmised",
+    "d": "Tervisekassa ülevaade perearstide uuringu-, tegevus- ja teraapiafondi kasutamisest."
+  },
+  {
+    "id": "ravijuhend",
+    "n": "Eesti ravijuhendid (ravijuhend.ee)",
+    "u": "https://www.ravijuhend.ee/",
+    "d": "Kehtivad Eesti ravijuhendid ja patsiendijuhendid."
+  },
+  {
+    "id": "tk-ekons-erialad",
+    "n": "E-konsultatsiooni erialapõhised tingimused (Tervisekassa)",
+    "u": "https://tervisekassa.ee/tervisekassa/e-tervise-tooted/suunamised/e-konsultatsioon/erialapohised-tingimused-ja-nouded",
+    "d": "Erialade e-konsultatsiooni kokkulepped ja haiglate kontaktisikud."
+  },
+  {
+    "id": "tk-soodusravimid",
+    "n": "Soodusravimid: kehtiv ravimite loetelu (Tervisekassa)",
+    "u": "https://tervisekassa.ee/partnerile/ravimitest/soodusravimid",
+    "d": "Kehtiv Tervisekassa ravimite loetelu (PDF), ravimite piirhinnad ja kokkuvõtlik Exceli tabel soodustustest ja väljakirjutamise tingimustest."
+  },
+  {
+    "id": "ravimiregister",
+    "n": "Ravimiregister (Ravimiamet)",
+    "u": "https://www.ravimiregister.ee/",
+    "d": "Müügiloaga ravimid, pakendi infolehed ja ravimi omaduste kokkuvõtted."
+  },
+  {
+    "id": "raviminfo",
+    "n": "raviminfo.ee",
+    "u": "https://ravimiinfo.ee/",
+    "d": "Ravimiotsing. Eraleht, mitte ametlik allikas: kontrolli soodustust Tervisekassa loetelust."
   }
 ]

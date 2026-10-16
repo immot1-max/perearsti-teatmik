@@ -16,6 +16,8 @@ on:
       - "build/soeluuringud.json"
       - "build/teemad.json"
       - "build/build.py"
+      - "build/muutused.py"
+      - "build/met_lisad.py"
 
 permissions:
   contents: write
