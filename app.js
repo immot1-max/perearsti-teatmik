@@ -89,11 +89,12 @@
 
   let paPref = true;
   try { paPref = localStorage.getItem('teatmik-pa') !== '0'; } catch (e) { /* ignoreeri */ }
-  // focus = täisvaates avatud kirje. pin = kirje, mis oli avatud, kui kasutaja hakkas otsima või valis kategooria;
-  // see jääb tulemuste alla eraldi avatud plokina, kuni kasutaja selle sulgeb või otsingu tühjendab (siis naaseb selle juurde).
+  // focus = täisvaates avatud kirje. pin = kirje, mis oli avatud (täisvaates või nimekirjas lahti klõpsatud), kui kasutaja
+  // hakkas otsima või valis kategooria; see jääb tulemuste alla eraldi avatud plokina, kuni kasutaja selle sulgeb või otsingu
+  // tühjendab (siis naaseb sinna, kus kirje oli: täisvaatesse või samasse nimekirja). pinFrom = nimekirja olek (q, filter, fund).
   // Kui pin on olemas, näidatakse esialgu PIN_LIMIT vastet, et avatud kirje jääks lähedale.
   const PIN_LIMIT = 10;
-  const state = { data: null, idx: [], filter: 'all', fund: null, q: '', open: new Set(), limit: 60, focus: null, pin: null, pinOpen: false, pa: paPref, labsAll: new Set(), msAll: new Set() };
+  const state = { data: null, idx: [], filter: 'all', fund: null, q: '', open: new Set(), limit: 60, focus: null, pin: null, pinFrom: null, pinOpen: false, lastOpen: null, pa: paPref, labsAll: new Set(), msAll: new Set() };
   const el = {};
 
   // ------------------------------------------------------------ andmed
@@ -326,7 +327,7 @@
     }
     if (!q && !state.fund && state.filter === 'all') {
       // Otsingut ega kategooriat enam pole: tagasi avatud kirje juurde, kui see on alles.
-      if (state.pin != null) { state.focus = state.pin; state.pin = null; state.pinOpen = false; route(); return; }
+      if (state.pin != null) { clearSearch(); return; }
       renderHome(); return;
     }
     let list;
@@ -762,7 +763,7 @@
       </div></section>
       <section class="section info"><h2>Kasutamine</h2>
         <p>Otsi nimetuse, koodi, lühendi või argisõnaga (nt „holter“, „TSH“, „6417“). Täpitähti pole vaja. Koodil klõpsates kopeerub see.</p>
-        <p>Kui avad kirje (nt „Hüpertooniatõbi“) ja otsid seejärel koodi või valid kategooria, tulevad vasted üles ja avatud kirje jääb lahtisena nende alla, nii et selle koode saab järjest edasi klõpsata. „Peida“ teeb selle üherealiseks, „Sulge“ eemaldab. Otsingu tühjendamine (× või Esc) viib tagasi avatud kirje juurde, „← Avaleht“ avalehele.</p>
+        <p>Kui avad kirje (nt „Hüpertooniatõbi“ avalehelt või „Diabeet II“ kvaliteedisüsteemi loetelust) ja otsid seejärel koodi või valid kategooria, tulevad vasted kõigist kategooriatest üles ja avatud kirje jääb lahtisena nende alla, nii et selle koode saab järjest edasi klõpsata. „Peida“ teeb selle üherealiseks, „Sulge“ eemaldab. Otsingu tühjendamine (× või Esc) viib tagasi sinna, kus kirje oli avatud, „← Avaleht“ avalehele.</p>
         <p>Laborianalüüsi saab otsida SYNLABi nime või lühendiga (nt „IGRA“, „HCV“). Vastes on Tervisekassa kood ja see, kas analüüs kuulub perearsti fondi. Koodi avades on näha kõik selle koodi alla kuuluvad SYNLABi analüüsid.</p>
         <p>Sünniaasta otsing (nt „1966“) näitab, millise rinna-, emakakaela- või soolevähi sõeluuringu sihtrühma inimene sel aastal kuulub. Sünniaastad tulevad terviseportaalist ja neid kontrollitakse kord kuus.</p>
         <p>„Igapäevatöö reeglid“ koondavad haigus- ja hoolduslehe, P21, tervisetõendite, nakkushaiguse teatiste, vaktsineerimise, töökorralduse ja nimistu põhireeglid. Iga punkti juures on viide sättele; ⚠ märgib allikate omavahelisi erinevusi. Otsida võib ka küsimusena (nt „kui kaua makstakse haigushüvitist“).</p>
@@ -865,26 +866,50 @@
     }
   }
 
-  // Täisvaatest lahkudes (otsing, kategooria, fond) jääb avatud kirje lahtisena tulemuste alla.
-  function leaveFocus() {
-    if (state.focus != null) { state.pin = state.focus; state.focus = null; state.pinOpen = true; }
+  // Uue otsingu või kategooria eel: täisvaates või nimekirjas viimati lahti klõpsatud kirje jääb lahtisena tulemuste alla.
+  // Kutsuda enne, kui q, filter või fund muudetakse, sest pinFrom jätab meelde senise nimekirja.
+  // Nimekirjast võetud kirje korral otsitakse edasi kõigist kategooriatest (kirje ise hoiab konteksti).
+  function leaveContext() {
+    if (state.focus != null) {
+      state.pin = state.focus; state.pinFrom = null; state.pinOpen = true; state.focus = null;
+      return;
+    }
+    const id = state.lastOpen;
+    // Kui midagi on juba avatud, jääb see alles; vastete seast lahti klõpsatud rida ei asenda seda.
+    if (id != null && state.open.has(id) && state.pin == null) {
+      state.pin = id; state.pinOpen = true;
+      state.pinFrom = { q: state.q, filter: state.filter, fund: state.fund };
+      state.filter = 'all'; state.fund = null;
+    }
+    state.lastOpen = null;
   }
   const baseLimit = (n) => (state.pin != null ? PIN_LIMIT : n);
   function setQuery(q) {
-    el.q.value = q; state.q = q; leaveFocus(); state.limit = baseLimit(60); state.open.clear();
-    route(); syncUrl(); window.scrollTo(0, 0);
-  }
-  function goHome() {
-    state.q = ''; el.q.value = ''; state.fund = null; state.filter = 'all'; state.focus = null; state.pin = null; state.pinOpen = false; state.open.clear(); state.limit = 60;
+    leaveContext(); el.q.value = q; state.q = q; state.limit = baseLimit(60); state.open.clear();
     renderChips(); route(); syncUrl(); window.scrollTo(0, 0);
   }
-  // Tühjenda / × / Esc: kui midagi oli avatud, naaseb selle juurde, muidu avalehele.
+  function goHome() {
+    state.q = ''; el.q.value = ''; state.fund = null; state.filter = 'all'; state.focus = null;
+    state.pin = null; state.pinFrom = null; state.pinOpen = false; state.lastOpen = null; state.open.clear(); state.limit = 60;
+    renderChips(); route(); syncUrl(); window.scrollTo(0, 0);
+  }
+  // Tühjenda / × / Esc: kui midagi oli avatud, naaseb sinna, kus see oli (täisvaade või nimekiri), muidu avalehele.
   function clearSearch() {
     if (state.pin == null) { goHome(); return; }
     const id = state.pin;
-    state.q = ''; el.q.value = ''; state.fund = null; state.filter = 'all'; state.pin = null; state.pinOpen = false; state.open.clear(); state.limit = 60;
-    state.focus = id;
-    renderChips(); route(); syncUrl(); window.scrollTo(0, 0);
+    const from = state.pinFrom && (state.pinFrom.q || state.pinFrom.fund || state.pinFrom.filter !== 'all') ? state.pinFrom : null;
+    state.pin = null; state.pinFrom = null; state.pinOpen = false; state.open.clear(); state.limit = 60;
+    if (from) {
+      state.q = from.q || ''; state.filter = from.filter; state.fund = from.fund; state.focus = null;
+      state.open.add(id); state.lastOpen = id;
+      if (from.fund) state.limit = 200;
+    } else {
+      state.q = ''; state.filter = 'all'; state.fund = null; state.focus = id;
+    }
+    el.q.value = state.q;
+    renderChips(); route(); syncUrl();
+    const head = from && el.results.querySelector(`[data-open="${id}"]`);
+    if (head) head.closest('article').scrollIntoView({ block: 'start' }); else window.scrollTo(0, 0);
   }
   function updateClear() {
     const box = el.q && el.q.parentElement;
@@ -914,7 +939,10 @@
       deb = setTimeout(() => {
         // Otsing kustutati tühjaks: tagasi avatud kirje juurde.
         if (!el.q.value.trim() && state.pin != null && !state.fund && state.filter === 'all') { clearSearch(); el.q.focus(); return; }
-        state.q = el.q.value; leaveFocus(); state.limit = baseLimit(60); state.open.clear(); route(); syncUrl();
+        const hadFilter = state.filter !== 'all' || state.fund;
+        leaveContext(); state.q = el.q.value; state.limit = baseLimit(60); state.open.clear();
+        if (hadFilter && state.filter === 'all' && !state.fund) renderChips();
+        route(); syncUrl();
       }, 90);
     });
     el.q.addEventListener('keydown', (e) => { if (e.key === 'Escape') clearSearch(); });
@@ -929,21 +957,29 @@
       if (t.dataset.copy) { e.stopPropagation(); e.preventDefault(); copy(t.dataset.copy); return; }
       if (t.dataset.open) {
         const id = +t.dataset.open;
-        if (state.open.has(id)) state.open.delete(id); else state.open.add(id);
+        if (state.open.has(id)) { state.open.delete(id); if (state.lastOpen === id) state.lastOpen = null; } else { state.open.add(id); state.lastOpen = id; }
         const art = t.closest('article');
         const it = state.data.items[id];
         art.outerHTML = row(it, art.querySelector('.via') ? true : false);
         return;
       }
-      if (t.dataset.fund) { state.fund = state.fund === t.dataset.fund ? null : t.dataset.fund; state.filter = 'all'; leaveFocus(); state.open.clear(); state.limit = baseLimit(200); renderChips(); route(); window.scrollTo(0, 0); return; }
+      if (t.dataset.fund) {
+        if (state.fund === t.dataset.fund && !state.q.trim()) { goHome(); return; }
+        const nf = state.fund === t.dataset.fund ? null : t.dataset.fund;
+        leaveContext(); state.fund = nf; state.filter = 'all'; state.open.clear(); state.limit = baseLimit(200); renderChips(); route(); window.scrollTo(0, 0); return;
+      }
       if (t.dataset.filter === 'all' && !state.q.trim()) { goHome(); return; }
-      if (t.dataset.filter) { state.filter = t.dataset.filter; state.fund = null; leaveFocus(); state.open.clear(); state.limit = baseLimit(60); renderChips(); route(); return; }
+      if (t.dataset.filter) {
+        if (t.dataset.filter === state.filter && !state.fund && state.focus == null) return;
+        const nf = t.dataset.filter;
+        leaveContext(); state.filter = nf; state.fund = null; state.open.clear(); state.limit = baseLimit(60); renderChips(); route(); return;
+      }
       if (t.dataset.q) { setQuery(t.dataset.q); return; }
-      if (t.dataset.focus) { state.focus = +t.dataset.focus; state.pin = null; route(); window.scrollTo(0, 0); return; }
+      if (t.dataset.focus) { state.focus = +t.dataset.focus; state.pin = null; state.pinFrom = null; route(); window.scrollTo(0, 0); return; }
       if (t.dataset.goto) {
         const [src, par] = t.dataset.goto.split(':');
         const it = state.data.items.find((x) => x.t === 'l' && x.src === src && x.par === par);
-        if (it) { state.focus = it._id; state.pin = null; route(); window.scrollTo(0, 0); }
+        if (it) { state.focus = it._id; state.pin = null; state.pinFrom = null; route(); window.scrollTo(0, 0); }
         return;
       }
       if (t.dataset.msAll) {
@@ -962,7 +998,7 @@
         return;
       }
       if (t.dataset.act === 'pin-toggle') { state.pinOpen = !state.pinOpen; rerenderPin(); return; }
-      if (t.dataset.act === 'unpin') { state.pin = null; state.pinOpen = false; state.limit = Math.max(state.limit, 60); route(); return; }
+      if (t.dataset.act === 'unpin') { state.pin = null; state.pinFrom = null; state.pinOpen = false; state.limit = Math.max(state.limit, 60); route(); return; }
       if (t.dataset.act === 'clear') { clearSearch(); return; }
       if (t.dataset.act === 'pa-off') { setPa(false); return; }
       if (t.dataset.act === 'home') { goHome(); return; }

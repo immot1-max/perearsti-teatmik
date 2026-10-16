@@ -223,6 +223,7 @@ main .wrap { padding-block: 14px 32px; display: grid; gap: 18px; }
   border-left: 4px solid var(--stripe);
   border-radius: 8px;
   min-width: 0;
+  scroll-margin-top: 124px; /* tagasi nimekirja naastes ei jää rida kleepuva päise alla */
 }
 .row.f37 { --stripe: var(--c-f37); }
 .row.f13 { --stripe: var(--c-f13); }
