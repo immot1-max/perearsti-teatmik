@@ -81,7 +81,8 @@
   "sate:meditsiiniseadmed:§ 3": ["omaosalus meditsiiniseade", "meditsiiniseadme omaosalus"],
 
   "fond:f37": ["uuringufond", "37%", "uuringute fond", "pearaha arvel lisaks"],
-  "fond:f13": ["teraapiafond", "13%", "psühholoogi fond", "füsioteraapia fond", "logopeed"],
+  "fond:f13": ["teraapiafond", "13%", "psühholoogi fond", "füsioteraapia fond", "logopeed", "füsioterapeut", "psühholoog-nõustaja", "psühhoterapeut", "massaaž", "tervishoiuspetsialist", "ths"],
+  "3132": ["vaimse tervise õde", "vaimse tervise õe lisatasu"],
   "fond:lisaks": ["tegevusfond", "väljaspool fondi", "lisaks fondile", "raviarvega", "eraldi arve"],
 
   "sate:ttl:§ 2": ["pearaha", "nimistuülene", "teenusekorralduse komponent"],

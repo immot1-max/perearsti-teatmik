@@ -39,9 +39,23 @@
   const tgCls = (g) => TEEMA_GRP[g] || '';
   const FUND_HELP = {
     f37: 'Tasutakse kuni 37% ulatuses nimistu pearahadeks arvestatud summast aastas.',
-    f13: 'Tasutakse kuni 13% ulatuses nimistu pearahadeks arvestatud summast aastas.',
+    f13: 'Füsioteraapia, massaaž, psühholoog, psühhoteraapia ja logopeed kuni 13% ulatuses nimistu pearahadeks arvestatud summast aastas.',
     lisaks: 'Tasutakse raviarvega lisaks pearahale, tervishoiuteenuste loetelu piirhinna alusel. Protsendilist piirmäära sellel lõikel ei ole.',
   };
+  // Fondi tasumise tingimus (metoodika § 6 lg 9); ehitaja lisab fondile välja cond, kui säte on kehtivas tekstis alles.
+  const FUND_COND = 'Tasutakse ainult siis, kui teenust osutab perearstiabi osutaja ise (äriühing või FIE, mille kaudu perearst tegutseb), mitte teise asutusse suunamisel.';
+  const lgPar = (p) => String(p || '').replace(/\s*\(([^)]+)\)$/, ' lg $1');
+  // links=false nupu sees (nupu sisse linki panna ei saa).
+  function fundHelp(k, links) {
+    const fi = state.data && state.data.items.find((x) => x.t === 'f' && x.k === k);
+    let h = esc(FUND_HELP[k] || '');
+    if (fi && fi.cond) {
+      h += ` ${esc(FUND_COND)}` + (links
+        ? ` <a href="${esc(fi.cond.url)}" target="_blank" rel="noopener">metoodika ${esc(lgPar(fi.cond.par))} ↗</a>`
+        : ` (metoodika ${esc(lgPar(fi.cond.par))})`);
+    }
+    return h;
+  }
   // Pearaha arvel tasutav uuring (metoodika § 5 lg 3, nt glükoos 66101): § 6 fondides ei ole, kuid sisaldub pearahas.
   const phBadge = (x) => (x && x.ph ? `<span class="badge ph" title="Tervisekassa tasub pearaha arvel (metoodika ${esc(x.ph.par)})">Pearaha ${esc(x.ph.par)}</span>` : '');
   // Tagasiside: GitHubi issue-vorm otsisõnaga (e-posti aadressi lehel ei näidata).
@@ -405,7 +419,7 @@
     let html = '';
     const fundItem = state.fund ? state.data.items.find((x) => x.t === 'f' && x.k === state.fund) : null;
     if (fundItem) {
-      html += `<div class="row ${fundItem.k}"><div class="detail" style="border-top:0"><div class="text"><p><strong>${esc(fundItem.n)}</strong> · metoodika ${esc(fundItem.par)}</p><p>${esc(FUND_HELP[fundItem.k] || '')}</p>${state.data.meta.starRule && fundItem.k === 'f37' ? `<p>* ${esc(state.data.meta.starRule)}</p>` : ''}</div><div class="actions"><a href="${esc(fundItem.url)}" target="_blank" rel="noopener">Säte Riigi Teatajas ↗</a>${(() => { const ft = state.data.items.find((x) => x.t === 'k' && x.id === 'tk-fondid'); return ft ? `<a href="${esc(ft.u)}" target="_blank" rel="noopener">Fondide täitmised ↗</a>` : ''; })()}</div></div></div>`;
+      html += `<div class="row ${fundItem.k}"><div class="detail" style="border-top:0"><div class="text"><p><strong>${esc(fundItem.n)}</strong> · metoodika ${esc(fundItem.par)}</p><p>${fundHelp(fundItem.k, true)}</p>${state.data.meta.starRule && fundItem.k === 'f37' ? `<p>* ${esc(state.data.meta.starRule)}</p>` : ''}</div><div class="actions"><a href="${esc(fundItem.url)}" target="_blank" rel="noopener">Säte Riigi Teatajas ↗</a>${(() => { const ft = state.data.items.find((x) => x.t === 'k' && x.id === 'tk-fondid'); return ft ? `<a href="${esc(ft.u)}" target="_blank" rel="noopener">Fondide täitmised ↗</a>` : ''; })()}</div></div></div>`;
     }
     const yCard = q && !state.fund && (state.filter === 'all' || state.filter === 'v') ? birthYearCard(norm(q).split(' ')) : '';
     html += yCard;
@@ -673,7 +687,7 @@
       if (it.f) {
         for (const f of it.f) {
           const fi = d.items.find((x) => x.t === 'f' && x.k === f);
-          h += `<div><dt>Rahastus</dt><dd><span class="badge ${f}">${esc(FUND_SHORT[f])}</span> ${esc(FUND_HELP[f] || '')}${fi ? ` <a href="${esc(fi.url)}" target="_blank" rel="noopener">metoodika ${esc(fi.par)} ↗</a>` : ''}</dd></div>`;
+          h += `<div><dt>Rahastus</dt><dd><span class="badge ${f}">${esc(FUND_SHORT[f])}</span> ${fundHelp(f, false)}${fi ?` <a href="${esc(fi.url)}" target="_blank" rel="noopener">metoodika ${esc(fi.par)} ↗</a>` : ''}</dd></div>`;
         }
       } else if (it.ph) {
         h += `<div><dt>Rahastus</dt><dd>${phBadge(it)} Tervisekassa tasub selle uuringu eest pearaha arvel, mitte § 6 fondidest. Kui perearst suunab haige eriarsti juurde seda uuringut tegemata, tasub ta selle eest eriarstiabi osutajale (metoodika § 5). <a href="${esc(it.ph.url)}" target="_blank" rel="noopener">metoodika ${esc(it.ph.par)} ↗</a></dd></div>`;
@@ -990,7 +1004,7 @@
       .map((x) => `<button class="qbtn ks" data-focus="${x._id}"><b>${esc(x.k === 'ylevaade' ? 'Ülevaade ja lisatasud' : x.sn)}</b><small>${esc(KS_CAT[x.cat])}${ksValue(x) ? ' · ' + esc(ksValue(x)) : ''} · ${esc(x.par)}</small></button>`).join('');
     el.results.innerHTML = `
       <section class="section"><h2>Rahastus (metoodika § 6)</h2><div class="funds">
-        ${funds.map((f) => `<button class="fund ${f.k}" data-fund="${f.k}"><strong>${esc(f.n)}</strong><span>${esc(FUND_HELP[f.k] || '')}</span><span class="cnt">${f.cnt} teenust · ${esc(f.par)}</span></button>`).join('')}
+        ${funds.map((f) => `<button class="fund ${f.k}" data-fund="${f.k}"><strong>${esc(f.n)}</strong><span>${fundHelp(f.k, false)}</span><span class="cnt">${f.cnt} teenust · ${esc(f.par)}</span></button>`).join('')}
       </div>${ftl ? `<p class="fundlink"><a href="${esc(ftl.u)}" target="_blank" rel="noopener">Perearstide fondide täitmised (Tervisekassa) ↗</a></p>` : ''}</section>
       ${teemaHtml}
       <section class="section"><h2>Kvaliteedisüsteem (metoodika § 8)</h2><div class="quick">${ksCards}</div></section>

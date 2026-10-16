@@ -43,7 +43,10 @@
     "tk-proteesid": {"n": "Tervisekassa: hambaproteeside hüvitis", "u": "https://tervisekassa.ee/inimesele/hambaravi/taiskasvanute-hambaravi/hambaproteeside-huvitis"},
     "rt-ravimite-loetelu": {"n": "Tervisekassa ravimite loetelu (Riigi Teataja, kehtiv redaktsioon)", "u": "https://www.riigiteataja.ee/akt/126032025010?leiaKehtiv"},
     "ravimiregister": {"n": "Ravimiregister (Ravimiamet): müügiload, infolehed, ravimi omaduste kokkuvõtted", "u": "https://www.ravimiregister.ee/"},
-    "raviminfo": {"n": "ravimiinfo.ee: ravimiotsing (eraleht, mitte ametlik allikas)", "u": "https://ravimiinfo.ee/"}
+    "raviminfo": {"n": "ravimiinfo.ee: ravimiotsing (eraleht, mitte ametlik allikas)", "u": "https://ravimiinfo.ee/"},
+    "tkl-2025": {"n": "Tervishoiuvaldkonna kollektiivleping 2025–2026 (PDF, Eesti Arstide Liit)", "u": "https://arstideliit.ee/wp-content/uploads/2025/03/2025_03_22_Tervishoiuvaldkonna_kollektiivleping_2025_2026.pdf"},
+    "err-tkl-2025": {"n": "ERR 24.03.2025: kollektiivleping, alammäärad tõusevad 2025 ja 2026", "u": "https://www.err.ee/1609642235/tervishoiutootajaid-ootab-tuleval-aastal-viieprotsendiline-alampalgatous"},
+    "err-tkl-2027": {"n": "ERR 26.09.2026: 2027. aasta läbirääkimised lõppesid tulemusteta, liidud pöörduvad lepitaja poole", "u": "https://www.err.ee/1610149147/lahe-tervishoiu-palgatousude-puhul-peab-lahtuma-tegelikest-voimalustest"}
   },
   "teemad": [
     {
@@ -679,6 +682,49 @@
          "allikas": [["immkorraldus", "§ 2"]],
          "kontroll": [["immkorraldus", "§ 2", "Kursuse minimaalne maht on 16 tundi"]]}
       ]
+    },
+    {
+      "k": "palgad",
+      "grupp": "Töökorraldus ja nimistu",
+      "n": "Tervishoiutöötajate töötasu alammäärad (kollektiivleping 2025–2026)",
+      "sn": "Töötasu alammäärad",
+      "seotud": ["oigused", "tookorraldus"],
+      "ule": {"alates": "2027-01-01", "s": "kollektiivleping 2025–2026 kehtis kuni 31.12.2026. Kontrolli, kas on sõlmitud uus leping või tehtud lepitaja ettepanek, ja uuenda määrad."},
+      "syn": ["palk", "palgad", "palga alammäär", "alampalk", "miinimumpalk", "töötasu", "töötasu alammäär", "tunnitasu", "tunnipalk", "kollektiivleping", "arsti palk", "eriarsti palk", "perearsti palk", "õe palk", "pereõe palk", "abiarst", "residendi palk", "hooldaja palk", "hooldustöötaja", "füsioterapeudi palk", "psühholoogi palk", "logopeedi palk", "ämmaemanda palk", "eriõde", "öötöö", "öötasu", "valvetasu", "puhkepäevatasu", "lisapuhkus"],
+      "tabelid": [
+        {"n": "Töötasu alammäär, eurot tunnis (lepingu p 2)",
+         "pais": ["Töötaja (lepingu mõiste)", "Alates 01.04.2026", "01.04.2025–31.03.2026"],
+         "read": [
+           ["Eriarst: eriarstina registreeritud, osutab eriarsti-, perearsti- või kiirabi (ka töölepinguga perearst)", "22,81", "21,72"],
+           ["Arst: arsti kutse ja arsti kvalifikatsiooni nõudev ametikoht, eriala eristamata (nt erialata arst)", "20,96", "19,97"],
+           ["Arst-resident: võrdne arsti määraga", "20,96", "19,97"],
+           ["Abiarst: vähemalt 60% arsti määrast*", "12,58", "11,99"],
+           ["Kliiniline psühholoog", "16,31", "15,53"],
+           ["Logopeed", "16,31", "15,53"],
+           ["Eriõde, ämmaemand", "13,27", "12,64"],
+           ["Õde", "12,79", "12,18"],
+           ["Tervishoiu tugispetsialist: füsioterapeut, tegevusterapeut, radioloogiatehnik, bioanalüütik", "12,79", "12,18"],
+           ["Erakorralise meditsiini tehnik", "11,03", "10,51"],
+           ["Kiirabitehnik", "10,66", "10,15"],
+           ["Hooldustöötaja", "8,10", "7,71"]
+         ],
+         "markus": "* Abiarsti määr on lepingus protsendina (p 2.3); summa on arvutatud ja ümardatud sendini ülespoole. Abiarst on arsti juhendamisel ja vastutusel töötav arstiõppe üliõpilane, kes on läbinud IV kursuse kohustuslikud ained (p 1.1.4).\nPsühholoog-nõustajat, psühhoterapeuti ega teisi siin nimetamata ametikohti leping eraldi ei nimeta.",
+         "allikas": ["tkl-2025"]}
+      ],
+      "read": [
+        {"p": "Kellele kehtib", "s": "Lepingu sõlmisid 23.03.2025 Eesti Haiglate Liit ja Eesti Kiirabi Liit ning Eesti Arstide Liit, Eesti Tervishoiutöötajate Kutseliit, Eesti Õdede Liit, Eesti Kliiniliste Psühholoogide Kutseliit ja Eesti Kliiniliste Logopeedide Kutseliit. Töötasu, öö- ja puhkepäevatöö, valve, summeeritud tööaja ja eriarstiabi vastuvõtu standardi punktid on laiendatud kõigile Terviseameti tegevusloaga asutustele, mida rahastatakse Tervisekassa ravi rahastamise lepingu alusel või riigieelarvest, ning nende kõigile töötajatele (p 12).",
+         "allikas": ["tkl-2025", "err-tkl-2025"]},
+        {"p": "Perearstikeskus", "s": "Perearstiabi leping on ravi rahastamise leping: Tervisekassa sõlmib selle nimistu alusel perearstiabi osutajaga vähemalt viieks aastaks (RaKS § 36 lg 5¹). Seega kehtivad laiendatud punktid ka perearstikeskuse töötajatele. Töölepinguga töötav perearst on lepingu mõistes eriarst.",
+         "allikas": [["raks", "§ 36"], "tkl-2025"],
+         "kontroll": [["raks", "§ 36", "ravi rahastamise lepingu kinnitatud perearsti nimistu alusel perearstiabi osutava isikuga"]]},
+        {"p": "Öö, puhkepäev ja valve", "s": "Alates 01.04.2026 makstakse öötöö (kl 22–06) eest vähemalt 1,42-kordset töötasu (enne 1,4-kordset) ja laupäeval või pühapäeval tehtud töö eest vähemalt 1,25-kordset. Valveaja (kodu- või väljakutsevalve) tasu on vähemalt 20% töötasust. Summeeritud tööaja arvestusperiood on kuni 4 kuud.",
+         "allikas": ["tkl-2025"]},
+        {"p": "Ainult lepingu pooltele", "s": "Lisapuhkus (vaktsineeritud töötajale 7 kalendripäeva, vaktsineerimata töötajale 5), koolituse ja töötervishoiu punktid ei ole laiendatud, seega ei kohaldu need tööandjale, kes lepingu sõlminud liitudesse ei kuulu.",
+         "allikas": ["tkl-2025"]},
+        {"p": "Kehtivus", "s": "Leping kehtib kuni 31.12.2026; pooled peavad selle tingimusi täitma kuni uue kollektiivlepingu sõlmimiseni (p 11.1.2). 2027. aasta läbirääkimised lõppesid 2026. aasta septembris tulemusteta ja töötajate liidud pöördusid riikliku lepitaja poole. Tervisekassa lükkas hindades sisalduva palgakomponendi järgmise tõusu aprillist 2027 jaanuari 2028.",
+         "allikas": ["tkl-2025", "err-tkl-2027"]}
+      ],
+      "lingid": ["tkl-2025"]
     }
   ]
 }

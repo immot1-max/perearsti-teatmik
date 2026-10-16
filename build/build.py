@@ -42,6 +42,8 @@ SUP = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
 TODAY = dt.date.today()
 # Fondide argikeelsed nimed (määruse tekstis neid ei ole)
 FUND_NAMES = {"f37": "Uuringufond", "lisaks": "Tegevusfond", "f13": "Teraapiafond"}
+# Kui fondil on täpsustus, asendab see pealkirjas protsendi (protsent on siis rakenduse selgitusreal).
+FUND_SUB = {"f13": "keskuse enda füsioterapeut, psühholoog, logopeed"}
 
 
 # ----------------------------------------------------------------- võrk
@@ -824,6 +826,9 @@ def build_teemad(cfg, sources, par_text, dyn, lisad):
         it = {"t": "j", "k": t["k"], "n": t["n"], "sn": t.get("sn") or t["n"], "g": t["grupp"], "syn": t.get("syn", [])}
         if t.get("boost"):
             it["boost"] = t["boost"]
+        # Ülevaatuse meeldetuletus (nt tähtajaline kollektiivleping): alates kuupäevast läheb hoiatus aruandesse.
+        if t.get("ule") and TODAY.isoformat() >= t["ule"]["alates"]:
+            warn.append(f'{t.get("sn") or t["n"]}: {t["ule"]["s"]}')
         for key in ("read", "erinevused"):
             out = []
             for r in t.get(key, []):
@@ -1037,6 +1042,8 @@ def build(args):
     if huvitised:
         aux_hash.update(json.dumps([huvitised["rows"], huvitised.get("ylempiir")], ensure_ascii=False, sort_keys=True).encode())
     jalgimine = watch_sources(teemad_cfg.get("allikad", {}), prev)
+    # Ülevaatuse kuupäeva saabumine (teemakaardi väli „ule“) käivitab ehituse, et hoiatus jõuaks aruandesse.
+    aux_hash.update(json.dumps(sorted(t["k"] for t in teemad_cfg["teemad"] if t.get("ule") and TODAY.isoformat() >= t["ule"]["alates"])).encode())
     # Sõrmejälge mõjutab sisu muutus ja püsiv (vähemalt kaks järjestikust) kättesaamatus, mitte ühekordne võrgutõrge.
     aux_hash.update(json.dumps({k: [v.get("uuendatud"), v.get("sha"), (v.get("vigu") or 0) >= 2] for k, v in sorted(jalgimine.items())},
                                ensure_ascii=False).encode())
@@ -1113,7 +1120,7 @@ def build(args):
                 fund_key = f"f{mp.group(1)}"
                 label = f"Kuni {mp.group(1)}% pearahast"
                 if fund_key in FUND_NAMES:
-                    label = f"{FUND_NAMES[fund_key]} · kuni {mp.group(1)}% pearahast"
+                    label = f"{FUND_NAMES[fund_key]} · {FUND_SUB.get(fund_key) or f'kuni {mp.group(1)}% pearahast'}"
             elif tbls and "raviarve" in txt and "täiendavalt" in txt:
                 fund_key = "lisaks"
                 label = f"{FUND_NAMES['lisaks']} · raviarvega lisaks pearahale"
@@ -1149,11 +1156,23 @@ def build(args):
                     "s": re.sub(r"\s*RT I \d{4}-\d\d-\d\d.*$", "", lo["blocks"][0]["s"]) if lo["blocks"] and lo["blocks"][0]["t"] == "p" else txt[:400],
                     "url": met["url"] + "#" + lo["id"],
                     "cnt": len(codes),
+                    "pct": int(mp.group(1)) if fund_key != "lisaks" else None,
                 })
             elif txt:
                 text_rules.append(("metoodika", par, lo, txt))
     # tärni tingimus
     star_rule = next((t for (s, p, l, t) in text_rules if s == "metoodika" and "tärniga" in t), None)
+    # Fondi tasumise tingimus (praegu § 6 lg 9): teenust peab osutama perearstiabi osutaja ise, mille kaudu perearst tegutseb.
+    fund_warn = []
+    for (s, p, lo, t) in text_rules:
+        mc = re.search(r"lõike(?:s|tes) (\S+?) nimetatud", t) if s == "metoodika" and "mille kaudu perearst tegutseb" in t else None
+        if mc:
+            for fd in funds:
+                if fd["par"] == f'{p["nr"]} ({mc.group(1)})':
+                    fd["cond"] = {"par": f'{p["nr"]} {lo["nr"]}'.strip(), "url": met["url"] + "#" + lo["id"]}
+    for fd in funds:
+        if fd["k"] in FUND_SUB and not fd.get("cond"):
+            fund_warn.append(f'{fd["n"]}: metoodikast ei leitud enam tingimust, et teenust osutab perearstiabi osutaja ise (oli § 6 lg 9). Vaata fondi pealkiri ja selgitus üle.')
 
     # 4. reeglid koodide juurde
     for (src_key, par, lo, txt) in text_rules:
@@ -1290,7 +1309,7 @@ def build(args):
     ml = met_lisad.lisad_info(xmls["metoodika"], met["id"], cache, aktilisa_url)
     dyn["ekons"] = ml.get("ekons")
     teema_items, teema_warn = build_teemad(teemad_cfg, sources, par_text, dyn, lisad)
-    teema_warn = hu_warn + imm_warn + ml.get("warn", []) + teema_warn
+    teema_warn = hu_warn + imm_warn + ml.get("warn", []) + fund_warn + teema_warn
     items.extend(teema_items)
 
     # 7d. mis muutus: jõustunud (viimase aasta) ja avaldatud tulevaste redaktsioonide vahe

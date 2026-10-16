@@ -41,4 +41,4 @@
 - NB: Standardkulu lisa: 1 rida ei õnnestunud lugeda (koodid 52625).
 
 
-Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 183 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 19 teemakaarti, 38 linki.
+Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 184 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 20 teemakaarti, 38 linki.

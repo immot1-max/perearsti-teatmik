@@ -9,7 +9,7 @@ Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, sõeluuringu
 | Allikas | Mida sealt võetakse |
 |---|---|
 | Tervisekassa tervishoiuteenuste loetelu | Kõik koodid ja piirhinnad, rakendamise tingimused, perearstiabi peatükk |
-| Tasu maksmise kohustuse ülevõtmise kord ja metoodika | § 6 fondid (uuringufond kuni 37%, tegevusfond raviarvega lisaks, teraapiafond kuni 13%), perearstiabi peatükk (§ 4–8¹); lisa „Teenuste standardkulu komponendid“ (iga koodi ressursid, sh arsti minutid) ja e-konsultatsiooni saatekirja nõuete lisad erialade kaupa |
+| Tasu maksmise kohustuse ülevõtmise kord ja metoodika | § 6 fondid (uuringufond kuni 37%, tegevusfond raviarvega lisaks, teraapiafond kuni 13%, mida tasutakse ainult siis, kui teenust osutab perearsti enda äriühing või FIE, § 6 lg 9), perearstiabi peatükk (§ 4–8¹); lisa „Teenuste standardkulu komponendid“ (iga koodi ressursid, sh arsti minutid) ja e-konsultatsiooni saatekirja nõuete lisad erialade kaupa |
 | Abivahendite loetelu, tõendi ja kaardi andmed | Määruse tekst ja lisa (abivahendite loetelu) |
 | Mootorsõidukijuhi tervisekontroll ja tervisenõuded | Kogu määruse tekst |
 | Metoodika § 8 ja Tervisekassa kvaliteedisüsteemi leht | Kvaliteedisüsteemi kriteeriumid, koodid, punktid ja lisapädevuste koodiloetelud; Tervisekassa uusimad juhendid |
@@ -74,7 +74,7 @@ Rakenduses näitab sünniaasta otsing (nt „1966“), millise sõeluuringu siht
 
 ## Igapäevatöö reeglid (teemakaardid)
 
-Haigus- ja hooldusleht, töövõimetuslehe vormistamine, P21, tervisetõendid (relvaluba, meremees, abipolitseinik, Kaitseliit, kaitsevägi, toidukäitleja jt nakkushaiguste tõend), nakkushaiguse teatis, vaktsineerimine, töökorraldus, nimistu, PADI, perearsti, erialata arsti ja pereõe õigused, retseptid ja ravimisoodustus, e-konsultatsioon ning patsiendi hüvitised ja omaosalus. Kaardid võivad viidata seotud kaartidele (väli `seotud`). Kokkuvõtted on failis `build/teemad.json`; need põhinevad Tommi allikaregistril (15.10.2026) ja on üle kontrollitud aktide kehtivast tekstist.
+Haigus- ja hooldusleht, töövõimetuslehe vormistamine, P21, tervisetõendid (relvaluba, meremees, abipolitseinik, Kaitseliit, kaitsevägi, toidukäitleja jt nakkushaiguste tõend), nakkushaiguse teatis, vaktsineerimine, töökorraldus, nimistu, PADI, perearsti, erialata arsti ja pereõe õigused, retseptid ja ravimisoodustus, e-konsultatsioon, patsiendi hüvitised ja omaosalus ning tervishoiutöötajate töötasu alammäärad (kollektiivleping 2025–2026). Kaardid võivad viidata seotud kaartidele (väli `seotud`). Kokkuvõtted on failis `build/teemad.json`; need põhinevad Tommi allikaregistril (15.10.2026) ja on üle kontrollitud aktide kehtivast tekstist.
 
 Avalehel on kaardid viies värviga eristatud rühmas: töövõimetus; tervisetõendid (esimesena juhi tervisetõend eraldi 1. ja 2. grupi kohta, siis relvaluba, toidukäitleja jt, Kaitseliit, abipolitseinik, kaitsevägi, meremees; sama värv kui juhi tervisenõuetel); nakkushaigused ja vaktsineerimine; ravimid, suunamine ja hüvitised; töökorraldus ja nimistu. Rühmade ja kaartide järjekord tuleb failist `build/teemad.json`.
 
@@ -82,7 +82,7 @@ Iga punkti juures on viide sättele (avaneb rakenduses) või allikale. Automaatn
 
 1. Iga punkti `kontroll`-lõik peab kehtivas sättes alles olema. Kui akt muutub ja lõik kaob, märgitakse punkt rakenduses „allika tekst muutunud“ ja teavitusse tuleb märkus.
 2. Tervisekassa hüvitiste võrdlustabel, päevane ülempiir, immuniseerimiskava lisad ja töövõimetuslehe põhjuse koodid loetakse otse allikast.
-3. Tervisekassa ja Terviseameti lehtede „Viimati uuendatud“ kuupäev ja PDF-ide sisu jälgitakse; muutusest tuleb teavitus koos soovitusega teemakaart üle vaadata.
+3. Tervisekassa ja Terviseameti lehtede „Viimati uuendatud“ kuupäev ja PDF-ide sisu jälgitakse; muutusest tuleb teavitus koos soovitusega teemakaart üle vaadata. Kaardil võib olla ka ülevaatuse kuupäev (väli `ule`, nt töötasu alammäärade kaardil 01.01.2027, kui kollektiivleping lõpeb); sellest alates tuleb teavitusse meeldetuletus.
 
 Allikate omavahelised vastuolud on kaardil „Erinevused allikates“ all (nt õe õigused töövõimetuslehel, perearsti vahetuse kuupäev, P21 juhendi 15./16. päev, Tervisekassa aegunud patsiendilehed).
 
