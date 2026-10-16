@@ -88,7 +88,9 @@
   let paPref = true;
   try { paPref = localStorage.getItem('teatmik-pa') !== '0'; } catch (e) { /* ignoreeri */ }
   // focus = täisvaates avatud kirje. pin = kirje, mis oli avatud, kui kasutaja hakkas otsima või valis kategooria;
-  // see jääb tulemuste kohale eraldi reale, kuni kasutaja selle sulgeb või otsingu tühjendab (siis naaseb selle juurde).
+  // see jääb tulemuste alla eraldi avatud plokina, kuni kasutaja selle sulgeb või otsingu tühjendab (siis naaseb selle juurde).
+  // Kui pin on olemas, näidatakse esialgu PIN_LIMIT vastet, et avatud kirje jääks lähedale.
+  const PIN_LIMIT = 10;
   const state = { data: null, idx: [], filter: 'all', fund: null, q: '', open: new Set(), limit: 60, focus: null, pin: null, pinOpen: false, pa: paPref, labsAll: new Set(), msAll: new Set() };
   const el = {};
 
@@ -346,14 +348,14 @@
     if (state.pin != null) list = list.filter((x) => x.it._id !== state.pin);
     const total = list.length;
     const shown = list.slice(0, state.limit);
-    let html = pinHtml();
+    let html = '';
     const fundItem = state.fund ? state.data.items.find((x) => x.t === 'f' && x.k === state.fund) : null;
     if (fundItem) {
       html += `<div class="row ${fundItem.k}"><div class="detail" style="border-top:0"><div class="text"><p><strong>${esc(fundItem.n)}</strong> · metoodika ${esc(fundItem.par)}</p><p>${esc(FUND_HELP[fundItem.k] || '')}</p>${state.data.meta.starRule && fundItem.k === 'f37' ? `<p>* ${esc(state.data.meta.starRule)}</p>` : ''}</div><div class="actions"><a href="${esc(fundItem.url)}" target="_blank" rel="noopener">Säte Riigi Teatajas ↗</a></div></div></div>`;
     }
     const yCard = q && !state.fund && (state.filter === 'all' || state.filter === 'v') ? birthYearCard(norm(q).split(' ')) : '';
     html += yCard;
-    html += `<div class="summary"><span>${total ? `${total} vastet` : ''}${q && total > state.limit ? `, näitan ${state.limit}` : ''}</span>${q || state.fund || state.filter !== 'all' ? '<button class="btn" data-act="clear">Tühjenda</button>' : ''}</div>`;
+    html += `<div class="summary"><span>${total ? `${total} vastet` : ''}${total > shown.length ? `, näitan ${shown.length}` : ''}</span>${q || state.fund || state.filter !== 'all' ? '<button class="btn" data-act="clear">Tühjenda</button>' : ''}</div>`;
     if (dropped.length) html += `<div class="hidden-note">Neid sõnu ei leitud, otsisin ilma nendeta: ${dropped.map(esc).join(', ')}</div>`;
     if (hidden && state.pa) html += `<div class="hidden-note">${hidden} vastet väljaspool perearstiabi on peidetud.<button class="btn" data-act="pa-off">Näita kõiki</button></div>`;
     if (!total && yCard) {
@@ -376,10 +378,11 @@
       html += '</div>';
       if (total > shown.length) html += `<button class="btn more" data-act="more">Näita veel ${Math.min(60, total - shown.length)}</button>`;
     }
+    html += pinHtml();
     r.innerHTML = html;
   }
 
-  // opt.pin: kirje on tulemuste kohal „Avatud“ real; avamise olek on state.pinOpen.
+  // opt.pin: kirje on tulemuste all „Avatud“ plokis; avamise olek on state.pinOpen.
   function row(it, via, opt = {}) {
     const open = opt.pin ? state.pinOpen : state.open.has(it._id);
     const re = state.hl;
@@ -739,7 +742,7 @@
       </div></section>
       <section class="section info"><h2>Kasutamine</h2>
         <p>Otsi nimetuse, koodi, lühendi või argisõnaga (nt „holter“, „TSH“, „6417“). Täpitähti pole vaja. Koodil klõpsates kopeerub see.</p>
-        <p>Kui avad kirje (nt „Hüpertooniatõbi“) ja otsid seejärel koodi või valid kategooria, jääb avatud kirje tulemuste kohale eraldi reale: „Näita“ avab selle sisu samas kohas, „Sulge“ eemaldab selle. Otsingu tühjendamine (× või Esc) viib tagasi avatud kirje juurde, „← Avaleht“ avalehele.</p>
+        <p>Kui avad kirje (nt „Hüpertooniatõbi“) ja otsid seejärel koodi või valid kategooria, tulevad vasted üles ja avatud kirje jääb lahtisena nende alla, nii et selle koode saab järjest edasi klõpsata. „Peida“ teeb selle üherealiseks, „Sulge“ eemaldab. Otsingu tühjendamine (× või Esc) viib tagasi avatud kirje juurde, „← Avaleht“ avalehele.</p>
         <p>Laborianalüüsi saab otsida SYNLABi nime või lühendiga (nt „IGRA“, „HCV“). Vastes on Tervisekassa kood ja see, kas analüüs kuulub perearsti fondi. Koodi avades on näha kõik selle koodi alla kuuluvad SYNLABi analüüsid.</p>
         <p>Sünniaasta otsing (nt „1966“) näitab, millise rinna-, emakakaela- või soolevähi sõeluuringu sihtrühma inimene sel aastal kuulub. Sünniaastad tulevad terviseportaalist ja neid kontrollitakse kord kuus.</p>
         <p>„Igapäevatöö reeglid“ koondavad haigus- ja hoolduslehe, P21, tervisetõendite, nakkushaiguse teatiste, vaktsineerimise, töökorralduse ja nimistu põhireeglid. Iga punkti juures on viide sättele; ⚠ märgib allikate omavahelisi erinevusi. Otsida võib ka küsimusena (nt „kui kaua makstakse haigushüvitist“).</p>
@@ -842,13 +845,13 @@
     }
   }
 
-  // Täisvaatest lahkudes (otsing, kategooria, fond) jääb avatud kirje tulemuste kohale.
+  // Täisvaatest lahkudes (otsing, kategooria, fond) jääb avatud kirje lahtisena tulemuste alla.
   function leaveFocus() {
-    if (state.focus != null) { state.pin = state.focus; state.focus = null; }
-    state.pinOpen = false;
+    if (state.focus != null) { state.pin = state.focus; state.focus = null; state.pinOpen = true; }
   }
+  const baseLimit = (n) => (state.pin != null ? PIN_LIMIT : n);
   function setQuery(q) {
-    el.q.value = q; state.q = q; state.limit = 60; leaveFocus(); state.open.clear();
+    el.q.value = q; state.q = q; leaveFocus(); state.limit = baseLimit(60); state.open.clear();
     route(); syncUrl(); window.scrollTo(0, 0);
   }
   function goHome() {
@@ -891,7 +894,7 @@
       deb = setTimeout(() => {
         // Otsing kustutati tühjaks: tagasi avatud kirje juurde.
         if (!el.q.value.trim() && state.pin != null && !state.fund && state.filter === 'all') { clearSearch(); el.q.focus(); return; }
-        state.q = el.q.value; state.limit = 60; leaveFocus(); state.open.clear(); route(); syncUrl();
+        state.q = el.q.value; leaveFocus(); state.limit = baseLimit(60); state.open.clear(); route(); syncUrl();
       }, 90);
     });
     el.q.addEventListener('keydown', (e) => { if (e.key === 'Escape') clearSearch(); });
@@ -912,9 +915,9 @@
         art.outerHTML = row(it, art.querySelector('.via') ? true : false);
         return;
       }
-      if (t.dataset.fund) { state.fund = state.fund === t.dataset.fund ? null : t.dataset.fund; state.filter = 'all'; leaveFocus(); state.open.clear(); state.limit = 200; renderChips(); route(); window.scrollTo(0, 0); return; }
+      if (t.dataset.fund) { state.fund = state.fund === t.dataset.fund ? null : t.dataset.fund; state.filter = 'all'; leaveFocus(); state.open.clear(); state.limit = baseLimit(200); renderChips(); route(); window.scrollTo(0, 0); return; }
       if (t.dataset.filter === 'all' && !state.q.trim()) { goHome(); return; }
-      if (t.dataset.filter) { state.filter = t.dataset.filter; state.fund = null; leaveFocus(); state.open.clear(); state.limit = 60; renderChips(); route(); return; }
+      if (t.dataset.filter) { state.filter = t.dataset.filter; state.fund = null; leaveFocus(); state.open.clear(); state.limit = baseLimit(60); renderChips(); route(); return; }
       if (t.dataset.q) { setQuery(t.dataset.q); return; }
       if (t.dataset.focus) { state.focus = +t.dataset.focus; state.pin = null; route(); window.scrollTo(0, 0); return; }
       if (t.dataset.goto) {
@@ -939,7 +942,7 @@
         return;
       }
       if (t.dataset.act === 'pin-toggle') { state.pinOpen = !state.pinOpen; rerenderPin(); return; }
-      if (t.dataset.act === 'unpin') { state.pin = null; state.pinOpen = false; route(); return; }
+      if (t.dataset.act === 'unpin') { state.pin = null; state.pinOpen = false; state.limit = Math.max(state.limit, 60); route(); return; }
       if (t.dataset.act === 'clear') { clearSearch(); return; }
       if (t.dataset.act === 'pa-off') { setPa(false); return; }
       if (t.dataset.act === 'home') { goHome(); return; }
