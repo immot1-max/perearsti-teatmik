@@ -680,7 +680,7 @@
       return h;
     }
     if (it.t === 'l') {
-      let h = '<div class="text">';
+      let h = groupNote(it) + '<div class="text">';
       for (const b of it.b) {
         if (b.t === 'p') h += `<p>${hl(b.s, re)}</p>`;
         else if (b.t === 'li') h += `<p class="li">${hl(b.s, re)}</p>`;
@@ -692,6 +692,22 @@
       return h;
     }
     return '';
+  }
+
+  // Mootorsõidukijuhi § 3–6 algusesse § 2 lg 2: kes kuulub 1. ja kes 2. gruppi (läheb sageli segamini).
+  // Tekst tuleb kehtivast § 2-st; käesoleva paragrahvi grupp on esile tõstetud.
+  function groupNote(it) {
+    if (it.src !== 'mootorsoidukijuht') return '';
+    const m = /([12])\. gruppi/.exec(it.n || '');
+    if (!m) return '';
+    const p2 = state.data.items.find((x) => x.t === 'l' && x.src === 'mootorsoidukijuht' && x.par === '§ 2');
+    const defs = p2 ? p2.b.filter((b) => b.t === 'li' && /^\d+\)\s*[12]\. gruppi/.test(b.s || '')) : [];
+    if (!defs.length) return '';
+    return `<div class="grp-note"><div class="grp-h"><span>Kes kuulub millisesse gruppi</span><button class="badge srcb" data-goto="mootorsoidukijuht:§ 2" title="Ava säte">${esc(p2.par)} ${esc(p2.n)}</button></div>`
+      + defs.map((b) => {
+        const g = /([12])\. gruppi/.exec(b.s)[1];
+        return `<p class="grp${g === m[1] ? ' cur' : ''}">${hl(b.s.replace(/^\d+\)\s*/, ''), state.hl)}</p>`;
+      }).join('') + '</div>';
   }
 
   function renderHome() {

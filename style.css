@@ -268,6 +268,11 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1
 .kv .inh { color: var(--muted); font-size: 0.75rem; }
 .note { background: var(--warn-bg); color: var(--warn-ink); border-radius: 8px; padding: 8px 10px; font-size: 0.88rem; }
 .rules { display: grid; gap: 6px; }
+.grp-note { display: grid; gap: 4px; margin-top: 8px; padding: 8px 10px; border-radius: 6px; background: var(--surface-2); border-left: 3px solid var(--c-juhi); }
+.grp-h { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.grp-h .badge { text-transform: none; letter-spacing: 0; }
+.grp { margin: 0; font-size: 0.88rem; color: var(--muted); max-width: 72ch; }
+.grp.cur { color: var(--ink); font-weight: 500; }
 .rules h4, .detail h4 { margin: 4px 0 0; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
 .rule { font-size: 0.9rem; }
 .ref { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); margin-right: 6px; white-space: nowrap; }
