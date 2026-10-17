@@ -1,4 +1,4 @@
-# Andmete uuendus 16.10.2026
+# Andmete uuendus 17.10.2026
 
 ## Allikad
 - Tervisekassa tervishoiuteenuste loetelu: [116062026020](https://www.riigiteataja.ee/akt/116062026020) kehtib alates 01.07.2026
@@ -25,6 +25,7 @@
 - Immuniseerimise korraldamise nõuded: [123052023016](https://www.riigiteataja.ee/akt/123052023016) kehtib alates 26.05.2023; tulevikus jõustub: [111072026170](https://www.riigiteataja.ee/akt/111072026170) alates 01.01.2028
 - Ravimite väljakirjutamine ja apteekidest väljastamine: [107072026011](https://www.riigiteataja.ee/akt/107072026011) kehtib alates 10.07.2026
 - Meremehe ja mereõppeasutusse õppima asuja tervisenõuded ja tervisekontroll: [115122021011](https://www.riigiteataja.ee/akt/115122021011) kehtib alates 18.12.2021
+- Tervishoiuteenuse osutamisel osalevad isikud ja tervise infosüsteemile juurdepääsu ulatus: [120032026005](https://www.riigiteataja.ee/akt/120032026005) kehtib alates 01.04.2026
 - SYNLABi hinnakiri: 949 analüüsi, SYNLAB Eesti OÜ analüüside hinnakiri ja koondtabel tervishoiuteenuse pakkujale (al 01.04.2026) - SYNLAB Eesti
 - Toru: toru_2026jul.xlsx (viimane muudatus 01.07.2026), hinnaerinevusi loeteluga: 3
 
@@ -41,4 +42,4 @@
 - NB: Standardkulu lisa: 1 rida ei õnnestunud lugeda (koodid 52625).
 
 
-Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 184 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 20 teemakaarti, 38 linki.
+Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 187 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 23 teemakaarti, 39 linki.

@@ -826,6 +826,9 @@ def build_teemad(cfg, sources, par_text, dyn, lisad):
         it = {"t": "j", "k": t["k"], "n": t["n"], "sn": t.get("sn") or t["n"], "g": t["grupp"], "syn": t.get("syn", [])}
         if t.get("boost"):
             it["boost"] = t["boost"]
+        # Kaardipõhine kontrollikuupäev (hiljem lisatud kaardid); muidu kehtib _meta.kontrollitud.
+        if t.get("kontrollitud"):
+            it["kk"] = t["kontrollitud"]
         # Ülevaatuse meeldetuletus (nt tähtajaline kollektiivleping): alates kuupäevast läheb hoiatus aruandesse.
         if t.get("ule") and TODAY.isoformat() >= t["ule"]["alates"]:
             warn.append(f'{t.get("sn") or t["n"]}: {t["ule"]["s"]}')

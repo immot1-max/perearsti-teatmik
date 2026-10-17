@@ -46,7 +46,21 @@
     "raviminfo": {"n": "ravimiinfo.ee: ravimiotsing (eraleht, mitte ametlik allikas)", "u": "https://ravimiinfo.ee/"},
     "tkl-2025": {"n": "Tervishoiuvaldkonna kollektiivleping 2025–2026 (PDF, Eesti Arstide Liit)", "u": "https://arstideliit.ee/wp-content/uploads/2025/03/2025_03_22_Tervishoiuvaldkonna_kollektiivleping_2025_2026.pdf"},
     "err-tkl-2025": {"n": "ERR 24.03.2025: kollektiivleping, alammäärad tõusevad 2025 ja 2026", "u": "https://www.err.ee/1609642235/tervishoiutootajaid-ootab-tuleval-aastal-viieprotsendiline-alampalgatous"},
-    "err-tkl-2027": {"n": "ERR 26.09.2026: 2027. aasta läbirääkimised lõppesid tulemusteta, liidud pöörduvad lepitaja poole", "u": "https://www.err.ee/1610149147/lahe-tervishoiu-palgatousude-puhul-peab-lahtuma-tegelikest-voimalustest"}
+    "err-tkl-2027": {"n": "ERR 26.09.2026: 2027. aasta läbirääkimised lõppesid tulemusteta, liidud pöörduvad lepitaja poole", "u": "https://www.err.ee/1610149147/lahe-tervishoiu-palgatousude-puhul-peab-lahtuma-tegelikest-voimalustest"},
+    "tu-res-leht": {"n": "Tartu Ülikool: peremeditsiini eriala residentuur", "u": "https://tervis.ut.ee/et/peremeditsiini-residentuur"},
+    "tu-res-programm": {"n": "TÜ peremeditsiini residentuuri programm 2022/2023 (PDF)", "u": "https://meditsiiniteadused.ut.ee/sites/default/files/2022-03/Peremeditsiini%20programm.pdf"},
+    "tu-res-tsyklid": {"n": "TÜ peremeditsiini residentuuri tsüklite tabel, märts 2026 (PDF)", "u": "https://tervis.ut.ee/sites/default/files/2026-03/peremeditsiini_tabel_final_3.pdf"},
+    "tu-res-eeskiri": {"n": "Tartu Ülikooli residentuuri eeskiri (PDF)", "u": "https://meditsiiniteadused.ut.ee/et/media/44976/download"},
+    "tu-res-kkk": {"n": "Tartu Ülikool: korduma kippuvad küsimused residentuuri kohta", "u": "https://meditsiiniteadused.ut.ee/et/sisu/korduma-kippuvad-kusimused-residentuuri-kohta"},
+    "rt-res-tasu-2026": {"n": "Ministri määrus 16.03.2026 nr 9 (RT I, 25.03.2026, 1): arst-residendi tööjõukulu alates 01.04.2026", "u": "https://www.riigiteataja.ee/akt/125032026001"},
+    "tu-praktika": {"n": "Tartu Ülikool: arstiteaduse kliiniline praktika (6. kursus)", "u": "https://meditsiiniteadused.ut.ee/et/sisu/arstiteaduse-kliiniline-praktika"},
+    "tu-praktika-sissejuhatus": {"n": "Kliinilise praktika päevik 2025/26: sissejuhatus ja kontaktid (PDF)", "u": "https://meditsiiniteadused.ut.ee/sites/default/files/2025-06/Sissejuhatus%20ja%20kontaktid.pdf"},
+    "tu-praktika-pere": {"n": "Praktikapäevik: peremeditsiin 2023/24 (PDF)", "u": "https://meditsiiniteadused.ut.ee/sites/default/files/2023-06/1-peremeditsiin_2023-24.pdf"},
+    "tu-praktika-vestlus": {"n": "Praktikapäevik: peremeditsiini vestluse kulg 2022/23 (PDF)", "u": "https://meditsiiniteadused.ut.ee/sites/default/files/2022-07/1-Peremeditsiin_VestluseKulg_2022-23.pdf"},
+    "tu-praktika-oskused": {"n": "Praktikapäevik: praktilised oskused 2023/24 (PDF)", "u": "https://meditsiiniteadused.ut.ee/sites/default/files/2023-06/6-praktilised_oskused_2023-24_0.pdf"},
+    "tu-praktika-juhend": {"n": "TÜ: praktika juhendamine meditsiiniteaduste valdkonnas, juhendmaterjal (PDF)", "u": "https://meditsiiniteadused.ut.ee/sites/default/files/inline-files/praktika_juhendamine_ty_meditsiiniteaduste_valdkonnas.pdf"},
+    "eays-abiarst": {"n": "Eesti Arstiteadusüliõpilaste Selts: abiarstindus", "u": "https://eays.ee/abiarstindus"},
+    "ea-abiarst-2026": {"n": "Eesti Arst 2026;105(5):227, juhtkiri „Abiarst“ (PDF)", "u": "https://ojs.utlib.ee/index.php/EA/article/download/26854/20310/43171"}
   },
   "teemad": [
     {
@@ -643,7 +657,7 @@
       "grupp": "Töökorraldus ja nimistu",
       "n": "Perearst, erialata arst (üldarst) ja pereõde: kes mida võib",
       "sn": "Perearst, üldarst, pereõde",
-      "seotud": ["ravimid", "tvl", "immtk"],
+      "seotud": ["ravimid", "tvl", "immtk", "residentuur"],
       "syn": ["üldarst", "erialata arst", "arst-resident", "resident", "pereõde", "õde", "õe retsept", "retseptiõigus", "asendaja", "asendamine", "pikaajaline asendamine", "lühiajaline asendamine", "kes võib", "pädevus", "volitused", "soodusretsept"],
       "read": [
         {"p": "Perearst", "s": "Perearst on perearsti eriala omandanud eriarst. Nimistu kinnitatakse perearstile; peremeditsiini residendile tingimusel, et tegutsemise alguseks on tema erialaks Terviseameti registris märgitud perearst.",
@@ -688,7 +702,7 @@
       "grupp": "Töökorraldus ja nimistu",
       "n": "Tervishoiutöötajate töötasu alammäärad (kollektiivleping 2025–2026)",
       "sn": "Töötasu alammäärad",
-      "seotud": ["oigused", "tookorraldus"],
+      "seotud": ["oigused", "tookorraldus", "residentuur", "abiarst"],
       "ule": {"alates": "2027-01-01", "s": "kollektiivleping 2025–2026 kehtis kuni 31.12.2026. Kontrolli, kas on sõlmitud uus leping või tehtud lepitaja ettepanek, ja uuenda määrad."},
       "syn": ["palk", "palgad", "palga alammäär", "alampalk", "miinimumpalk", "töötasu", "töötasu alammäär", "tunnitasu", "tunnipalk", "kollektiivleping", "arsti palk", "eriarsti palk", "perearsti palk", "õe palk", "pereõe palk", "abiarst", "residendi palk", "hooldaja palk", "hooldustöötaja", "füsioterapeudi palk", "psühholoogi palk", "logopeedi palk", "ämmaemanda palk", "eriõde", "öötöö", "öötasu", "valvetasu", "puhkepäevatasu", "lisapuhkus"],
       "tabelid": [
@@ -725,6 +739,137 @@
          "allikas": ["tkl-2025", "err-tkl-2027"]}
       ],
       "lingid": ["tkl-2025"]
+    },
+    {
+      "k": "residentuur",
+      "kontrollitud": "2026-10-17",
+      "grupp": "Residendid, praktikandid ja abiarstid",
+      "n": "Peremeditsiini residentuur: kava, palk, tööaeg ja puhkus",
+      "sn": "Peremeditsiini residentuur",
+      "seotud": ["palgad", "oigused", "praktika", "abiarst"],
+      "ule": {"alates": "2027-04-01", "s": "arst-residendi tööjõukulu hüvitamise brutotunnipalk (määrus nr 71 § 2 lg 3) ja kollektiivlepingu alammäärad muutuvad tavaliselt 1. aprillil. Kontrolli uued määrad ja TÜ uue programmi versioon."},
+      "syn": ["residentuur", "resident", "arst-resident", "peremeditsiini resident", "residendi puhkus", "residendi palk", "residendi tööaeg", "residentuuri programm", "rotatsioon", "rotatsiooniplaan", "tsüklid", "baasasutus", "baaspraksis", "residendi juhendaja", "juhendaja", "residentuuripäevik", "varasem töökogemus", "VÕTA", "osakoormus", "residentuuri peatamine", "lapsehoolduspuhkus", "lõpueksam", "uurimistöö"],
+      "tabelid": [
+        {"n": "Praktilise koolituse tsüklid (programm 2022/2023)",
+         "pais": ["Tsükkel", "Kestus", "Märkus"],
+         "read": [
+           ["Peremeditsiin", "vähemalt 24 kuud", "vähemalt kahes perearstikeskuses, üks maapiirkonnas (seal kokku vähemalt 6 kuud)"],
+           ["Sisehaigused", "5 kuud", "sh kardioloogia 1–2 kuud; ambulatoorne ja statsionaarne"],
+           ["Lastehaigused", "5 kuud", "ambulatoorne ja statsionaarne"],
+           ["Kirurgilised tsüklid", "3 kuud", "vähemalt 2 tsüklit: ortopeedia, traumatoloogia, üldkirurgia, günekoloogia"],
+           ["Erakorraline meditsiin", "2 kuud", "või 1 kuu EMO ja 1 kuu kiirabi"],
+           ["Neuroloogia", "1 kuu", "ambulatoorne ja statsionaarne"],
+           ["Nahahaigused", "1 kuu", "ambulatoorne"],
+           ["Psühhiaatria", "1 kuu", "võimalusel ambulatoorne"],
+           ["Valiktsüklid", "kokku vähemalt 4 kuud", "üks tsükkel kuni 2 kuud: pulmonoloogia, endokrinoloogia, reumatoloogia, hematoloogia, uroloogia, taastusravi, radioloogia, silmahaigused, kõrva-nina-kurguhaigused, gastroenteroloogia, üldkirurgia"]
+         ],
+         "markus": "Kohustuslikud tsüklid kokku vähemalt 42 kuud koos 4 puhkusekuuga. Kui eriarstiabi tsükleid on miinimumis, suureneb valiktsüklite maht ja vastupidi.",
+         "allikas": ["tu-res-programm"]}
+      ],
+      "read": [
+        {"p": "Õiguslik raam", "s": "Residentuuri korraldab Tartu Ülikool. Raamnõuded on sotsiaalministri 17.12.2019 määruses nr 70 „Residentuuri raamnõuded ja korraldamise tingimused“, ülikooli tasandil kehtivad residentuuri eeskiri ja peremeditsiini programm (kood 209702). Resident sõlmib töölepingu baasasutusega, kus ta tsüklit läbib; tööjõukulu hüvitatakse baasasutusele Tervisekassa kaudu sotsiaalministri 17.12.2019 määruse nr 71 järgi.",
+         "allikas": ["tu-res-eeskiri", "tu-res-kkk", "rt-res-tasu-2026"]},
+        {"p": "Kestus", "s": "4 aastat ehk 48 kuud, sellest 4 kuud puhkust. Peremeditsiini vähemalt 24 kuud, eriarstiabi tsüklid ja valiktsüklid on tabelis. Teoreetiline koolitus on 24 EAP (sh töökorraldus ja e-tervis 3, teadustöö 6, kliinilised seminarid 3, valikkursused 6) ja toimub tööaja sees.",
+         "allikas": ["tu-res-programm", "tu-res-leht"]},
+        {"p": "Lõpetamine", "s": "Uurimistöö tulemused esitatakse residentide kevadkonverentsil. Lõpueksamile pääseb, kui programm on läbitud, kõik tsüklid on positiivselt hinnatud, uurimistöö on esitatud ja oma patsiendikonsultatsiooni salvestis analüüsitud. Lõpueksam on kirjalik ja suuline.",
+         "allikas": ["tu-res-programm", "tu-res-leht"]},
+        {"p": "Palk ja tööaeg", "s": "Arst-residendi töötasu alammäär on sama mis arstil: alates 01.04.2026 20,96 € tunnis. Tasustatud tööaeg on 40 tundi nädalas ja residentuuri teoreetiline koolitus on tööaja sees. Öötöö eest vähemalt 1,42-kordne, laupäeval ja pühapäeval 1,25-kordne töötasu, valveaja eest vähemalt 20% töötasust. Need punktid on laiendatud ka perearstikeskusele.",
+         "allikas": ["tkl-2025"]},
+        {"p": "Tervisekassa hüvitis", "s": "Baasasutusele hüvitatava tööjõukulu arvutamise alus on alates 01.04.2026 brutotunnipalk 20,96 € ehk 3500,32 € kuus (määrus nr 71 § 2 lg 3; 01.04.2025–31.03.2026 oli see 19,97 €).",
+         "allikas": ["rt-res-tasu-2026"]},
+        {"p": "Puhkus", "s": "Põhipuhkus on 4 nädalat igal õppeaastal (1.09–31.08); rotatsiooniplaanis on 11 kuud tsükleid ja 1 kuu puhkust. Kui resident töötab aasta jooksul mitmes baasis, makstakse iga töölepingu lõpus kasutamata puhkuse eest hüvitis ja suvel võetakse puhkus baasist palgata. Õppepuhkus ei sobi residentuuriga, sest koolitus on tööaja sees.",
+         "allikas": ["tu-res-eeskiri", "tu-res-kkk"]},
+        {"p": "Lisapuhkus", "s": "Kollektiivlepingu lisapuhkus on 7 kalendripäeva, kui ettenähtud vaktsineerimised on tehtud või vastunäidustus tõendatud, muidu 5 kalendripäeva. See punkt ei ole laiendatud, seega on kohustus ainult Eesti Haiglate Liidu ja Eesti Kiirabi Liidu liikmetel: haiglatsüklites enamasti jah, perearstikeskuses ainult siis, kui tööandja on liidu liige või lepib selle töölepingus kokku. TÜ soovitab lisapuhkuse võtta pikemas tsüklis, sest seda aega järele ei tehta.",
+         "allikas": ["tkl-2025", "tu-res-kkk"]},
+        {"p": "Osakoormus ja peatamine", "s": "Osakoormusega (20 tundi nädalas) võib läbida kokku kuni 22 kuud, alati paarisarv kuid, kui resident on alla 3-aastase või puudega lapse vanem, doktorant või hooldab abivajavat pereliiget; taotlus vähemalt 2 kuud ette. Peatada saab doktoriõppeks kuni 4 aastat, ajateenistuseks kuni 1 aasta, tervislikel põhjustel kuni 2 aastat, lapse hooldamiseks kuni lapse 3-aastaseks saamiseni ja omal soovil kuni 1 aasta, kuid mitte alla 1 kuu.",
+         "allikas": ["tu-res-eeskiri", "tu-res-kkk"]},
+        {"p": "Juhendaja ja vastutus", "s": "Arst-residendi tegevus loetakse juhendaja tegevuseks. Juhendaja on eriarst, kellel on vähemalt 5 aastat erialast töökogemust; korraga 1 resident, erandina 2. Juhendaja annab iga tsükli lõpus kirjaliku arvamuse.",
+         "allikas": [["ttks", "§ 4³"], ["osalejad", "§ 2"], "tu-res-eeskiri"],
+         "kontroll": [["ttks", "§ 4³", "loetakse selle isiku tegevuseks, kelle juhendamisel ja vastutusel ta tegutseb"], ["osalejad", "§ 2", "arst-resident eriarstiabi, perearstiabi ja kiirabi osutamisel töötava eriarsti juhendamisel ja vastutusel, kellel on vähemalt viieaastane töökogemus"]]},
+        {"p": "Dokumendid", "s": "Igaks õppeaastaks individuaalne õpingukava (1. aasta 1. augustiks, edaspidi 1. juuniks). Resident peab residentuuripäevikut ja esitab aruande koos hinnanguga baasile 1. detsembriks ja 1. juuniks; üldjuhendaja hindab edasijõudmist 1. jaanuariks ja 1. juuliks.",
+         "allikas": ["tu-res-eeskiri"]},
+        {"p": "Varasem töökogemus", "s": "Alates 01.09.2026 saab arvestada vähemalt kaheaastast täistööajaga (või samaväärset osalise tööajaga) üldarsti (asendusarst, haigla) või perearsti kogemust, mis on omandatud pärast arstiõpet ja enne residentuuri viimase 5 aasta jooksul ELis, EMP-s või Šveitsis; kuni 50% praktilisest õppest (22 kuud). Taotlus aastaringselt, tasu 1750 €, otsus 60 päeva jooksul.",
+         "allikas": ["tu-res-kkk", "tu-res-leht"]}
+      ],
+      "erinevused": [
+        {"s": "Programmist on veebis kaks versiooni: meditsiiniteaduste valdkonna lehe fail kaustas „2025-05“ on 2019/20 versioon, residentuuri leht viitab 2022/23 versioonile (valiktsüklites ka endokrinoloogia ja reumatoloogia, erakorralises meditsiinis kiirabi variant).",
+         "allikas": ["tu-res-programm", "tu-res-leht"]},
+        {"s": "Märtsi 2026 tsüklitabelis ei ole neuroloogia kohustuslike hulgas ja kirurgias nõutakse üldkirurgiat; programm ja residentuuri lehe tekst nimetavad neuroloogia 1 kuu kohustuslikuna ning leht mainib 2-kuulisi lisatsükleid, mida programmis ei ole. Võimalik, et uus programmi versioon on avaldamata.",
+         "allikas": ["tu-res-tsyklid", "tu-res-leht", "tu-res-programm"]},
+        {"s": "Allalaaditava residentuuri eeskirja viimane muudatus on 28.04.2023, kuigi KKK järgi jõustusid eeskirja muudatused (varasema töökogemuse arvestamine) 01.09.2026. KKK link residentuuripäeviku täitmise juhendile ei avane.",
+         "allikas": ["tu-res-eeskiri", "tu-res-kkk"]},
+        {"s": "TÜ KKK käsitleb kollektiivlepingu lisapuhkust kõigi residentide õigusena, kuid lepingu lisapuhkuse punkt ei ole laiendatud (vt „Lisapuhkus“).",
+         "allikas": ["tu-res-kkk", "tkl-2025"]}
+      ],
+      "lingid": ["tu-res-leht", "tu-res-programm", "tu-res-tsyklid", "tu-res-eeskiri", "tu-res-kkk", "rt-res-tasu-2026", "tkl-2025"]
+    },
+    {
+      "k": "praktika",
+      "kontrollitud": "2026-10-17",
+      "grupp": "Residendid, praktikandid ja abiarstid",
+      "n": "6. kursuse kliiniline praktika ja praktikapäevik (peremeditsiini tsükkel)",
+      "sn": "6. kursuse praktika",
+      "seotud": ["abiarst", "residentuur"],
+      "ule": {"alates": "2027-06-01", "s": "praktikapäeviku versioonid ja esitamise tähtajad on 2026/27 õppeaasta omad. Kontrolli uue õppeaasta päevikut ja tähtaegu."},
+      "syn": ["praktika", "praktikant", "kliiniline praktika", "praktika-aasta", "6. kursus", "kuues kursus", "VI kursus", "arstitudeng", "tudeng", "üliõpilane", "praktikapäevik", "päevik", "oskuste päevik", "praktilised oskused", "juhuanalüüs", "eneseanalüüs", "vestluse kulg", "praktikabaas", "praktika juhendaja", "Moodle"],
+      "read": [
+        {"p": "Ülesehitus", "s": "6. kursuse kliiniline praktika kestab 36 nädalat (55 EAP) ja seda saab alustada pärast 5. kursuse kohustuslike kliiniliste ainete läbimist. Erakorraline meditsiin, sisemeditsiin, kirurgia ja peremeditsiin on igaüks 8 nädalat (12 EAP); ülejäänud 4 nädalat (7 EAP) on valiktsükkel või mõne põhitsükli pikendus. Haiglatsüklid on üldjuhul samas haiglas.",
+         "allikas": ["tu-praktika", "tu-praktika-sissejuhatus"]},
+        {"p": "Peremeditsiini tsükkel", "s": "8 nädalat perearstipraksises, samal ajal on kohustuslik peremeditsiini Moodle'i kursus. Päevikusse 8 juhuanalüüsi: 6 kohustuslikul teemal (ebaselge diagnoos, ennetus, kroonilise haiguse käsitlus, lapse arengu jälgimine, mootorsõidukijuhi tervisekontroll, ägeda haiguse käsitlus) ja 2 vabal valikul (nt saatekirja sooviv patsient, telefonikonsultatsioon). Päevik soovitab esitada ühe juhuanalüüsi nädalas.",
+         "allikas": ["tu-praktika-pere", "tu-praktika"]},
+        {"p": "Eneseanalüüs", "s": "Üliõpilane salvestab oma konsultatsiooni patsiendiga, hindab seda „vestluse kulu“ töölehe järgi ja kirjutab eneseanalüüsi (mida nägi ja tegi, tugevused, mida parandada); lisaks märgib vähemalt 3 õpetlikku patsiendijuhtumit. Soovituslik on praktiseerida ka pereõe juures (nt EKG, veenipunktsioon).",
+         "allikas": ["tu-praktika-pere", "tu-praktika-vestlus"]},
+        {"p": "Juhendaja allkiri", "s": "Peremeditsiini peatüki lõpus kinnitab juhendav arst nime, arsti koodi, praksise ja allkirjaga, et juhuanalüüsid ja eneseanalüüs on ette näidatud, ning annab vabas vormis hinnangu (teadmised ja nende rakendamine, suhtumine igapäevatöösse, mida esile tõsta).",
+         "allikas": ["tu-praktika-pere"]},
+        {"p": "Praktilised oskused", "s": "Kõigile tsüklitele ühine peatükk: 76 oskust, neist 37 kohustuslikud (sh kõik 7 kriitilise haige käsitluse oskust). Kohustuslik oskus tuleb ette näidata ning juhendaja (arst või õde) kinnitab selle nime, ameti ja allkirjaga; kriitilist seisundit võib kirjeldada suuliselt. Nõustamist (alkohol, rasestumisvastased vahendid, krooniline haigus, liikumine, suitsetamine, toitumine, vaktsineerimine) soovitatakse harjutada peremeditsiini tsüklis; dokumentatsiooni hulgas on tõend, töövõimetusleht, retsept, saatekiri ja surmatõend.",
+         "allikas": ["tu-praktika-oskused", "tu-praktika-sissejuhatus"]},
+        {"p": "Tähtajad 2026/27", "s": "Kahe põhitsükli täidetud peatükid dekanaati 20. õppenädala alguseks (hiljemalt 11.01.2027), kõik peatükid koos praktiliste oskuste peatükiga 37. õppenädala alguseks (hiljemalt 10.05.2027). Esitatakse originaal, tsüklite peatükid eraldi köidetult; päevik tagastatakse.",
+         "allikas": ["tu-praktika"]}
+      ],
+      "erinevused": [
+        {"s": "Praktikalehel nimetatakse päevikuid 2026/27 versioonideks, kuid lingitud tsüklipeatükid on 2023/24 versioonid (valiktsükkel 2021/22, vestluse kulg 2022/23); sissejuhatus on 2025/26 versioon.",
+         "allikas": ["tu-praktika"]},
+        {"s": "Sissejuhatuse (2025/26) järgi hindab juhendaja nelja valdkonda etteantud kirjelduste järgi (patsiendikontakt ja anamnees, objektiivne uurimine, teoreetilised teadmised, osalemine igapäevatöös), peremeditsiini 2023/24 peatükis on ainult vaba vormiga hinnang. Kehtivat peatükki tasub küsida peremeditsiini erialajuhendajalt.",
+         "allikas": ["tu-praktika-sissejuhatus", "tu-praktika-pere"]}
+      ],
+      "lingid": ["tu-praktika", "tu-praktika-sissejuhatus", "tu-praktika-pere", "tu-praktika-vestlus", "tu-praktika-oskused", "tu-praktika-juhend"]
+    },
+    {
+      "k": "abiarst",
+      "kontrollitud": "2026-10-17",
+      "grupp": "Residendid, praktikandid ja abiarstid",
+      "n": "Abiarst (arstiõppe üliõpilane): alus, juhendamine, palk ja ligipääsud",
+      "sn": "Abiarst",
+      "seotud": ["palgad", "praktika", "oigused"],
+      "syn": ["abiarst", "abiarstindus", "abiarsti palk", "abiarsti juhendamine", "abiarsti leping", "arstitudeng tööle", "tudeng tööle", "üliõpilane tööle", "IV kursus", "4. kursus", "5. kursus", "tervishoiuteenuse osutamisel osalemine", "osalev isik", "digilugu", "retseptikeskus", "EAÜS"],
+      "read": [
+        {"p": "Kes võib", "s": "Arstiõppe üliõpilane, kes on läbinud õppekava IV kursuse kohustuslikud ained, võib osaleda tervishoiuteenuse osutamisel arsti juhendamisel ja vastutusel. Tema tegevus loetakse juhendava arsti tegevuseks. Osaleda võib, kui ta on registreeritud tervishoiukorralduse infosüsteemis (see ei ole tervishoiutöötaja registreering). Võimalus on olnud alates 2011. aastast.",
+         "allikas": [["osalejad", "§ 2"], ["ttks", "§ 4³"], "eays-abiarst"],
+         "kontroll": [["osalejad", "§ 2", "arstiõppe üliõpilane, kes on läbinud õppekavas olevad IV kursuse kohustuslikud ained, arsti juhendamisel ja vastutusel"], ["ttks", "§ 4³", "kutse omandamise eesmärgil vastaval õppekaval õppiv üliõpilane"], ["ttks", "§ 4³", "kui nad on registreeritud tervishoiukorralduse infosüsteemis"]]},
+        {"p": "Juhendaja", "s": "Abiarsti juhendajaks piisab arstist, erialast staaži määrus ei nõua (arst-residendi juhendajal peab olema vähemalt 5 aastat erialast kogemust). Ülesanded peavad vastama tegelikule pädevusele: IV kursuse järel on läbimata nt lastehaigused, naistehaigused ja sünnitusabi, neuroloogia, psühhiaatria, perearstiteadus ning naha- ja suguhaigused.",
+         "allikas": [["osalejad", "§ 2"], "ea-abiarst-2026"]},
+        {"p": "Ülesanded", "s": "Näiteks haiglas anamnees, esmane läbivaatus, sissekanded ja epikriisid, analüüside ja uuringute tellimine ning lihtsamad protseduurid; perearstikeskuses lisaks lapse arengu jälgimine, tõendite vormistamine ning telefoni- ja e-posti nõustamine. Retsepti abiarst välja kirjutada ei saa; EAÜS ei toeta praegu abiarsti koodi ega retsepti ettevalmistamise õigust.",
+         "allikas": ["ea-abiarst-2026", "eays-abiarst"]},
+        {"p": "Palk", "s": "Kollektiivlepingu järgi vähemalt 60% arsti alammäärast: alates 01.04.2026 vähemalt 12,58 € tunnis (01.04.2025–31.03.2026 11,99 €). Punkt on laiendatud ka perearstikeskusele; kehtivad ka öö-, puhkepäeva- ja valvetasu punktid.",
+         "allikas": ["tkl-2025"]},
+        {"p": "Leping ja puhkus", "s": "Tööandja sõlmib kirjaliku töö- või töövõtulepingu ja määrab juhendaja. Töölepinguga abiarstil on põhipuhkus töölepingu seaduse järgi; kollektiivlepingu lisapuhkus (7 või 5 kalendripäeva) kehtib ainult Eesti Haiglate Liidu ja Eesti Kiirabi Liidu liikmetest tööandjate juures.",
+         "allikas": ["ea-abiarst-2026", "tkl-2025"]},
+        {"p": "Ligipääsud", "s": "Määrus annab abiarstile juurdepääsu tervise infosüsteemi patsiendiandmetele, sh eriliiki andmetele. Oma kontoga pääseb ta digiloole alates 2021. aastast, kui ta on asutusega seotud; 2026. aasta sügisest näeb ta ka retseptikeskuses varem välja kirjutatud retsepte.",
+         "allikas": [["osalejad", "§ 3"], "eays-abiarst", "ea-abiarst-2026"],
+         "kontroll": [["osalejad", "§ 3", "juurdepääs tervise infosüsteemis olevatele patsiendi isikuandmetele, sealhulgas eriliiki isikuandmetele"]]},
+        {"p": "Nimistu suurus", "s": "Abiarst ei ole arsti kvalifikatsiooniga tervishoiutöötaja, seega ei võimalda ta nimistu ülempiiri tõsta 2400-le.",
+         "allikas": [["ttks", "§ 8"]],
+         "kontroll": [["ttks", "§ 8", "osutab perearstiabi koos perearstiga vähemalt üks arsti kvalifikatsiooniga tervishoiutöötaja"]]},
+        {"p": "Oskuste päevik", "s": "Abiarstidele ühtset oskuste päevikut ega pädevusloendit avalikult ei ole (seis 17.10.2026). 6. kursuse üliõpilasel on praktikapäevik oma praktiliste oskuste peatükiga (vt „6. kursuse praktika“).",
+         "allikas": ["eays-abiarst", "tu-praktika-oskused"]}
+      ],
+      "erinevused": [
+        {"s": "Sõna „abiarst“ kasutatakse perearstikeskustes ka nimistuta arstide kohta, kuid kollektiivleping käsitleb abiarstina ainult arstiõppe üliõpilast (p 1.1.4).",
+         "allikas": ["ea-abiarst-2026", "tkl-2025"]},
+        {"s": "Mitmes PDF-allikas (nt kollektiivlepingu varasemates versioonides) on viide kujul „TTKS § 43“; Riigi Teatajas on see § 4³ (ülaindeks on kadunud). TTKS § 43 käsitleb tegevusloa väljaandmist.",
+         "allikas": [["ttks", "§ 4³"]]}
+      ],
+      "lingid": ["eays-abiarst", "ea-abiarst-2026", "tkl-2025"]
     }
   ]
 }

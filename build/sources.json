@@ -45,7 +45,8 @@
       "§ 8",
       "§ 8¹",
       "§ 7",
-      "§ 35"
+      "§ 35",
+      "§ 4³"
     ]
   },
   "tvl": {
@@ -187,6 +188,15 @@
       "§ 7",
       "§ 12",
       "§ 13"
+    ]
+  },
+  "osalejad": {
+    "nimi": "Tervishoiuteenuse osutamisel osalevad isikud ja tervise infosüsteemile juurdepääsu ulatus",
+    "lyh": "Osalejate määrus",
+    "grupiId": 1046612,
+    "par": [
+      "§ 2",
+      "§ 3"
     ]
   }
 }

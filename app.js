@@ -35,6 +35,7 @@
     'Nakkushaigused ja vaktsineerimine': 'tg-nakk',
     'Ravimid, suunamine ja hüvitised': 'tg-rav',
     'Töökorraldus ja nimistu': 'tg-tk',
+    'Residendid, praktikandid ja abiarstid': 'tg-ope',
   };
   const tgCls = (g) => TEEMA_GRP[g] || '';
   const FUND_HELP = {
@@ -42,12 +43,19 @@
     f13: 'Füsioteraapia, massaaž, psühholoog, psühhoteraapia ja logopeed kuni 13% ulatuses nimistu pearahadeks arvestatud summast aastas.',
     lisaks: 'Tasutakse raviarvega lisaks pearahale, tervishoiuteenuste loetelu piirhinna alusel. Protsendilist piirmäära sellel lõikel ei ole.',
   };
+  // Avalehe fondikaardi lühitekst (sama pikk kui teistel fondidel); täistekst jääb teenuse ja fondi vaatesse.
+  const FUND_HELP_SHORT = {
+    f13: 'Tasutakse kuni 13% ulatuses nimistu pearahadeks arvestatud summast aastas',
+  };
   // Fondi tasumise tingimus (metoodika § 6 lg 9); ehitaja lisab fondile välja cond, kui säte on kehtivas tekstis alles.
   const FUND_COND = 'Tasutakse ainult siis, kui teenust osutab perearstiabi osutaja ise (äriühing või FIE, mille kaudu perearst tegutseb), mitte teise asutusse suunamisel.';
   const lgPar = (p) => String(p || '').replace(/\s*\(([^)]+)\)$/, ' lg $1');
-  // links=false nupu sees (nupu sisse linki panna ei saa).
-  function fundHelp(k, links) {
+  // links=false nupu sees (nupu sisse linki panna ei saa); short=true avalehe kaardil.
+  function fundHelp(k, links, short) {
     const fi = state.data && state.data.items.find((x) => x.t === 'f' && x.k === k);
+    if (short && FUND_HELP_SHORT[k]) {
+      return esc(FUND_HELP_SHORT[k]) + (fi && fi.cond ? `; ainult kui teenust osutab perearsti enda ettevõte (${esc(lgPar(fi.cond.par))}).` : '.');
+    }
     let h = esc(FUND_HELP[k] || '');
     if (fi && fi.cond) {
       h += ` ${esc(FUND_COND)}` + (links
@@ -714,6 +722,15 @@
       if (it.muud) h += `<div><dt>Esineb ka</dt><dd>${it.muud.map((m) => esc(m.par)).join(', ')}</dd></div>`;
       h += '</dl>';
       if (it.tmis) h += `<p class="note">Toru failis on selle koodi hind ${fmtEur(it.tp.p)}, mis erineb kehtivast loetelust. Õiguslikult kehtib loetelu hind.</p>`;
+      // Tingimused on igapäevatöös vajalikum info, seepärast enne standardkulu.
+      if (it.r && it.r.length) {
+        h += '<div class="rules"><h4>Tingimused ja seotud sätted</h4>';
+        for (const ri of it.r) {
+          const rr = d.rules[ri];
+          h += `<div class="rule"><span class="ref">${esc(srcName(rr.src))} ${esc(rr.par)}</span>${hl(rr.s, re)} <a href="${esc(rr.url)}" target="_blank" rel="noopener">↗</a></div>`;
+        }
+        h += '</div>';
+      }
       const ku = d.kulu && d.kulu.c && d.kulu.c[it.c];
       if (ku) h += kuluHtml(it, ku);
       const labs = state.labsByCode[it.c] || [];
@@ -723,14 +740,6 @@
         h += `<div class="rules"><h4>SYNLABi analüüsid selle koodiga (${labs.length})</h4><div class="labs">`
           + shown.map((lb) => `<button class="btn" data-q="${esc(lb.ab || lb.n)}" title="${esc(lb.n)}">${esc(lb.n)}${lb.ab ? ' · ' + esc(lb.ab) : ''}</button>`).join('')
           + (showAll ? '' : `<button class="btn solid" data-labs-all="${esc(it.c)}">Näita kõiki ${labs.length}</button>`) + '</div></div>';
-      }
-      if (it.r && it.r.length) {
-        h += '<div class="rules"><h4>Tingimused ja seotud sätted</h4>';
-        for (const ri of it.r) {
-          const rr = d.rules[ri];
-          h += `<div class="rule"><span class="ref">${esc(srcName(rr.src))} ${esc(rr.par)}</span>${hl(rr.s, re)} <a href="${esc(rr.url)}" target="_blank" rel="noopener">↗</a></div>`;
-        }
-        h += '</div>';
       }
       return h;
     }
@@ -879,7 +888,7 @@
       const links = [...(it.lisad || []).map((x) => ({ n: 'Lisa: ' + x.n, u: x.u })), ...(it.l || [])];
       if (links.length) h += `<div class="actions">${links.map((x) => `<a href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.n)} ↗</a>`).join('')}</div>`;
       const tm = d.meta.teemad || {};
-      h += `<p class="small">Kokkuvõte on koostatud allikate põhjal (kontrollitud ${fmtDate(tm.kontrollitud)}). Automaatkontroll võrdleb igal kuul viidatud sätete teksti; õiguslikult kehtib alati allikas.</p>`;
+      h += `<p class="small">Kokkuvõte on koostatud allikate põhjal (kontrollitud ${fmtDate(it.kk || tm.kontrollitud)}). Automaatkontroll võrdleb igal kuul viidatud sätete teksti; õiguslikult kehtib alati allikas.</p>`;
       return h;
     }
     if (it.t === 'u') return uDetail(it);
@@ -965,7 +974,7 @@
       const it = q(src, par);
       return it ? `<button class="qbtn ${cls}" data-focus="${it._id}"><b>${esc(t)}</b><small>${esc(srcName(src))} ${esc(par)} · ${esc(sub)}</small></button>` : '';
     }).join('');
-    const ex = ['holter', 'IGRA', 'HCV', 'jalaortoos', '7115', 'hüpertoonia', '1966', 'haigusleht', 'P21', 'relvaluba', 'meremees', 'nakkushaiguse teatis', 'õe retsept', 'hambaravihüvitis', 'e-konsultatsioon', 'ratastool', 'juhiload'];
+    const ex = ['holter', 'IGRA', 'HCV', 'jalaortoos', '7115', 'hüpertoonia', '1966', 'haigusleht', 'P21', 'relvaluba', 'meremees', 'nakkushaiguse teatis', 'õe retsept', 'hambaravihüvitis', 'e-konsultatsioon', 'ratastool', 'juhiload', 'residendi puhkus', 'abiarst'];
     const tj = d.items.filter((x) => x.t === 'j');
     const groups = [...new Set(tj.map((x) => x.g))];
     // Juhi tervisetõend on tervisetõendite rühmas esimene, eraldi 1. ja 2. grupp (määruse § 2 lg 2; „kategooria“ on juhiloa A, B, C jne).
@@ -1004,7 +1013,7 @@
       .map((x) => `<button class="qbtn ks" data-focus="${x._id}"><b>${esc(x.k === 'ylevaade' ? 'Ülevaade ja lisatasud' : x.sn)}</b><small>${esc(KS_CAT[x.cat])}${ksValue(x) ? ' · ' + esc(ksValue(x)) : ''} · ${esc(x.par)}</small></button>`).join('');
     el.results.innerHTML = `
       <section class="section"><h2>Rahastus (metoodika § 6)</h2><div class="funds">
-        ${funds.map((f) => `<button class="fund ${f.k}" data-fund="${f.k}"><strong>${esc(f.n)}</strong><span>${fundHelp(f.k, false)}</span><span class="cnt">${f.cnt} teenust · ${esc(f.par)}</span></button>`).join('')}
+        ${funds.map((f) => `<button class="fund ${f.k}" data-fund="${f.k}"><strong>${esc(f.n)}</strong><span>${fundHelp(f.k, false, true)}</span><span class="cnt">${f.cnt} teenust · ${esc(f.par)}</span></button>`).join('')}
       </div>${ftl ? `<p class="fundlink"><a href="${esc(ftl.u)}" target="_blank" rel="noopener">Perearstide fondide täitmised (Tervisekassa) ↗</a></p>` : ''}</section>
       ${teemaHtml}
       <section class="section"><h2>Kvaliteedisüsteem (metoodika § 8)</h2><div class="quick">${ksCards}</div></section>
@@ -1017,7 +1026,7 @@
       <section class="section"><h2>Värvid</h2><div class="legend">
         <span><i style="--k:var(--c-f37)"></i>uuringufond 37%</span><span><i style="--k:var(--c-lisaks)"></i>tegevusfond</span><span><i style="--k:var(--c-f13)"></i>teraapiafond 13%</span>
         <span><i style="--k:var(--c-teenus)"></i>muu teenus</span><span><i style="--k:var(--c-abiv)"></i>abivahend</span><span><i style="--k:var(--c-sate)"></i>säte</span><span><i style="--k:var(--c-ks)"></i>kvaliteedisüsteem</span><span><i style="--k:var(--c-lab)"></i>SYNLABi analüüs</span><span><i style="--k:var(--c-ms)"></i>meditsiiniseade</span><span><i style="--k:var(--c-soel)"></i>sõeluuring</span><span><i style="--k:var(--c-muutus)"></i>muudatus (seadused, määrused)</span>
-        <b class="legend-h">Igapäevatöö reeglid</b><span><i style="--k:var(--c-g-too)"></i>töövõimetus</span><span><i style="--k:var(--c-g-toend)"></i>tervisetõendid, sh juhi tervisenõuded</span><span><i style="--k:var(--c-g-nakk)"></i>nakkushaigused ja vaktsineerimine</span><span><i style="--k:var(--c-g-rav)"></i>ravimid, suunamine ja hüvitised</span><span><i style="--k:var(--c-g-tk)"></i>töökorraldus ja nimistu</span>
+        <b class="legend-h">Igapäevatöö reeglid</b><span><i style="--k:var(--c-g-too)"></i>töövõimetus</span><span><i style="--k:var(--c-g-toend)"></i>tervisetõendid, sh juhi tervisenõuded</span><span><i style="--k:var(--c-g-nakk)"></i>nakkushaigused ja vaktsineerimine</span><span><i style="--k:var(--c-g-rav)"></i>ravimid, suunamine ja hüvitised</span><span><i style="--k:var(--c-g-tk)"></i>töökorraldus ja nimistu</span><span><i style="--k:var(--c-g-ope)"></i>residendid, praktikandid ja abiarstid</span>
       </div></section>
       <section class="section info"><h2>Kasutamine</h2>
         <p>Otsi nimetuse, koodi, lühendi või argisõnaga (nt „holter“, „TSH“, „6417“). Täpitähti pole vaja. Koodil klõpsates kopeerub see.</p>
@@ -1026,7 +1035,7 @@
         <p>Sünniaasta otsing (nt „1966“) näitab, millise rinna-, emakakaela- või soolevähi sõeluuringu sihtrühma inimene sel aastal kuulub. Sünniaastad tulevad terviseportaalist ja neid kontrollitakse kord kuus.</p>
         <p>„Mis muutus“ (avalehe lõpus) näitab iga jälgitava seaduse ja määruse viimase aasta jooksul jõustunud ja juba avaldatud tulevasi redaktsioone: uued ja kadunud koodid, hinnamuutused, fondide koodid ning muutunud sätete varasem ja uus sõnastus (muutunud sõnad on esile tõstetud).</p>
         <p>Teenuse koodi avades on näha ka „Mis on hinnas“: metoodika standardkulu lisa järgi personal (sh arsti minutid), ruumid, seadmed ja materjalid.</p>
-        <p>„Igapäevatöö reeglid“ koondavad haigus- ja hoolduslehe, P21, tervisetõendite, nakkushaiguse teatiste, vaktsineerimise, retseptide, e-konsultatsiooni, patsiendi hüvitiste, töökorralduse ja nimistu põhireeglid; igal rühmal on oma värv. Iga punkti juures on viide sättele; ⚠ märgib allikate omavahelisi erinevusi. Otsida võib ka küsimusena (nt „kui kaua makstakse haigushüvitist“).</p>
+        <p>„Igapäevatöö reeglid“ koondavad haigus- ja hoolduslehe, P21, tervisetõendite, nakkushaiguse teatiste, vaktsineerimise, retseptide, e-konsultatsiooni, patsiendi hüvitiste, töökorralduse ja nimistu põhireeglid ning peremeditsiini residentuuri, 6. kursuse praktika ja abiarsti info (palk, tööaeg, puhkus, juhendamine); igal rühmal on oma värv. Iga punkti juures on viide sättele; ⚠ märgib allikate omavahelisi erinevusi. Otsida võib ka küsimusena (nt „kui kaua makstakse haigushüvitist“).</p>
         <p>Linnuke „Ainult perearstiabi“ peidab teenused, mis ei kuulu perearsti fondidesse, kvaliteedisüsteemi ega perearstiabi peatükki (nt operatsioonid). Täpse koodi otsing näitab koodi alati.</p>
         <p>Rakendus töötab pärast esimest avamist ka võrguta. Telefonis lisa see avakuvale: iPhone'is Safari jagamismenüü → „Lisa avakuvale“, Androidis Chrome'i menüü → „Installi rakendus“.</p>
         <p>Andmed tulevad Riigi Teataja avalikust liidesest ja neid kontrollitakse automaatselt kord kuus. Õiguslikult kehtib alati Riigi Teatajas avaldatud tekst.</p>

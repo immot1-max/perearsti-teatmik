@@ -27,7 +27,7 @@
   --c-teema: #34495e;
   --c-muutus: #1565c0;
   /* Igapäevatöö reeglite rühmad */
-  --c-g-too: #8a6d00; --c-g-toend: var(--c-juhi); --c-g-nakk: #8e3a9d; --c-g-rav: #007b86; --c-g-tk: #34495e;
+  --c-g-too: #8a6d00; --c-g-toend: var(--c-juhi); --c-g-nakk: #8e3a9d; --c-g-rav: #007b86; --c-g-tk: #34495e; --c-g-ope: #7a4a2a;
 
   --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -42,7 +42,7 @@
     --accent: #8fc0dc; --accent-ink: #0f1513; --mark: #6b5310; --warn-bg: #3a2c0c; --warn-ink: #f3cf85;
     --c-f37: #6cc48c; --c-lisaks: #e3a646; --c-f13: #b39be8; --c-teenus: #7fb3d1; --c-abiv: #4fc7c2;
     --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a; --c-soel: #aaa3f5; --c-teema: #c3d0dd; --c-muutus: #6cb2f2;
-    --c-g-too: #e0c050; --c-g-toend: var(--c-juhi); --c-g-nakk: #d39be0; --c-g-rav: #4fc3d0; --c-g-tk: #c3d0dd;
+    --c-g-too: #e0c050; --c-g-toend: var(--c-juhi); --c-g-nakk: #d39be0; --c-g-rav: #4fc3d0; --c-g-tk: #c3d0dd; --c-g-ope: #d9a679;
     color-scheme: dark;
   }
 }
@@ -51,7 +51,7 @@
   --accent: #8fc0dc; --accent-ink: #0f1513; --mark: #6b5310; --warn-bg: #3a2c0c; --warn-ink: #f3cf85;
   --c-f37: #6cc48c; --c-lisaks: #e3a646; --c-f13: #b39be8; --c-teenus: #7fb3d1; --c-abiv: #4fc7c2;
   --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a; --c-soel: #aaa3f5; --c-teema: #c3d0dd; --c-muutus: #6cb2f2;
-    --c-g-too: #e0c050; --c-g-toend: var(--c-juhi); --c-g-nakk: #d39be0; --c-g-rav: #4fc3d0; --c-g-tk: #c3d0dd;
+    --c-g-too: #e0c050; --c-g-toend: var(--c-juhi); --c-g-nakk: #d39be0; --c-g-rav: #4fc3d0; --c-g-tk: #c3d0dd; --c-g-ope: #d9a679;
   color-scheme: dark;
 }
 
@@ -108,6 +108,7 @@ button { font: inherit; color: inherit; }
 .tg-nakk { --c-teema: var(--c-g-nakk); }
 .tg-rav { --c-teema: var(--c-g-rav); }
 .tg-tk { --c-teema: var(--c-g-tk); }
+.tg-ope { --c-teema: var(--c-g-ope); }
 .srcs { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-top: 4px; }
 .badge.srcb { color: var(--accent); background: transparent; cursor: pointer; font: inherit; font-size: 0.72rem; font-weight: 500; text-decoration: none; border-style: dotted; }
 .rule.changed { border-left: 3px solid var(--warn-ink); padding-left: 8px; }
