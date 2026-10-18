@@ -386,6 +386,25 @@
       + `<a class="btn" href="${esc(FEEDBACK_URL(q))}" target="_blank" rel="noopener">Ei leidnud? Anna teada ↗</a>`
       + '<small>Avaneb GitHubi tagasisidevorm (vajab GitHubi kontot), otsisõna on juba sees. Puuduvad sõnad lisatakse sünonüümidesse.</small></div>';
   }
+  // Kategooria- ja fondivaade (ilma otsinguta) näitab kirjeid rühmade kaupa.
+  const isGrouped = (hasQ) => !hasQ && !!(state.fund || ['a', 'l', 'q', 'b', 's', 'm', 'j', 'u'].includes(state.filter));
+  function groupKey(it) {
+    if (it.t === 'u') return it.tul ? 'Tulekul: avaldatud, veel jõustumata' : 'Jõustunud viimase aasta jooksul';
+    if (it.t === 'j') return it.g;
+    if (it.t === 'm') return 'Tervisekassa meditsiiniseadmed';
+    if (it.t === 'a') return (it.g || [])[0] || it.n;
+    if (it.t === 'l') return srcName(it.src);
+    if (it.t === 'f') return 'Fondid';
+    if (it.t === 'q') return KS_CAT[it.cat];
+    if (it.t === 'b') return it.cat;
+    return it.pt || (it.tp && it.tp.hk) || srcName(it.src);
+  }
+  // Mitu kirjet näidata: kui üle piiri jääks kuni kolmandik piirist, näidatakse kohe kõik
+  // (nt meditsiiniseadmed 64 → kõik 64, mitte 60 + „Näita veel 4“).
+  function cutAt(limit, total) {
+    const rest = total - limit;
+    return rest > 0 && rest <= Math.ceil(limit / 3) ? total : Math.min(limit, total);
+  }
   function route() {
     const r = el.results;
     const q = state.q.trim();
@@ -420,10 +439,18 @@
       }
       if (state.filter === 'q') list.sort((a, b) => KS_ORDER.indexOf(a.it.cat) - KS_ORDER.indexOf(b.it.cat));
       if (state.filter === 'u') list.sort(uOrder);
+      // Sorteerida tuleb enne lõikamist, muidu „Näita veel“ segab uued kirjed varem näidatute vahele.
+      if (state.filter === 'm') list.sort((a, b) => a.it.n.localeCompare(b.it.n, 'et'));
+      if (isGrouped(false)) {
+        // Sama rühma kirjed kokku esmakordse esinemise järjekorras, et rühma pealkiri ei korduks.
+        const first = new Map();
+        list.forEach((x, i) => { const g = groupKey(x.it); if (!first.has(g)) first.set(g, i); });
+        list.sort((a, b) => first.get(groupKey(a.it)) - first.get(groupKey(b.it)));
+      }
     }
     if (state.pin != null) list = list.filter((x) => x.it._id !== state.pin);
     const total = list.length;
-    const shown = list.slice(0, state.limit);
+    const shown = list.slice(0, cutAt(state.limit, total));
     let html = '';
     const fundItem = state.fund ? state.data.items.find((x) => x.t === 'f' && x.k === state.fund) : null;
     if (fundItem) {
@@ -441,18 +468,17 @@
       if (q && (state.fund || state.filter !== 'all')) html += '<button class="btn solid" data-act="all">Otsi kõigist kategooriatest</button>';
     } else {
       html += '<div class="list">';
-      const grouped = !q && (state.fund || ['a', 'l', 'q', 'b', 's', 'm', 'j', 'u'].includes(state.filter));
-      if (!q && state.filter === 'm') shown.sort((a, b) => a.it.n.localeCompare(b.it.n, 'et'));
+      const grouped = isGrouped(!!q);
       let lastG = null;
       for (const x of shown) {
         if (grouped) {
-          const g = x.it.t === 'u' ? (x.it.tul ? 'Tulekul: avaldatud, veel jõustumata' : 'Jõustunud viimase aasta jooksul') : x.it.t === 'j' ? x.it.g : x.it.t === 'm' ? 'Tervisekassa meditsiiniseadmed' : x.it.t === 'a' ? (x.it.g || [])[0] || x.it.n : x.it.t === 'l' ? srcName(x.it.src) : x.it.t === 'f' ? 'Fondid' : x.it.t === 'q' ? KS_CAT[x.it.cat] : x.it.t === 'b' ? x.it.cat : x.it.pt || (x.it.tp && x.it.tp.hk) || srcName(x.it.src);
+          const g = groupKey(x.it);
           if (g !== lastG) { html += `<div class="group-h">${esc(g)}</div>`; lastG = g; }
         }
         html += row(x.it, x.via);
       }
       html += '</div>';
-      if (total > shown.length) html += `<button class="btn more" data-act="more">Näita veel ${Math.min(60, total - shown.length)}</button>`;
+      if (total > shown.length) html += `<button class="btn more" data-act="more">Näita veel ${cutAt(state.limit + 60, total) - shown.length}</button>`;
     }
     if (q) html += notFoundHtml(q, !total && !yCard);
     html += pinHtml();
