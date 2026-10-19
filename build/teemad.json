@@ -60,7 +60,28 @@
     "tu-praktika-oskused": {"n": "Praktikapäevik: praktilised oskused 2023/24 (PDF)", "u": "https://meditsiiniteadused.ut.ee/sites/default/files/2023-06/6-praktilised_oskused_2023-24_0.pdf"},
     "tu-praktika-juhend": {"n": "TÜ: praktika juhendamine meditsiiniteaduste valdkonnas, juhendmaterjal (PDF)", "u": "https://meditsiiniteadused.ut.ee/sites/default/files/inline-files/praktika_juhendamine_ty_meditsiiniteaduste_valdkonnas.pdf"},
     "eays-abiarst": {"n": "Eesti Arstiteadusüliõpilaste Selts: abiarstindus", "u": "https://eays.ee/abiarstindus"},
-    "ea-abiarst-2026": {"n": "Eesti Arst 2026;105(5):227, juhtkiri „Abiarst“ (PDF)", "u": "https://ojs.utlib.ee/index.php/EA/article/download/26854/20310/43171"}
+    "ea-abiarst-2026": {"n": "Eesti Arst 2026;105(5):227, juhtkiri „Abiarst“ (PDF)", "u": "https://ojs.utlib.ee/index.php/EA/article/download/26854/20310/43171"},
+    "rt-koolivaheajad-45": {"n": "Haridus- ja teadusministri määrus nr 45 „2024/2025., 2025/2026. ja 2026/2027. õppeaasta koolivaheajad“ (Riigi Teataja)", "u": "https://www.riigiteataja.ee/akt/119032025005"},
+    "rt-koolivaheajad-36": {"n": "Haridus- ja teadusministri määrus nr 36 „2027/2028., 2028/2029. ja 2029/2030. õppeaasta koolivaheajad“ (RT I, 04.08.2026, 22)", "u": "https://www.riigiteataja.ee/akt/104082026022"},
+    "hm-koolivaheajad": {"n": "Haridus- ja Teadusministeerium: järgmise kolme õppeaasta koolivaheajad on kinnitatud", "u": "https://hm.ee/uudised/haridus-ja-teadusministeerium-kinnitas-jargmise-kolme-oppeaasta-koolivaheajad-1"},
+    "err-koolivaheajad-plaan": {"n": "ERR 28.05.2026: ülejärgmisel õppeaastal lõpeb talvine koolivaheaeg juba 2. jaanuaril (plaan)", "u": "https://www.err.ee/1610040062/ulejargmisel-oppeaastal-lopeb-talvine-koolivaheaeg-juba-2-jaanuaril"},
+    "rj-eek2": {"n": "EEK-2 küsimustik ja tulemuste tõlgendamine (ravijuhend.ee, PDF)", "u": "https://www.ravijuhend.ee/uploads/userifles/Unehaired/EEK-2.pdf"},
+    "ea-depr-2011": {"n": "Depressiooni ravijuhend perearstidele, Eesti Arst 2011;90(9), lisa 3: EEK-2 eesti ja vene keeles (PDF)", "u": "https://ojs.utlib.ee/index.php/EA/article/download/10860/6045/"},
+    "peaasi-test": {"n": "Peaasi.ee: emotsionaalse enesetunde test", "u": "https://peaasi.ee/enesetundetest/"},
+    "hik-eek2": {"n": "TÜ tervise ja heaolu hindamisvahendite kompetentsikeskus: EEK-2", "u": "https://hik.ut.ee/emotsiaalse-enesetunde-kusimustik-eek-2/"},
+    "rj-ath": {"n": "Ravijuhend „Aktiivsus- ja tähelepanuhäire diagnoosimise ning ravi põhimõtted“ (RJ-F/69.1-2023)", "u": "https://ravijuhend.ee/tervishoiuvarav/juhendid-gp/29/aktiivsus-ja-tahelepanuhaire-diagnoosimise-ning-ravi-pohimotted"},
+    "lh-lvtk": {"n": "Tallinna Lastehaigla: Laste Vaimse Tervise Keskus (küsimustikud)", "u": "https://www.lastehaigla.ee/kliinikud/laste-vaimse-tervise-keskus/meist"},
+    "rj-une": {"n": "Ravijuhend „Täiskasvanute unehäirete esmane diagnostika“ (RJ-G/28.1-2018)", "u": "https://ravijuhend.ee/tervishoiuvarav/juhendid/193/taiskasvanute-unehairete-esmane-diagnostika"},
+    "rj-une-pj": {"n": "Patsiendijuhend „Unehäired. Infomaterjal patsientidele“", "u": "https://ravijuhend.ee/patsiendivarav/juhendid/179/unehaired-infomaterjal-patsientidele"},
+    "rj-migreen-pj": {"n": "Patsiendijuhend „Migreeni diagnoosimine ja ravi“", "u": "https://ravijuhend.ee/patsiendivarav/juhendid/238/migreeni-diagnoosimine-ja-ravi"},
+    "arst-migreen-rj": {"n": "Migreeni ravijuhend (RJ-G/61.1-2022), tekst Arst.ee-s", "u": "https://arst.ee/haigused-ja-seisundid/migreen-ravijuhend/"},
+    "apotheka-migrevention": {"n": "Apotheka: Migreventioni digitaalne peavalupäevik", "u": "https://www.apotheka.ee/terviseinfo/migrevention-peavalupaevik"},
+    "kk-urodyn": {"n": "TÜ Kliinikum: urodünaamiline uuring (urineerimispäevik)", "u": "https://www.kliinikum.ee/patsiendiinfo-andmebaas/urodunaamiline-uuring/"},
+    "teresa-kys": {"n": "Teresa: küsimustikud ja päevikud (urineerimispäevik)", "u": "https://teresa.ee/kasulik/kusimustikud-ja-paevikud/"},
+    "kuivaks-kys": {"n": "Kuivaks: küsimustikud ja päevikud (uriinipidamatus, enurees)", "u": "https://kuivaks.ee/uriinipidamatus/kusimustikud-ja-paevikud/"},
+    "tai-audit": {"n": "Tervise Arengu Instituut: AUDIT, test alkoholi tarvitamise hindamiseks (PDF)", "u": "https://tai.ee/sites/default/files/2021-03/146943581485_AUDIT_test_est.pdf"},
+    "tk-alko-juhend": {"n": "Tervisekassa: alkoholitarvitamise häire ennetus ja nõustamine esmatasandil, juhend 2023 (PDF)", "u": "https://haigekassa.ee/sites/default/files/ennetusedendus/2023_02_21_alkoholitarvitamise_haire_ennetus_ja_noustamine_esmatasandil_juhend.pdf"},
+    "kliinik-testid": {"n": "Kliinik.ee: testid (veebis täidetavad küsimustikud)", "u": "https://www.kliinik.ee/testid"}
   },
   "teemad": [
     {
@@ -546,6 +567,207 @@
       "lingid": ["tk-hambaravi", "tk-proteesid", "tk-taiendav", "tk-ravimihuvitis"]
     },
     {
+      "k": "kys-meeleolu",
+      "kontrollitud": "2026-10-19",
+      "grupp": "Küsimustikud ja päevikud",
+      "n": "Meeleolu ja ärevus: EEK-2 ja Peaasi enesetundetest",
+      "sn": "EEK-2",
+      "seotud": ["kys-uni", "kys-alkohol"],
+      "syn": ["EEK", "EEK-2", "EEK2", "emotsionaalse enesetunde küsimustik", "enesetundetest", "enesetunde test", "depressioon", "depressiooni test", "depressiooni küsimustik", "ärevus", "ärevuse test", "ärevushäire", "paanikahäire", "sotsiaalfoobia", "asteenia", "meeleolu", "küsimustik", "küsimustik vene keeles", "Peaasi", "опросник", "ЕЕК-2"],
+      "tabelid": [
+        {"n": "Vormid ja testid",
+         "pais": ["Vorm", "Eesti", "Vene", "Inglise"],
+         "read": [
+           ["EEK-2 paberivorm koos tulemuste tõlgendamisega", ["PDF", "https://www.ravijuhend.ee/uploads/userifles/Unehaired/EEK-2.pdf"], "–", "–"],
+           ["EEK-2 eesti ja vene keeles (depressiooni ravijuhend perearstidele 2011, lisa 3)", ["PDF", "https://ojs.utlib.ee/index.php/EA/article/download/10860/6045/"], ["PDF", "https://ojs.utlib.ee/index.php/EA/article/download/10860/6045/"], "–"],
+           ["Peaasi.ee enesetundetest (lühendatud EEK, veebis, tagasisidega)", ["veebis", "https://peaasi.ee/enesetundetest/?l=et"], ["veebis", "https://peaasi.ee/enesetundetest/?l=ru"], ["online", "https://peaasi.ee/enesetundetest/?l=en"]]
+         ],
+         "markus": "Eesti Arsti 2011. aasta PDF-is on eesti- ja venekeelne vorm samas failis.",
+         "allikas": ["rj-eek2", "ea-depr-2011", "peaasi-test"]}
+      ],
+      "read": [
+        {"p": "Ülesehitus", "s": "28 küsimust, igaüks 0–4 punkti selle järgi, kuivõrd probleem on viimase kuu jooksul häirinud. Eestis loodud (Aluoja jt 1999) ja valideeritud; sobib alates 15. eluaastast, keeled eesti ja vene.",
+         "allikas": ["rj-eek2", "hik-eek2", "rj-une"]},
+        {"p": "Tõlgendamine", "s": "Alaskaalade summad: depressioon (küsimused 1–8) üle 11; üldine ärevus (9–14) üle 11; paanikahäire ja agorafoobia (15–19) üle 6; sotsiaalfoobia (20–21) üle 3; asteenia ehk vaimne kurnatus (22–25) üle 6; unehäired (26–28) üle 5.",
+         "allikas": ["rj-eek2"]},
+        {"p": "Peaasi enesetundetest", "s": "Peaasi.ee veebitest on EEK lühendatud versioon (25 küsimust, lagedakartuse küsimusi EEK-2 16–19 ei ole) ja annab üldise tagasiside koos soovitustega. Test ei võimalda diagnoosi; vastused kogutakse anonüümselt.",
+         "allikas": ["peaasi-test"]}
+      ],
+      "erinevused": [
+        {"s": "EEK-2 tõlgendusjuhendi järgi viitab unehäirele küsimuste 26–28 summa üle 5, unehäirete ravijuhendi järgi on unetus tõenäoline, kui summa on ≥ 5.",
+         "allikas": ["rj-eek2", "rj-une"]}
+      ],
+      "lingid": ["rj-eek2", "ea-depr-2011", "peaasi-test", "hik-eek2"]
+    },
+    {
+      "k": "kys-ath",
+      "kontrollitud": "2026-10-19",
+      "grupp": "Küsimustikud ja päevikud",
+      "n": "ATH: SNAP-IV-26 lapsevanemale ja õpetajale",
+      "sn": "SNAP-IV (ATH)",
+      "seotud": ["ekons", "kys-meeleolu"],
+      "syn": ["SNAP", "SNAP-IV", "SNAP IV", "SNAP-IV-26", "ATH", "ADHD", "aktiivsus- ja tähelepanuhäire", "tähelepanuhäire", "hüperaktiivsus", "keskendumisraskus", "ASRS", "ASRS-5", "lastepsühhiaater", "lastepsühhiaatria anamnees", "Lastehaigla", "LVTK", "Rajaleidja", "kooli iseloomustus", "õpetaja küsimustik"],
+      "tabelid": [
+        {"n": "Vormid",
+         "pais": ["Vorm", "Eesti", "Vene", "Inglise"],
+         "read": [
+           ["SNAP-IV-26 küsimustik lapsevanemale ja õpetajale (Tallinna Lastehaigla)", ["PDF", "https://www.lastehaigla.ee/sites/default/files/documents/2025-02/SNAP-IV-26%20k%C3%BCsimustik%20lapsevanemale%20ja%20%C3%B5petajale_0.pdf"], "–", "–"],
+           ["Lastepsühhiaatria anamnees vanemale (Tallinna Lastehaigla)", ["PDF", "https://www.lastehaigla.ee/sites/default/files/documents/2025-02/VLP%20anamnees%20vanemale.pdf"], "–", "–"]
+         ],
+         "allikas": ["lh-lvtk"]}
+      ],
+      "read": [
+        {"p": "Ravijuhend", "s": "Tähelepanu- ja/või käitumisprobleemidega 6–17-aastasel võib ATH väljaselgitamiseks lisaks kliinilisele hindamisele kasutada küsimustikku SNAP-IV 26 (nõrk soovitus). Tundlikkus 70–96,5%, spetsiifilisus 26–82%.",
+         "allikas": ["rj-ath"]},
+        {"p": "Valideerimine", "s": "SNAP-IV ei ole Eestis valideeritud; eestikeelne küsimustik lisatakse ravijuhendile, kui see on kättesaadav. Täiskasvanutele soovitatud ASRS-5 ei ole Eestis valideeritud ega eesti keeles kättesaadav.",
+         "allikas": ["rj-ath"]},
+        {"p": "Lastehaigla", "s": "Laste Vaimse Tervise Keskusesse pöördutakse perearsti e-konsultatsiooniga. ATH kahtlusel palutakse SNAP-i täita nii vanemal kui ka lapse õpetajal ning võtta esmasele vastuvõtule kaasa lasteaia või kooli iseloomustus.",
+         "allikas": ["lh-lvtk"]},
+        {"p": "Rajaleidja", "s": "Kui raskused on lasteaias või koolis (õppetöö, kohanemine, käitumine), soovitab Lastehaigla pöörduda esmalt Rajaleidja keskusesse. Rajaleidja suunab vajadusel perearsti juurde, kes lisab info lapse arengu ja tervise kohta ning koostab e-konsultatsiooni lastepsühhiaatrile.",
+         "allikas": ["lh-lvtk"]}
+      ],
+      "lingid": ["rj-ath", "lh-lvtk"]
+    },
+    {
+      "k": "kys-uni",
+      "kontrollitud": "2026-10-19",
+      "grupp": "Küsimustikud ja päevikud",
+      "n": "Uni: unepäevik, Epworthi skaala, STOP-BANG, ISI ja PSQI",
+      "sn": "Unepäevik ja uneküsimustikud",
+      "seotud": ["kys-meeleolu"],
+      "syn": ["unepäevik", "une päevik", "unetus", "uni", "unehäire", "unehäired", "unisus", "päevane unisus", "liigunisus", "Epworth", "Epworthi skaala", "ESS", "unisuse test", "STOP-BANG", "STOPBANG", "STOP BANG", "uneapnoe", "norskamine", "ISI", "PSQI", "Flinders", "väsimus", "SDS-CL-25", "дневник сна", "бессонница"],
+      "tabelid": [
+        {"n": "Vormid ja testid",
+         "pais": ["Vorm", "Eesti", "Vene", "Inglise"],
+         "read": [
+           ["Unepäevik koos täitmise juhendi ja näidisega (ravijuhend)", ["PDF", "https://www.ravijuhend.ee/uploads/userifles/Unep__evik_veebi.pdf"], ["PDF", "https://ravijuhend.ee/uploads/userifles/une-pj-a4-rus-r.pdf"], "–"],
+           ["Unehäirete patsiendijuhend (unepäeviku tulemuste hindamine)", ["veebis", "https://ravijuhend.ee/patsiendivarav/juhendid/179/unehaired-infomaterjal-patsientidele"], ["veebis", "https://ravijuhend.ee/ru/portal-pacientov/rukovodstva/179/unehaired-infomaterjal-patsientidele"], "–"],
+           ["Epworthi unisuse skaala (8 olukorda, veebis)", ["kliinik.ee", "https://www.kliinik.ee/testid/unisuse_test"], "–", "–"],
+           ["STOP-BANG, uneapnoe risk (8 küsimust, veebis)", ["kliinik.ee", "https://www.kliinik.ee/testid/uneapnoe"], "–", "–"],
+           ["ISI, PSQI, Flindersi väsimuse skaala (lisa 4) ja SDS-CL-25 (lisa 2)", ["ravijuhend", "https://ravijuhend.ee/tervishoiuvarav/juhendid/193/taiskasvanute-unehairete-esmane-diagnostika"], "–", "–"]
+         ],
+         "markus": "Kliinik.ee unisuse testi allikaks on märgitud Eesti Unemeditsiini Selts. Venekeelse patsiendijuhendi PDF-is on unepäevik koos juhendiga.",
+         "allikas": ["rj-une-pj", "rj-une", "kliinik-testid"]}
+      ],
+      "read": [
+        {"p": "Unepäevik", "s": "Unetuse, liigunisuse ja une-ärkveloleku rütmi häire kahtlusel täidetakse unepäevikut vähemalt kaks nädalat. Rahutute jalgade sündroomi diagnoosimiseks unepäevikut ei soovitata.",
+         "allikas": ["rj-une"]},
+        {"p": "Tavapärane uni", "s": "Täiskasvanul on tavapärane uneaeg 6,5–11 tundi (enamikul 7–9), magamaminek kell 21–01, ärkamine kell 6–10, uinumine 30 minuti jooksul ja keskmiselt 1–2 ärkamist; alates 55. eluaastast kuni 30-minutiline päevane uinak. Vahetustega ja öötööd tegevale need ei kehti.",
+         "allikas": ["rj-une-pj"]},
+        {"p": "Unetus", "s": "Unetuse kahtlusel soovitab ravijuhend küsimustikke ISI ja PSQI, väsimuse kaebusel Flindersi väsimuse skaalat. Epworthi skaala ei sobi unetuse diagnoosimiseks.",
+         "allikas": ["rj-une"]},
+        {"p": "Uneapnoe", "s": "Uneaegse hingamishäire kahtlusel on soovitatav STOP-BANG: kolm või enam jah-vastust viitab suurele riskile (Eestis valideerimata). Epworthi skaalat ei soovitata kasutada iseseisva diagnoosimismeetodina.",
+         "allikas": ["rj-une"]},
+        {"p": "Liigunisus", "s": "Liigunisuse kahtlusel on soovitatav unepäevik, meeleolu- ja ärevushäire küsimustik EEK-2 ning STOP-BANG; liigunisuse, väsimuse ja narkolepsia küsimustikke ei soovitata.",
+         "allikas": ["rj-une"]}
+      ],
+      "erinevused": [
+        {"s": "Ravijuhendi soovitus 8 soovitab uneapnoe kahtlusel STOP-BANG-i, soovitus 11 aga ei soovita iseseisva meetodina väsimust hindavaid küsimustikke ja loetleb põhjenduses nende hulgas ka STOP-BANG-i. Ravijuhendi järgi aitab küsimustik raske uneapnoe kahtlusel valida, keda suunata uneuuringule.",
+         "allikas": ["rj-une"]}
+      ],
+      "lingid": ["rj-une", "rj-une-pj", "kliinik-testid"]
+    },
+    {
+      "k": "kys-peavalu",
+      "kontrollitud": "2026-10-19",
+      "grupp": "Küsimustikud ja päevikud",
+      "n": "Peavalu: peavalupäevik ja testid",
+      "sn": "Peavalupäevik",
+      "seotud": ["ravimid"],
+      "syn": ["peavalupäevik", "peavalu päevik", "peavalu", "migreen", "migreenipäevik", "migreeni test", "pingepeavalu", "HIT-6", "Migrevention", "ravimtekkeline peavalu", "MOH", "triptaan", "дневник головной боли", "головная боль"],
+      "tabelid": [
+        {"n": "Vormid ja testid",
+         "pais": ["Vorm", "Eesti", "Vene", "Inglise"],
+         "read": [
+           ["Migreeni patsiendijuhend (mida päevikusse märkida)", ["veebis", "https://ravijuhend.ee/patsiendivarav/juhendid/238/migreeni-diagnoosimine-ja-ravi"], ["veebis", "https://ravijuhend.ee/ru/portal-pacientov/rukovodstva/238/migreeni-diagnoosimine-ja-ravi"], "–"],
+           ["Migreeni test (6 küsimust, veebis)", ["kliinik.ee", "https://www.kliinik.ee/testid/migreeni_kusimustik"], "–", "–"],
+           ["Peavalu ravivastuse test (veebis)", ["kliinik.ee", "https://www.kliinik.ee/testid/peavalu_test"], ["kliinik.ee", "https://www.kliinik.ee/testid/peavalu_test_vene"], "–"],
+           ["Migreventioni digitaalne peavalupäevik (rakendus)", ["Apotheka", "https://www.apotheka.ee/terviseinfo/migrevention-peavalupaevik"], "–", "–"]
+         ],
+         "markus": "Prinditavat peavalupäeviku vormi ravijuhendi ega Eesti Migreeni ja Peavalu Patsientide Ühingu lehel ei ole (seis 19.10.2026).",
+         "allikas": ["rj-migreen-pj", "kliinik-testid", "apotheka-migrevention"]}
+      ],
+      "read": [
+        {"p": "Mida märkida", "s": "Peavalude sagedus, kestus, valu iseloom, vallandavad tegurid ning tarvitatud ravimid koos annuse ja mõjuga. Täidetud päevik võetakse vastuvõtule kaasa.",
+         "allikas": ["rj-migreen-pj"]},
+        {"p": "Ravimipäevad", "s": "Triptaani ei tohiks võtta rohkem kui 10 päeval kuus ning paratsetamooli või MSPVR-i kuni 15 päeval kuus; hooravimeid kokku mitte üle 15 päeva kuus.",
+         "allikas": ["rj-migreen-pj"]},
+        {"p": "Sagedus", "s": "Episoodilise migreeni korral on peavalupäevi alla 15 ja kroonilise korral 15 või rohkem kuus. Ennetav ravi on näidustatud 4 või enama peavalupäeva korral kuus, ebatõhusa hooravi korral või kui haigus mõjutab oluliselt elukvaliteeti.",
+         "allikas": ["rj-migreen-pj"]},
+        {"p": "HIT-6", "s": "Migreeni ravijuhendi töörühma järgi on HIT-6 Eestis valideeritud ning olemas eesti ja vene keeles; avalikult kättesaadavat vormi ei leitud (seis 19.10.2026).",
+         "allikas": ["arst-migreen-rj"]}
+      ],
+      "lingid": ["rj-migreen-pj", "apotheka-migrevention", "kliinik-testid"]
+    },
+    {
+      "k": "kys-uriin",
+      "kontrollitud": "2026-10-19",
+      "grupp": "Küsimustikud ja päevikud",
+      "n": "Urineerimine ja voodimärgamine: päevikud ja IPSS",
+      "sn": "Urineerimispäevik",
+      "syn": ["urineerimispäevik", "urineerimise päevik", "põiepäevik", "joomise päevik", "uriinipidamatus", "pidamatus", "inkontinents", "sage urineerimine", "noktuuria", "öine urineerimine", "tung", "IPSS", "kusemishäire", "kusemishäirete küsimustik", "eesnääre", "prostata", "voodimärgamine", "enurees", "urodünaamiline uuring"],
+      "tabelid": [
+        {"n": "Vormid ja testid",
+         "pais": ["Vorm", "Eesti", "Vene", "Inglise"],
+         "read": [
+           ["Urineerimispäevik (TÜ Kliinikum, urodünaamilise uuringu juhendis)", ["veebis", "https://www.kliinikum.ee/patsiendiinfo-andmebaas/urodunaamiline-uuring/"], "–", "–"],
+           ["Urineerimispäevik, üks ööpäev (Kuivaks)", ["PDF", "https://kuivaks.ee/wp-content/uploads/2012/11/Lisa2_Urineerimispaevik_2016_LOGOGA.pdf"], "–", "–"],
+           ["Urineerimispäevik (Teresa, muudetav)", ["Word", "https://teresa.ee/wp-content/uploads/2025/11/Urineerimispaevik.docx"], "–", "–"],
+           ["Põie ja sooletegevuse kontrollküsimustik (Kuivaks)", ["PDF", "https://kuivaks.ee/wp-content/uploads/2012/11/Lisa1_Kontroll_kysimustik_2016_LOGOGA.pdf"], "–", "–"],
+           ["Põie ja sooletegevuse kontrollküsimustik (Teresa, muudetav)", ["Word", "https://teresa.ee/wp-content/uploads/2025/10/Poie-ja-sooletegevuse-kontrollkusimustik.docx"], "–", "–"],
+           ["Kusemishäirete küsimustik (IPSS, veebis)", ["kliinik.ee", "https://www.kliinik.ee/testid/kusemishairete_kusimustik"], "–", "–"],
+           ["Lapse voodimärgamise päevik lapsevanemale (5 lk, Kuivaks)", ["PDF", "https://kuivaks.ee/wp-content/uploads/2015/10/Lapse_voodimargamise_paevik_5lk.pdf"], "–", "–"],
+           ["Lapse öise uneaja päevik lapsele (3 lk, Kuivaks)", ["PDF", "https://kuivaks.ee/wp-content/uploads/2015/10/Lapse_oine_uneaja_paevik_3lk.pdf"], "–", "–"]
+         ],
+         "allikas": ["kk-urodyn", "kuivaks-kys", "teresa-kys", "kliinik-testid"]}
+      ],
+      "read": [
+        {"p": "Kliinikumi juhend", "s": "Enne urodünaamilist uuringut täidetakse urineerimispäevikut 2–3 ööpäeva: kõik urineerimise ajad ja kogused ning uriinipidamatuse episoodid. Päevad ei pea olema järjestikused, kuid päeviku päeval süüakse ja juuakse tavapäraselt.",
+         "allikas": ["kk-urodyn"]},
+        {"p": "Teresa juhend", "s": "Päevikut peetakse vähemalt kaks järjestikust tavapärast ööpäeva ja iga sündmus märgitakse kellaajaga eraldi reale: joogid ja nende kogus, lekked, tung, mõõdetud uriini kogus ning kommentaar (nt sideme või riiete vahetus).",
+         "allikas": ["teresa-kys"]}
+      ],
+      "erinevused": [
+        {"s": "Kliinikumi juhendi järgi ei pea päeviku päevad olema järjestikused, Teresa juhendi järgi peetakse päevikut vähemalt kaks järjestikust ööpäeva.",
+         "allikas": ["kk-urodyn", "teresa-kys"]}
+      ],
+      "lingid": ["kk-urodyn", "kuivaks-kys", "teresa-kys"]
+    },
+    {
+      "k": "kys-alkohol",
+      "kontrollitud": "2026-10-19",
+      "grupp": "Küsimustikud ja päevikud",
+      "n": "Alkohol ja tubakas: AUDIT ja nikotiinisõltuvuse test",
+      "sn": "AUDIT",
+      "seotud": ["kys-meeleolu"],
+      "syn": ["AUDIT", "AUDIT-C", "AUDIT test", "alkohol", "alkoholitest", "alkoholi test", "alkoholitarvitamine", "alkoholi liigtarvitamine", "alkoholisõltuvus", "lühinõustamine", "Fagerström", "Fagerströmi test", "nikotiinisõltuvus", "suitsetamine", "tubakas", "suitsetamisest loobumine", "тест AUDIT", "алкоголь"],
+      "tabelid": [
+        {"n": "Vormid ja juhendid",
+         "pais": ["Vorm", "Eesti", "Vene", "Inglise"],
+         "read": [
+           ["AUDIT ja AUDIT-C koos punktisumma seletusega (TAI)", ["PDF", "https://tai.ee/sites/default/files/2021-03/146943581485_AUDIT_test_est.pdf"], ["PDF", "https://tai.ee/sites/default/files/2021-03/14694359413_AUDIT_RUS.pdf"], "–"],
+           ["Alkoholi liigtarvitava patsiendi varajane avastamine ja nõustamine perearstipraksises (TAI juhend)", ["PDF", "https://tai.ee/sites/default/files/2021-03/134251911631_Alkoholi_liigtarvitava_patsiendi_varajane_avastamine_ja_noustamine_perearstipraksises_kolmas_trykk_est.pdf"], "–", "–"],
+           ["Alkoholitarvitamise häire ennetus ja nõustamine esmatasandil (Tervisekassa juhend 2023)", ["PDF", "https://haigekassa.ee/sites/default/files/ennetusedendus/2023_02_21_alkoholitarvitamise_haire_ennetus_ja_noustamine_esmatasandil_juhend.pdf"], "–", "–"],
+           ["Nikotiinisõltuvuse test (Fagerström, veebis)", ["kliinik.ee", "https://www.kliinik.ee/testid/nikotiinsoltuvuse_maaramine"], "–", "–"]
+         ],
+         "allikas": ["tai-audit", "tk-alko-juhend", "kliinik-testid"]}
+      ],
+      "read": [
+        {"p": "Teenus", "s": "AUDIT test koos tagasisidestamisega (10 min) on kood 3127, kaugvastuvõtuna 3234 ja videovastuvõtuna 3235; neid tasutakse raviarvega lisaks pearahale (tegevusfond). Testi skoor dokumenteeritakse ja märgitakse raviarvele.",
+         "allikas": [["ttl", "§ 8"], ["metoodika", "§ 6"], "tk-alko-juhend"]},
+        {"p": "Tingimus", "s": "Tervisekassa tasub AUDIT testi ning alkoholitarvitamise häire ennetuse ja nõustamise (3122, 3123 ja nende kaug- ja videovariandid) eest, kui teenust osutab vastava koolitusega tervishoiutöötaja või tervishoiuspetsialist.",
+         "allikas": [["ttl", "§ 8"]],
+         "kontroll": [["ttl", "§ 8", "kui teenust osutab vastava koolitusega tervishoiutöötaja või tervishoiuspetsialist"]]},
+        {"p": "Tõlgendamine", "s": "0–7 madal risk, 8–15 ohustav tarvitamine, 16–19 kahjustav tarvitamine, 20 ja rohkem võimalik sõltuvus. AUDIT-C (küsimused 1–3) on lühiversioon: kui naise summa on ≥ 4 või mehe summa ≥ 5, vastatakse ka küsimustele 4–10.",
+         "allikas": ["tai-audit"]},
+        {"p": "Edasi", "s": "Skoori 8–15 korral hinnatakse valmisolekut muutusteks ning lühi- või laiendatud nõustamise vajadust. AUDIT ≥ 8 korral on soovitav uurida ka depressiooni võimalikku esinemist.",
+         "allikas": ["tk-alko-juhend"]},
+        {"p": "Tubakas", "s": "Nikotiinisõltuvust hindab Fagerströmi test. Tubaka- või nikotiinitoodetest loobumise nõustamise koodid on 3119 (esmane, 50 min) ja 3120 (15 min), kaug- ja videonõustamine 3232 ja 3233.",
+         "allikas": [["ttl", "§ 8"], "kliinik-testid"]}
+      ],
+      "lingid": ["tai-audit", "tk-alko-juhend", "kliinik-testid"]
+    },
+    {
       "k": "tookorraldus",
       "grupp": "Töökorraldus ja nimistu",
       "n": "Perearstiabi töökorraldus ja tähtajad",
@@ -739,6 +961,39 @@
          "allikas": ["tkl-2025", "err-tkl-2027"]}
       ],
       "lingid": ["tkl-2025"]
+    },
+    {
+      "k": "koolivaheajad",
+      "kontrollitud": "2026-10-19",
+      "grupp": "Töökorraldus ja nimistu",
+      "n": "Koolivaheajad 2026/2027–2029/2030",
+      "sn": "Koolivaheajad",
+      "ule": {"alates": "2027-09-01", "s": "2026/2027 õppeaasta on läbi ja määrus nr 45 kehtis kuni 31.08.2027. Eemalda koolivaheaegade tabelist veerg 2026/2027."},
+      "syn": ["koolivaheaeg", "koolivaheajad", "kooli vaheaeg", "vaheaeg", "vaheajad", "sügisvaheaeg", "jõuluvaheaeg", "talvevaheaeg", "kevadvaheaeg", "suvevaheaeg", "suvepuhkus", "kool", "õppeaasta", "kooliaasta"],
+      "tabelid": [
+        {"n": "Üldhariduskoolide vaheajad (esimene ja viimane päev)",
+         "pais": ["Vaheaeg", "2026/2027", "2027/2028", "2028/2029", "2029/2030"],
+         "read": [
+           ["I (sügis)", "26.10–01.11.2026", "25.10–31.10.2027", "23.10–29.10.2028", "22.10–28.10.2029"],
+           ["II (jõulud)", "21.12.2026–03.01.2027", "23.12.2027–09.01.2028", "25.12.2028–07.01.2029", "24.12.2029–06.01.2030"],
+           ["III (talv)", "22.02–28.02.2027", "28.02–05.03.2028", "26.02–04.03.2029", "25.02–03.03.2030"],
+           ["IV (kevad), v.a 12. klass", "12.04–18.04.2027", "24.04–30.04.2028", "23.04–29.04.2029", "15.04–21.04.2030"],
+           ["V (suvi), v.a lõpuklassid", "09.06–31.08.2027", "14.06–31.08.2028", "12.06–31.08.2029", "11.06–31.08.2030"]
+         ],
+         "markus": "Õppeaasta 2026/2027 vaheajad on määruses nr 45, õppeaastate 2027/2028–2029/2030 omad määruses nr 36 (jõustub 01.09.2027). Vaheaegade nimetused sulgudes on argikeelsed, määruses on vaheajad nummerdatud.",
+         "allikas": ["rt-koolivaheajad-45", "rt-koolivaheajad-36"]}
+      ],
+      "read": [
+        {"p": "Alus", "s": "Põhikooli ja gümnaasiumi vaheajad kehtestab haridus- ja teadusminister määrusega põhikooli- ja gümnaasiumiseaduse § 24 lõike 7 alusel. 2026/2027 kehtib määrus nr 45 (kuni 31.08.2027), õppeaastatel 2027/2028–2029/2030 määrus nr 36.",
+         "allikas": ["rt-koolivaheajad-45", "rt-koolivaheajad-36"]},
+        {"p": "Erandid", "s": "IV vaheaeg ei kehti 12. klassile ja V vaheaeg ei kehti lõpuklassidele.",
+         "allikas": ["rt-koolivaheajad-45", "rt-koolivaheajad-36"]}
+      ],
+      "erinevused": [
+        {"s": "ERR kirjutas 28.05.2026 ministeeriumi plaanist, mille järgi 2027/2028 jõuluvaheaeg oleks 20.12.2027–02.01.2028. Kehtestatud määruses nr 36 on see 23.12.2027–09.01.2028; vanemad veebilehed võivad näidata plaani.",
+         "allikas": ["err-koolivaheajad-plaan", "rt-koolivaheajad-36"]}
+      ],
+      "lingid": ["rt-koolivaheajad-45", "rt-koolivaheajad-36", "hm-koolivaheajad"]
     },
     {
       "k": "residentuur",
