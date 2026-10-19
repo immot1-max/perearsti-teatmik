@@ -60,6 +60,18 @@
     "d": "Kehtivad Eesti ravijuhendid ja patsiendijuhendid."
   },
   {
+    "id": "rhk-tehik",
+    "n": "RHK-10 kehtiv versioon (TEHIK-u Teabekeskus)",
+    "u": "https://teabekeskus.tehik.ee/et/loendid/rhk10",
+    "d": "Kehtiv RHK-10: versioonide ajalugu, koodid detailvaates (AKK) ja lihtsustatud XLSX. Seisuga 19.10.2026 kehtib versioon 11.0.0 (alates 09.04.2026)."
+  },
+  {
+    "id": "rhk-sm",
+    "n": "RHK-10 otsing (rhk.sm.ee, Sotsiaalministeerium)",
+    "u": "https://rhk.sm.ee/",
+    "d": "Kiirotsing koodi või nimetuse alguse järgi (eesti, ladina ja inglise nimetus). Lehte ei uuendata alates 2023. aastast (viimati 2022. aasta oktoobris); kehtiv versioon on TEHIK-u Teabekeskuses."
+  },
+  {
     "id": "tk-ekons-erialad",
     "n": "E-konsultatsiooni erialapõhised tingimused (Tervisekassa)",
     "u": "https://tervisekassa.ee/tervisekassa/e-tervise-tooted/suunamised/e-konsultatsioon/erialapohised-tingimused-ja-nouded",

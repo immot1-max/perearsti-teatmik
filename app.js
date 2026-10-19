@@ -1026,7 +1026,7 @@
       + `</div><div class="actions"><button class="btn" data-filter="u">Kõik muudatused (${uu.length})</button></div></section>`;
     const linkBy = (id) => d.items.find((x) => x.t === 'k' && x.id === id);
     const ftl = linkBy('tk-fondid');
-    const usefulIds = ['tk-fondid', 'ravijuhend', 'tk-soodusravimid', 'tk-ekons-erialad', 'ravimiregister', 'raviminfo'];
+    const usefulIds = ['tk-fondid', 'ravijuhend', 'rhk-tehik', 'rhk-sm', 'tk-soodusravimid', 'tk-ekons-erialad', 'ravimiregister', 'raviminfo'];
     const useful = usefulIds.map(linkBy).filter(Boolean);
     const linksHtml = !useful.length ? '' : `<section class="section"><h2>Kasulikud lingid</h2><div class="quick">`
       + useful.map((x) => `<a class="qbtn linkq" href="${esc(x.u)}" target="_blank" rel="noopener"><b>${esc(x.n)} ↗</b><small>${esc(x.d || '')}</small></a>`).join('') + '</div></section>';

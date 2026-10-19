@@ -98,5 +98,8 @@
   "sate:mootorsoidukijuht:§ 4": ["juhiload vastunäidustus", "1. grupp vastunäidustus"],
   "sate:mootorsoidukijuht:§ 5": ["2. grupp", "teine grupp", "veoauto", "buss"],
   "sate:mootorsoidukijuht:§ 6": ["2. grupp vastunäidustus"],
-  "sate:mootorsoidukijuht:§ 10": ["tervisetõend", "tõendi kehtivus", "tõendi vormistamine"]
+  "sate:mootorsoidukijuht:§ 10": ["tervisetõend", "tõendi kehtivus", "tõendi vormistamine"],
+
+  "link:rhk-tehik": ["rhk", "rhk-10", "rhk10", "rhk 10", "rhk kood", "diagnoosikood", "diagnoosi kood", "diagnoosikoodid", "icd", "icd-10", "icd10"],
+  "link:rhk-sm": ["rhk", "rhk-10", "rhk10", "rhk 10", "rhk otsing", "diagnoosikood", "diagnoosi kood", "icd-10"]
 }
