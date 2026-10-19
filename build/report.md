@@ -1,4 +1,4 @@
-# Andmete uuendus 17.10.2026
+# Andmete uuendus 19.10.2026
 
 ## Allikad
 - Tervisekassa tervishoiuteenuste loetelu: [116062026020](https://www.riigiteataja.ee/akt/116062026020) kehtib alates 01.07.2026
@@ -42,4 +42,4 @@
 - NB: Standardkulu lisa: 1 rida ei õnnestunud lugeda (koodid 52625).
 
 
-Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 187 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 23 teemakaarti, 39 linki.
+Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 187 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 30 teemakaarti, 41 linki.
