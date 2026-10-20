@@ -199,6 +199,26 @@ details.lisa .pre { white-space: pre-wrap; font-size: 0.82rem; line-height: 1.45
 .search.has-q .clear { display: inline-flex; }
 .search.has-q input { padding-right: 132px; }
 .chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+/* Vahelehed kiipide kohal: alajoonega, et eristuks kategooriakiipidest (kiip = filter, vaheleht = teema). */
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); margin-bottom: 10px; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: none; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px;
+  padding: 6px 12px 7px; font-family: var(--font-display); font-size: 0.98rem; font-weight: 500; color: var(--muted);
+  cursor: pointer; white-space: nowrap;
+}
+.tab:first-child { padding-left: 2px; }
+.tab:hover { color: var(--ink); }
+.tab[aria-current="page"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.tab .ts { display: none; }
+@media (max-width: 560px) {
+  .tab { padding-inline: 9px; }
+  .tab.has-sn .tl { display: none; }
+  .tab.has-sn .ts { display: inline; }
+}
+.tabhint { margin: 0; font-size: 0.86rem; color: var(--muted); }
+.section.tg-kys h2::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: 1px; background: var(--c-g-kys); }
+.section.tg-kys .qbtn.teema { border-left-color: var(--c-g-kys); }
 .chip {
   flex: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
   border-radius: 999px; padding: 4px 11px; font-size: 0.85rem; cursor: pointer; white-space: nowrap;
