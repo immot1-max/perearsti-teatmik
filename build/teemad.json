@@ -81,7 +81,29 @@
     "kuivaks-kys": {"n": "Kuivaks: küsimustikud ja päevikud (uriinipidamatus, enurees)", "u": "https://kuivaks.ee/uriinipidamatus/kusimustikud-ja-paevikud/"},
     "tai-audit": {"n": "Tervise Arengu Instituut: AUDIT, test alkoholi tarvitamise hindamiseks (PDF)", "u": "https://tai.ee/sites/default/files/2021-03/146943581485_AUDIT_test_est.pdf"},
     "tk-alko-juhend": {"n": "Tervisekassa: alkoholitarvitamise häire ennetus ja nõustamine esmatasandil, juhend 2023 (PDF)", "u": "https://haigekassa.ee/sites/default/files/ennetusedendus/2023_02_21_alkoholitarvitamise_haire_ennetus_ja_noustamine_esmatasandil_juhend.pdf"},
-    "kliinik-testid": {"n": "Kliinik.ee: testid (veebis täidetavad küsimustikud)", "u": "https://www.kliinik.ee/testid"}
+    "kliinik-testid": {"n": "Kliinik.ee: testid (veebis täidetavad küsimustikud)", "u": "https://www.kliinik.ee/testid"},
+    "kk-kolo-et": {"n": "TÜ Kliinikum: koloskoopia (patsiendiinfo)", "u": "https://www.kliinikum.ee/patsiendiinfo-andmebaas/koloskoopia/"},
+    "kk-kolo-ru": {"n": "TÜ Kliinikum: колоноскопия (patsiendiinfo vene keeles)", "u": "https://www.kliinikum.ee/ru/patient-info-entries/kolonoskopiya/"},
+    "kk-kolo-en": {"n": "TÜ Kliinikum: colonoscopy (patsiendiinfo inglise keeles)", "u": "https://www.kliinikum.ee/en/patient-info-entries/colonoscopy/"},
+    "kk-gastro-et": {"n": "TÜ Kliinikum: gastroskoopia (patsiendiinfo)", "u": "https://www.kliinikum.ee/patsiendiinfo-andmebaas/gastroskoopia/"},
+    "kk-gastro-ru": {"n": "TÜ Kliinikum: гастроскопия (patsiendiinfo vene keeles)", "u": "https://www.kliinikum.ee/ru/patient-info-entries/gastroskopiya/"},
+    "kk-gastro-en": {"n": "TÜ Kliinikum: gastroscopy (patsiendiinfo inglise keeles)", "u": "https://www.kliinikum.ee/en/patient-info-entries/gastroscopy/"},
+    "itk-kolo-et": {"n": "Ida-Tallinna Keskhaigla: koloskoopia (ITK397)", "u": "https://www.itk.ee/patsiendile/patsiendi-infomaterjalid/uuringud/koloskoopia"},
+    "itk-kolo-ru": {"n": "Ida-Tallinna Keskhaigla: колоноскопия (ITK622)", "u": "https://www.itk.ee/patsiendile/patsiendi-infomaterjalid/uuringud/kolonoskopija"},
+    "itk-gastro-et": {"n": "Ida-Tallinna Keskhaigla: gastroskoopia", "u": "https://www.itk.ee/patsiendile/patsiendi-infomaterjalid/uuringud/gastroskoopia"},
+    "itk-gastro-ru": {"n": "Ida-Tallinna Keskhaigla: гастроскопия (ITK623)", "u": "https://www.itk.ee/patsiendile/patsiendi-infomaterjalid/uuringud/gastroskopija"},
+    "itk-gastro-en": {"n": "Ida-Tallinna Keskhaigla: gastroscopy (inglise keeles, lühikirjeldus)", "u": "https://www.itk.ee/en/patient/clinics/oesophagogastroduodenoscopy-ie-gastroscopy"},
+    "medicum-kolo": {"n": "Medicum: patsiendi infoleht koloskoopia teostamiseks (PDF)", "u": "https://www.medicum.ee/wp-content/uploads/2024/12/koloskoopia-infoleht.pdf"},
+    "medicum-gastro-ru": {"n": "Medicum: gastroskoopia nõusolek ja infoleht vene keeles (PDF)", "u": "https://www.medicum.ee/wp-content/uploads/2024/06/patsiendi-nousolek-gastroskoopia-rus.pdf"},
+    "medicum-gastro-en": {"n": "Medicum: gastroskoopia nõusolek ja infoleht inglise keeles (PDF)", "u": "https://www.medicum.ee/wp-content/uploads/2024/06/patsiendi-nousolek-gastroskoopia-eng.pdf"},
+    "tk-kolo": {"n": "Tervisekassa: koloskoopia ettevalmistus, eesti ja vene keeles (PDF)", "u": "https://tervisekassa.ee/media/17/download"},
+    "perh-kolo": {"n": "Regionaalhaigla: kolonoskoopia (patsiendiinfo)", "u": "https://www.regionaalhaigla.ee/kolonoskoopia"},
+    "perh-gastro": {"n": "Regionaalhaigla: gastroskoopia (patsiendiinfo)", "u": "https://www.regionaalhaigla.ee/gastroskoopia"},
+    "ltkh-juhendid": {"n": "Lääne-Tallinna Keskhaigla: patsiendijuhendid (gastroskoopia ja koloskoopia eesti ja vene keeles)", "u": "https://www.keskhaigla.ee/patsiendile-ja-kulastajale/juhendid"},
+    "ltkh-kolo-et": {"n": "Lääne-Tallinna Keskhaigla: koloskoopia infoleht (PDF)", "u": "https://cdn.prod.website-files.com/66d001b8c1ce9bc0b1e262c7/6853cb2337d1178d402a2f54_Koloskoopia_EST.pdf"},
+    "ltkh-kolo-ru": {"n": "Lääne-Tallinna Keskhaigla: колоноскопия, infoleht vene keeles (PDF)", "u": "https://cdn.prod.website-files.com/66d001b8c1ce9bc0b1e262c7/6853cb24e269c38c10eb83d2_Koloskoopia_RUS.pdf"},
+    "ltkh-gastro-et": {"n": "Lääne-Tallinna Keskhaigla: gastroskoopia infoleht (PDF)", "u": "https://cdn.prod.website-files.com/66d001b8c1ce9bc0b1e262c7/6853cb2395e8863b3c9bb2c4_Gastroskoopia_EST.pdf"},
+    "ltkh-gastro-ru": {"n": "Lääne-Tallinna Keskhaigla: гастроскопия, infoleht vene keeles (PDF)", "u": "https://cdn.prod.website-files.com/66d001b8c1ce9bc0b1e262c7/6853cb238e8c4b97ac6285f3_Gastroskoopia_RUS.pdf"}
   },
   "teemad": [
     {
@@ -766,6 +788,70 @@
          "allikas": [["ttl", "§ 8"], "kliinik-testid"]}
       ],
       "lingid": ["tai-audit", "tk-alko-juhend", "kliinik-testid"]
+    },
+    {
+      "k": "kys-endoskoopia",
+      "kontrollitud": "2026-10-20",
+      "grupp": "Küsimustikud ja päevikud",
+      "n": "Koloskoopia ja gastroskoopia: patsiendi ettevalmistusjuhendid ja toitumine",
+      "sn": "Koloskoopia ja gastroskoopia",
+      "syn": ["koloskoopia", "kolonoskoopia", "gastroskoopia", "gastro", "endoskoopia", "FGS", "EGD", "ösofagogastroduodenoskoopia", "koloskoopia ettevalmistus", "gastroskoopia ettevalmistus", "soole ettevalmistus", "soolepuhastus", "soolepuhastuslahus", "kiudainevaene dieet", "räbuvaba dieet", "dieet enne koloskoopiat", "lahtisti", "Fortrans", "Moviprep", "Eziclen", "Picoprep", "Cololyt", "sõelkoloskoopia", "sõeluuringu koloskoopia", "patsiendijuhend", "infoleht", "колоноскопия", "гастроскопия", "подготовка к колоноскопии", "colonoscopy", "gastroscopy", "bowel preparation"],
+      "tabelid": [
+        {"n": "Koloskoopia: ettevalmistuse juhendid",
+         "pais": ["Asutus ja juhend", "Eesti", "Vene", "Inglise"],
+         "read": [
+           ["TÜ Kliinikum (2023): nädal, kaks päeva ja eelmine päev eraldi", ["veebis", "https://www.kliinikum.ee/patsiendiinfo-andmebaas/koloskoopia/"], ["veebis", "https://www.kliinikum.ee/ru/patient-info-entries/kolonoskopiya/"], ["veebis", "https://www.kliinikum.ee/en/patient-info-entries/colonoscopy/"]],
+           ["Ida-Tallinna Keskhaigla (ITK397, 2023; vene ITK622, 2025): 7 päeva kiudainevaene dieet, lubatud ja keelatud toidud", ["veebis", "https://www.itk.ee/patsiendile/patsiendi-infomaterjalid/uuringud/koloskoopia"], ["veebis", "https://www.itk.ee/patsiendile/patsiendi-infomaterjalid/uuringud/kolonoskopija"], "–"],
+           ["Ida-Tallinna Keskhaigla: video dieedist ja lahtistist (eestikeelsel lehel)", ["YouTube", "https://www.youtube.com/watch?v=iQYY2H9uQ5M"], "–", "–"],
+           ["Medicum (2024): 3–5 päeva kiudainevaene dieet, lubatud ja keelatud toitude tabel", ["PDF", "https://www.medicum.ee/wp-content/uploads/2024/12/koloskoopia-infoleht.pdf"], "–", "–"],
+           ["Tervisekassa: ettevalmistus perearstilt saadud soolepuhastusravimiga (eesti ja vene tekst samas failis)", ["PDF", "https://tervisekassa.ee/media/17/download"], ["PDF", "https://tervisekassa.ee/media/17/download"], "–"],
+           ["Regionaalhaigla: lühijuhend, dieedi kestust ei nimeta", ["veebis", "https://www.regionaalhaigla.ee/kolonoskoopia"], "–", "–"],
+           ["Lääne-Tallinna Keskhaigla: ainult paastumisaeg, toitumisjuhist ei ole", ["PDF", "https://cdn.prod.website-files.com/66d001b8c1ce9bc0b1e262c7/6853cb2337d1178d402a2f54_Koloskoopia_EST.pdf"], ["PDF", "https://cdn.prod.website-files.com/66d001b8c1ce9bc0b1e262c7/6853cb24e269c38c10eb83d2_Koloskoopia_RUS.pdf"], "–"]
+         ],
+         "markus": "Juhendid erinevad dieedi kestuse ja joomise lõpu poolest (vt ⚠), seega sobib patsiendile anda selle asutuse juhend, kus uuring tehakse.",
+         "allikas": ["kk-kolo-et", "itk-kolo-et", "medicum-kolo", "tk-kolo", "perh-kolo", "ltkh-juhendid"]},
+        {"n": "Gastroskoopia: ettevalmistuse juhendid",
+         "pais": ["Asutus ja juhend", "Eesti", "Vene", "Inglise"],
+         "read": [
+           ["TÜ Kliinikum (2022, vene 2023): 6–8 tundi söömata ja joomata", ["veebis", "https://www.kliinikum.ee/patsiendiinfo-andmebaas/gastroskoopia/"], ["veebis", "https://www.kliinikum.ee/ru/patient-info-entries/gastroskopiya/"], ["veebis", "https://www.kliinikum.ee/en/patient-info-entries/gastroscopy/"]],
+           ["Ida-Tallinna Keskhaigla (vene ITK623, 2023): vähemalt 6 tundi söömata, vett vähesel määral kuni 2 tundi enne", ["veebis", "https://www.itk.ee/patsiendile/patsiendi-infomaterjalid/uuringud/gastroskoopia"], ["veebis", "https://www.itk.ee/patsiendile/patsiendi-infomaterjalid/uuringud/gastroskopija"], ["lühikirjeldus", "https://www.itk.ee/en/patient/clinics/oesophagogastroduodenoscopy-ie-gastroscopy"]],
+           ["Regionaalhaigla: vähemalt 6 tundi söömata ja joomata", ["veebis", "https://www.regionaalhaigla.ee/gastroskoopia"], "–", "–"],
+           ["Lääne-Tallinna Keskhaigla: 6–8 tundi söömata", ["PDF", "https://cdn.prod.website-files.com/66d001b8c1ce9bc0b1e262c7/6853cb2395e8863b3c9bb2c4_Gastroskoopia_EST.pdf"], ["PDF", "https://cdn.prod.website-files.com/66d001b8c1ce9bc0b1e262c7/6853cb238e8c4b97ac6285f3_Gastroskoopia_RUS.pdf"], "–"],
+           ["Medicum (nõusoleku- ja infoleht, 2024): vene keeles 6 tundi söömata, inglise keeles 12 tundi söömata ja joomata", "–", ["PDF", "https://www.medicum.ee/wp-content/uploads/2024/06/patsiendi-nousolek-gastroskoopia-rus.pdf"], ["PDF", "https://www.medicum.ee/wp-content/uploads/2024/06/patsiendi-nousolek-gastroskoopia-eng.pdf"]]
+         ],
+         "allikas": ["kk-gastro-et", "itk-gastro-et", "perh-gastro", "ltkh-juhendid", "medicum-gastro-ru"]}
+      ],
+      "read": [
+        {"p": "Gastroskoopia", "s": "Gastroskoopia juhendites eelnevate päevade dieeti ei ole, magu peab olema tühi. Kliinikumi järgi ei sööda ega jooda 6–8 tundi enne uuringut ja viimane söögikord on soovitatavalt eelmisel õhtul; ITK järgi ollakse vähemalt 6 tundi söömata, vett võib vähesel määral juua kuni 2 tundi enne ning vererõhuravimid võtta uuringupäeva hommikul. Eemaldatavad hambaproteesid ning suu- ja huuleehted võetakse enne uuringut ära.",
+         "allikas": ["kk-gastro-et", "itk-gastro-et", "perh-gastro"]},
+        {"p": "Koloskoopia: nädal enne", "s": "Kliinikumi ja Tervisekassa juhendi järgi ei sööda nädal enne punast peeti, tomatit, seemneid sisaldavaid puuvilju ja marju ega seemnetega täisteratooteid (Kliinikumi järgi ka moosi) ning lõpetatakse raua- ja söetablettide võtmine. ITK järgi algab kiudainevaene dieet seitse päeva enne: keelatud on juur-, puu- ja köögiviljad, marjad (sh kiivi, kuivatatud ja konserveeritud marjad), müsli, seened, seemneleib ja sepik, täisteraputrud ja supid; sobivad kala, liha- ja piimatooted, munad, nisujahutooted, tarretis, köögiviljadeta puljong, lisanditeta jäätis ja mahlajäätis, kummi- ja klaaskommid ning pähkliteta ja rosinateta šokolaad.",
+         "allikas": ["kk-kolo-et", "tk-kolo", "itk-kolo-et"]},
+        {"p": "Koloskoopia: 3–5 päeva enne (Medicum)", "s": "Medicumi juhendi järgi algab kiudainevaene dieet 3–5 päeva enne: kokku kuni 10 g kiudaineid päevas või 1–2 g toidukorra kohta lubatud ja keelatud toitude tabeli järgi; vältida tuleb ka punaseid ja purpurseid toite ning jooke. 5 päeva enne lõpetatakse raua- ja söetabletid ning kiudainelisandid (nt Lepicol, psüllium), 3–5 päeva enne kõhulahtisuse sümptomaatiline ravi (nt loperamiid).",
+         "allikas": ["medicum-kolo"]},
+        {"p": "Koloskoopia: kaks päeva enne", "s": "Kliinikumi ja Tervisekassa juhendi järgi süüakse kaks päeva (48 tundi) enne ainult vähese kiudainesisaldusega toitu, näiteks puljong, püreesupp, kissell, mahl, kuivikud või sai, keedetud kala või kana, munad, juust, kartul või kartulipuder ja seemneteta jogurt. Juua tuleb palju, Kliinikumi järgi vähemalt 1,5 liitrit.",
+         "allikas": ["kk-kolo-et", "tk-kolo"]},
+        {"p": "Koloskoopia: eelmine päev", "s": "Kliinikumi ja Tervisekassa järgi võib hommikul süüa kerge kiudainevaba eine, edasi juuakse ainult selgeid vedelikke (vesi, tee, mahl, puljong, ka magusainetega ja gaseeritud joogid). Piim, läbipaistmatud, punased või muu tugeva värviga, viljaliha või sademega joogid ja alkohol ei sobi; Tervisekassa lubab hommikukohvi või -tee sisse veidi piima või koort. ITK ja Medicumi järgi ei sööda kogu päeva tahket toitu: ITK lubab hommikul selget puljongit, päeva jooksul kummi- ja klaaskomme ning lisaks lahtistile vähemalt 1–1,5 liitrit selget vedelikku, Medicumi järgi on terve päev vedel dieet ja lisaks lahtistile juuakse 1,5–2 liitrit.",
+         "allikas": ["kk-kolo-et", "tk-kolo", "itk-kolo-et", "medicum-kolo"]},
+        {"p": "Koloskoopia: uuringupäev", "s": "Uuringupäeval ei sööda. Kliinikumi järgi võib selgeid vedelikke juua kuni 2 tundi enne uuringut ja Tervisekassa juhendi järgi lõpetatakse lahus ja muud selged vedelikud vähemalt 2 tundi enne; Medicumi järgi lõpetatakse lahtisti ja vedelikud 4 tundi enne, ravimeid võib võtta väikese lonksu veega 2 tundi enne. ITK järgi peab jagatud annuse korral viimase lahtistiannuse ja uuringu vahele jääma vähemalt 3–4 tundi.",
+         "allikas": ["kk-kolo-et", "tk-kolo", "medicum-kolo", "itk-kolo-et"]},
+        {"p": "Lahtisti", "s": "Lahtisti (nt Fortrans, Eziclen, Cololyt, Moviprep, Picoprep) kirjutab välja uuringule suunav arst ja skeem sõltub uuringu kellaajast: hommikuse uuringu korral juuakse kogu kogus eelmisel õhtul, lõuna- või pärastlõunase uuringu korral jagatud annusena (pool õhtul, pool uuringupäeva hommikul). ITK järgi kehtib retsept kaks kuud. Tervisekassa juhendi järgi saab patsient soolepuhastusravimi perearstilt (kood 9047 soolepuhastuspreparaat, pearahasisene); pakis on kaks kotti ja kummastki valmistatakse 1 liiter lahust.",
+         "allikas": ["itk-kolo-et", "kk-kolo-et", "medicum-kolo", "tk-kolo"]},
+        {"p": "Ravimid", "s": "Igapäevaste ravimite jätkamise või katkestamise otsustab uuringule suunav arst; verevedeldajate ja diabeediravimite kohta on vaja eraldi juhist. Kliinikumi järgi võetakse ravimid 1–3 tundi enne või vähemalt 1 tund pärast sooleloputuslahuse joomist. Medicum palub nõu pidada ka kaalulangetamise ravimite korral, sest need võivad aeglustada mao tühjenemist.",
+         "allikas": ["itk-kolo-et", "kk-kolo-et", "medicum-kolo"]}
+      ],
+      "erinevused": [
+        {"s": "Kiudainevaese dieedi kestus: ITK 7 päeva, Medicum 3–5 päeva, Kliinikum ja Tervisekassa nädal toidupiiranguid ja 2 päeva vähese kiudainega toitu; Regionaalhaigla kestust ei nimeta ja Lääne-Tallinna Keskhaigla koloskoopia juhendis toitumisjuhist ei ole.",
+         "allikas": ["itk-kolo-et", "medicum-kolo", "kk-kolo-et", "tk-kolo", "perh-kolo", "ltkh-juhendid"]},
+        {"s": "Raua- ja söetablettide lõpetamine: Kliinikum, Tervisekassa ja ITK nädal (7 päeva) enne, Medicum 5 päeva enne, Regionaalhaigla rauapreparaadid 3–4 päeva enne.",
+         "allikas": ["kk-kolo-et", "tk-kolo", "itk-kolo-et", "medicum-kolo", "perh-kolo"]},
+        {"s": "Joomise lõpp enne koloskoopiat: Kliinikum ja Tervisekassa 2 tundi, Medicum 4 tundi, ITK järgi viimane lahtistiannus vähemalt 3–4 tundi enne. Lääne-Tallinna Keskhaigla eestikeelne leht keelab 8–10 tundi enne nii söömise kui ka joomise, venekeelne nimetab ainult söömist.",
+         "allikas": ["kk-kolo-et", "tk-kolo", "medicum-kolo", "itk-kolo-et", "ltkh-kolo-et", "ltkh-kolo-ru"]},
+        {"s": "Gastroskoopia paastumisaeg: Kliinikum 6–8 tundi söömata ja joomata, Regionaalhaigla vähemalt 6 tundi söömata ja joomata, ITK vähemalt 6 tundi söömata (vett vähesel määral kuni 2 tundi enne), Lääne-Tallinna Keskhaigla 6–8 tundi söömata. Medicumi venekeelne nõusolekuleht nimetab 6 tundi söömata ja vett kuni 2 tundi enne, ingliskeelne (ja soomekeelne) 12 tundi söömata ja joomata.",
+         "allikas": ["kk-gastro-et", "perh-gastro", "itk-gastro-et", "ltkh-gastro-et", "medicum-gastro-ru", "medicum-gastro-en"]},
+        {"s": "Kliinikumi venekeelses koloskoopia juhendis on kahe päeva toitude seas „сухофрукты (без косточек)“ ehk kuivatatud puuviljad; eestikeelses tekstis on samas kohas kuivikud ja ingliskeelses küpsised. Kuivatatud puuviljad on Medicumi tabelis keelatud.",
+         "allikas": ["kk-kolo-ru", "kk-kolo-et", "kk-kolo-en", "medicum-kolo"]}
+      ],
+      "lingid": ["kk-kolo-et", "itk-kolo-et", "medicum-kolo", "tk-kolo", "ltkh-juhendid"]
     },
     {
       "k": "tookorraldus",
