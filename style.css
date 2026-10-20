@@ -217,6 +217,8 @@ details.lisa .pre { white-space: pre-wrap; font-size: 0.82rem; line-height: 1.45
   .tab.has-sn .tl { display: none; }
   .tab.has-sn .ts { display: inline; }
 }
+@media (max-width: 440px) { .tab { padding-inline: 5px; font-size: 0.94rem; } }
+.tabs.ovf { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent); }
 .tabhint { margin: 0; font-size: 0.86rem; color: var(--muted); }
 /* Vahelehel pealkirjana näidatud igapäevatöö reeglite rühm (rühma värv tuleb klassist tg-*). */
 .section.tgsec h2::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: 1px; background: var(--c-teema); }

@@ -47,12 +47,14 @@
     { k: 'rahastus', n: 'Rahastus' },
     { k: 'noud', n: 'Seadused ja nõuded', sn: 'Nõuded' },
     { k: 'kys', n: 'Küsimustikud ja infolehed', sn: 'Küsimustikud' },
+    { k: 'rj', n: 'Ravijuhendid', sn: 'Juhendid' },
   ];
   const tabName = (k) => (TABS.find((t) => t.k === k) || TABS[0]).n;
   const TAB_CHIPS = {
     rahastus: ['s', 'fund', 'q', 'v', 'b', 'pa'],
     noud: ['j', 'l', 'a', 'm', 'u'],
-    kys: ['g'],
+    kys: [],
+    rj: [],
   };
   // Vahelehe „Küsimustikud ja infolehed“ rühmad (teemad.json väli grupp); need ei ole vahelehel „Seadused ja nõuded“.
   const KYS_GROUPS = ['Küsimustikud ja päevikud', 'Infolehed patsiendile'];
@@ -1079,14 +1081,14 @@
   // Avalehe kasutusjuhend (ainult vahelehel „Avaleht“).
   const HOME_INFO = `<section class="section info"><h2>Kasutamine</h2>
         <p>Otsi nimetuse, koodi, lühendi või argisõnaga (nt „holter“, „TSH“, „6417“). Täpitähti pole vaja. Koodil klõpsates kopeerub see.</p>
-        <p>Vahelehed „Rahastus“, „Seadused ja nõuded“ ning „Küsimustikud ja infolehed“ näitavad avalehe sisust ühe osa ja selle osa kategooriad; „Avaleht“ näitab kõike. Otsing otsib alati kõigist andmetest, vahelehest sõltumata. Vahelehe aadressi (nt lõpuga ?tab=rahastus) saab kolleegile saata.</p>
+        <p>Vahelehed „Rahastus“, „Seadused ja nõuded“, „Küsimustikud ja infolehed“ ning „Ravijuhendid“ näitavad avalehe sisust ühe osa ja selle osa kategooriad; „Avaleht“ näitab kõike. Otsing otsib alati kõigist andmetest, vahelehest sõltumata. Vahelehe aadressi (nt lõpuga ?tab=rahastus) saab kolleegile saata.</p>
         <p>Kui avad kirje (nt „Hüpertooniatõbi“ avalehelt või „Diabeet II“ kvaliteedisüsteemi loetelust) ja otsid seejärel koodi või valid kategooria, tulevad vasted kõigist kategooriatest üles ja avatud kirje jääb lahtisena nende alla, nii et selle koode saab järjest edasi klõpsata. „Peida“ teeb selle üherealiseks, „Sulge“ eemaldab. Otsingu tühjendamine (× või Esc) viib tagasi sinna, kus kirje oli avatud, nupp „←“ avalehele või vahelehele, kust kirje avati.</p>
         <p>Laborianalüüsi saab otsida SYNLABi nime või lühendiga (nt „IGRA“, „HCV“). Vastes on Tervisekassa kood ja see, kas analüüs kuulub perearsti fondi. Koodi avades on näha kõik selle koodi alla kuuluvad SYNLABi analüüsid.</p>
         <p>Sünniaasta otsing (nt „1966“) näitab, millise rinna-, emakakaela- või soolevähi sõeluuringu sihtrühma inimene sel aastal kuulub. Sünniaastad tulevad terviseportaalist ja neid kontrollitakse kord kuus.</p>
         <p>„Mis muutus“ (avalehe lõpus) näitab iga jälgitava seaduse ja määruse viimase aasta jooksul jõustunud ja juba avaldatud tulevasi redaktsioone: uued ja kadunud koodid, hinnamuutused, fondide koodid ning muutunud sätete varasem ja uus sõnastus (muutunud sõnad on esile tõstetud).</p>
         <p>Teenuse koodi avades on näha ka „Mis on hinnas“: metoodika standardkulu lisa järgi personal (sh arsti minutid), ruumid, seadmed ja materjalid.</p>
         <p>„Igapäevatöö reeglid“ koondavad haigus- ja hoolduslehe, P21, tervisetõendite, nakkushaiguse teatiste, vaktsineerimise, retseptide, e-konsultatsiooni, patsiendi hüvitiste, töökorralduse ja nimistu põhireeglid, koolivaheajad, patsiendi küsimustike ja päevikute otselingid (EEK-2, SNAP-IV, uni, peavalu, urineerimine, AUDIT), patsiendi infolehed (koloskoopia ja gastroskoopia ettevalmistusjuhendid haiglate kaupa) (võimalusel eesti, vene ja inglise keeles) ning peremeditsiini residentuuri, 6. kursuse praktika ja abiarsti info (palk, tööaeg, puhkus, juhendamine); igal rühmal on oma värv. Iga punkti juures on viide sättele; ⚠ märgib allikate omavahelisi erinevusi. Otsida võib ka küsimusena (nt „kui kaua makstakse haigushüvitist“).</p>
-        <p>„Ravijuhendid“ sisaldab kõigi ravijuhend.ee kinnitatud ravijuhendite ja käsitlusjuhendite otselinke koos koodi, kuupäevade, lisade ja patsiendijuhendiga. Mõne juhendi sageli vajalik lisa (nt KNH progresseerumise tabel, antibiootikumide valik ja annused, osteoporoosi, ATH ja 2. tüüpi diabeedi algoritm) on kirjes kohe pildina näha; kõrgvererõhktõve juures on Medicumi majasisesed riskitabelid. Lisasid kontrollitakse kord kuus ja pilt uueneb, kui ravijuhend.ee-s lisa muutub.</p>
+        <p>Vaheleht „Ravijuhendid“ sisaldab kõigi ravijuhend.ee kinnitatud ravijuhendite ja käsitlusjuhendite otselinke koos koodi, kuupäevade, lisade ja patsiendijuhendiga. Mõne juhendi sageli vajalik lisa (nt KNH progresseerumise tabel, antibiootikumide valik ja annused, osteoporoosi, ATH ja 2. tüüpi diabeedi algoritm) on kirjes kohe pildina näha; kõrgvererõhktõve juures on Medicumi majasisesed riskitabelid. Lisasid kontrollitakse kord kuus ja pilt uueneb, kui ravijuhend.ee-s lisa muutub.</p>
         <p>Linnuke „Ainult perearstiabi“ peidab teenused, mis ei kuulu perearsti fondidesse, kvaliteedisüsteemi ega perearstiabi peatükki (nt operatsioonid). Täpse koodi otsing näitab koodi alati.</p>
         <p>Rakendus töötab pärast esimest avamist ka võrguta. Telefonis lisa see avakuvale: iPhone'is Safari jagamismenüü → „Lisa avakuvale“, Androidis Chrome'i menüü → „Installi rakendus“.</p>
         <p>Andmed tulevad Riigi Teataja avalikust liidesest ja neid kontrollitakse automaatselt kord kuus. Õiguslikult kehtib alati Riigi Teatajas avaldatud tekst.</p>
@@ -1168,9 +1170,9 @@
     const rjAll = d.items.filter((x) => x.t === 'g');
     const linkBtn = (id) => { const x = linkBy(id); return x ? `<a class="btn" href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.n)} ↗</a>` : ''; };
     const rjCard = (x) => `<button class="qbtn rj" data-focus="${x._id}"><b>${esc(x.sn)}</b><small>${esc([...(x.pv || []).map((p) => (p.n.match(/^Lisa \d+/) || [p.n])[0] + ' pildina'), x.mk ? 'Medicumi riskitabelid' : ''].filter(Boolean).join(', '))}${x.kood ? ' · ' + esc(x.kood) : ''}</small></button>`;
-    const rjHtml = !rjAll.length ? '' : sec('Ravijuhendid', `<div class="quick">${rjAll.filter((x) => x.sn).map(rjCard).join('')}</div>`
-      + `<div class="actions rjact"><button class="btn solid" data-filter="g">Kõik ravijuhendid (${rjAll.length})</button>${linkBtn('rj-pj')}${linkBtn('abr')}</div>`
-      + '<p class="hint">Otsi juhendi nime, teema või lisa sisu järgi (nt „tonsilliit“, „KNH“, „SCORE2“). Juhendi kirjes on kood, kuupäevad, lisade otselingid ja patsiendijuhend.</p>');
+    const rjFeat = (title, more) => (!rjAll.length ? '' : sec(title, `<div class="quick">${rjAll.filter((x) => x.sn).map(rjCard).join('')}</div>`
+      + `<div class="actions rjact">${more ? `<button class="btn solid" data-tab="rj">Kõik ravijuhendid (${rjAll.length})</button>` : ''}${linkBtn('rj-pj')}${linkBtn('abr')}</div>`
+      + '<p class="hint">Otsi juhendi nime, teema või lisa sisu järgi (nt „tonsilliit“, „KNH“, „SCORE2“). Juhendi kirjes on kood, kuupäevad, lisade otselingid ja patsiendijuhend.</p>'));
 
     if (tab === 'rahastus') {
       el.results.innerHTML = tabHint('Perearsti fondid, pearaha, lisatasud, kvaliteedisüsteem ja sõeluuringud.')
@@ -1191,14 +1193,27 @@
       return;
     }
     if (tab === 'kys') {
-      el.results.innerHTML = tabHint('Patsiendi küsimustikud, päevikud ja ettevalmistusjuhendid (võimalusel eesti, vene ja inglise keeles) ning ravijuhendid.')
+      el.results.innerHTML = tabHint('Patsiendi küsimustikud, päevikud ja ettevalmistusjuhendid, võimalusel eesti, vene ja inglise keeles.')
         + KYS_GROUPS.map((g) => {
           const cards = tj.filter((x) => x.g === g);
           return cards.length ? `<section class="section tgsec ${tgCls(g)}"><h2>${esc(g)}</h2><div class="quick">${cards.map(tCard).join('')}</div></section>` : '';
         }).join('')
-        + rjHtml
         + linksHtml(['ravijuhend', 'rhk-tehik', 'rhk-sm', 'ravimiregister', 'raviminfo'])
-        + examples(['EEK-2', 'unepäevik', 'AUDIT', 'SNAP-IV', 'peavalupäevik', 'koloskoopia', 'RHK', 'KNH', 'tonsilliit', 'SCORE2']);
+        + examples(['EEK-2', 'unepäevik', 'AUDIT', 'SNAP-IV', 'peavalupäevik', 'koloskoopia', 'RHK']);
+      return;
+    }
+    if (tab === 'rj') {
+      // Kõik juhendid on vahelehel kohe nimekirjana; kirje avaneb samas kohas.
+      const rjList = (liik, title) => {
+        const l = rjAll.filter((x) => (liik === 'ravijuhend') === (x.liik === 'ravijuhend'));
+        return l.length ? sec(`${title} (${l.length})`, `<div class="list">${l.map((x) => row(x)).join('')}</div>`) : '';
+      };
+      el.results.innerHTML = tabHint('Kõik ravijuhend.ee kinnitatud ravijuhendid ja käsitlusjuhendid. Kirje avaneb samas kohas: kood, kuupäevad, lisade otselingid ja patsiendijuhend; mõne juhendi sageli vajalik lisa on kohe pildina.')
+        + rjFeat('Lisa pildina või Medicumi tabelitega', false)
+        + rjList('ravijuhend', 'Ravijuhendid (RJNK kinnitatud)')
+        + rjList('kasitlus', 'Käsitlusjuhendid')
+        + linksHtml(['ravijuhend', 'rj-pj', 'abr'])
+        + examples(['KNH', 'tonsilliit', 'antibiootikum', 'SCORE2', 'osteoporoos', 'ATH', 'diabeet', 'kolorektaalvähk']);
       return;
     }
 
@@ -1208,7 +1223,7 @@
     el.results.innerHTML = `
       ${fundsHtml('Rahastus (metoodika § 6)')}
       ${teemaHtml}
-      ${rjHtml}
+      ${rjFeat('Ravijuhendid', true)}
       ${ksHtml}
       ${soelHtml}
       ${sec('Kiirvalikud', `<div class="quick">${quick}${msBtn}</div>`)}
@@ -1251,6 +1266,18 @@
   function renderTabs() {
     if (!el.tabs) return;
     el.tabs.innerHTML = TABS.map((t) => `<button class="tab${t.sn ? ' has-sn' : ''}" data-tab="${t.k}" aria-current="${state.tab === t.k ? 'page' : 'false'}"><span class="tl">${esc(t.n)}</span>${t.sn ? `<span class="ts">${esc(t.sn)}</span>` : ''}</button>`).join('');
+    // Kitsal ekraanil ei pruugi kõik vahelehed mahtuda: valitud vaheleht keritakse nähtavale ja parem serv hajub, kui midagi jääb peitu.
+    const cur = el.tabs.querySelector('[aria-current="page"]');
+    if (cur) {
+      const a = cur.getBoundingClientRect(), box = el.tabs.getBoundingClientRect();
+      if (a.right > box.right) el.tabs.scrollLeft += a.right - box.right + 12;
+      else if (a.left < box.left) el.tabs.scrollLeft -= box.left - a.left + 12;
+    }
+    tabsFade();
+  }
+  function tabsFade() {
+    const t = el.tabs;
+    if (t) t.classList.toggle('ovf', t.scrollWidth - t.clientWidth - t.scrollLeft > 4);
   }
 
   function renderChips() {
@@ -1401,6 +1428,7 @@
 
   function bind() {
     el.q = $('#q'); el.results = $('#results'); el.chips = $('#chips'); el.tabs = $('#tabs');
+    if (el.tabs) { el.tabs.addEventListener('scroll', tabsFade, { passive: true }); window.addEventListener('resize', tabsFade); }
     let deb;
     el.q.addEventListener('input', () => {
       clearTimeout(deb);
