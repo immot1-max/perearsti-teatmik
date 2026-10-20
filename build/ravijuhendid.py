@@ -321,6 +321,10 @@ def collect(get, cfg, prev_items, root, today):
                 continue
             if changed and old_pv:
                 notes.append(f"Eelvaade uuenes: {it['n']}, {lisa[0]}")
+            if want.get("peida"):
+                pv["peida"] = True  # käsitsi tabel asendab pildi; allikat jälgitakse edasi
+            if want.get("kasitsi_sha") and pv.get("sha") != want["kasitsi_sha"]:
+                warn.append(f"{it['n']}: {lisa[0]} muutus ravijuhend.ee-s; käsitsi tehtud tabel vajab ülevaatust (build/ravijuhendid.json)")
             pvs.append(pv)
         if pvs:
             it["pv"] = pvs

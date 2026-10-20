@@ -562,7 +562,7 @@
     } else if (it.t === 'g') {
       const nl = (it.lisad || []).length;
       head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${esc(it.kood || '')}</small></span>
-        <span class="meta"><span class="badge rj">${esc(it.liik || 'ravijuhend')}</span>${it.kinnitatud ? `<span>kinnitatud ${fmtDate(it.kinnitatud)}</span>` : ''}${nl ? `<span>${nl} lisa</span>` : ''}${(it.pv || []).length ? '<span class="badge rjpv">lisa pildina</span>' : ''}${it.mk ? '<span class="badge rjpv">+ Medicumi tabelid</span>' : ''}${via ? '<span class="via">· vaste lisades</span>' : ''}</span>`;
+        <span class="meta"><span class="badge rj">${esc(it.liik || 'ravijuhend')}</span>${it.kinnitatud ? `<span>kinnitatud ${fmtDate(it.kinnitatud)}</span>` : ''}${nl ? `<span>${nl} lisa</span>` : ''}${(it.pv || []).some((p) => !p.peida) ? '<span class="badge rjpv">lisa pildina</span>' : ''}${it.mk ? `<span class="badge rjpv">${esc(it.mk.lyh || 'tabel')}</span>` : ''}${via ? '<span class="via">· vaste lisades</span>' : ''}</span>`;
     } else if (it.t === 'v') {
       const yrs = it.sy ? `${it.aasta}: ${it.sy.length} sünniaastat` : (it.lyh || '');
       head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${esc(ageRange(it))}</small></span>
@@ -748,7 +748,7 @@
   function mkCell(c, tag) {
     const o = typeof c === 'string' ? { s: c } : c;
     const attrs = (o.r ? ` rowspan="${o.r}"` : '') + (o.c ? ` colspan="${o.c}"` : '');
-    const cls = [o.k ? 'rk ' + o.k : '', o.h ? 'rh' : ''].filter(Boolean).join(' ');
+    const cls = [o.k ? 'rk ' + o.k : '', o.h ? 'rh' : '', String(o.s).length <= 9 && !String(o.s).includes('\n') ? 'nw' : ''].filter(Boolean).join(' ');
     return `<${tag}${attrs}${cls ? ` class="${cls}"` : ''}>${hl(o.s, state.hl).replace(/\n/g, '<br>')}</${tag}>`;
   }
   function mkHtml(mk) {
@@ -780,15 +780,16 @@
     if ((it.er || []).length) h += `<div><dt>Erialad</dt><dd>${it.er.map(esc).join('<br>')}</dd></div>`;
     h += '</dl>';
     if (it.mk) h += mkHtml(it.mk);
-    for (const pv of it.pv || []) {
+    for (const pv of (it.pv || []).filter((p) => !p.peida)) {
       const lk = pv.lk ? ` · juhendi PDF lk ${pv.lk.join('–')}` : '';
       h += `<details class="rjpv" open><summary>${hl(pv.n, state.hl)}</summary><div class="pvimgs">`
         + pv.img.map(([src, w, hh], i) => `<a href="${esc(src)}" target="_blank" rel="noopener" title="Ava suurelt"><img src="${esc(src)}" width="${w}" height="${hh}" loading="lazy" alt="${esc(pv.n)}${pv.img.length > 1 ? `, osa ${i + 1}` : ''}"></a>`).join('')
         + `</div><p class="small">Pilt ravijuhendi lisast (ravijuhend.ee${lk}). Klõps avab suurelt. <a href="${esc(pv.u)}" target="_blank" rel="noopener">Lisa allikas ↗</a></p></details>`;
     }
-    const pvN = new Set((it.pv || []).map((p) => p.n));
+    const pvN = new Set((it.pv || []).filter((p) => !p.peida).map((p) => p.n));
+    const mkN = it.mk && /^Lisa \d+/.test(it.mk.n || '') ? (it.mk.n.match(/^Lisa \d+/) || [])[0] : null;
     if ((it.lisad || []).length) {
-      h += '<div class="rules"><h4>Lisad</h4><div class="rjl">' + it.lisad.map(([n, u]) => `<div><a href="${esc(u)}" target="_blank" rel="noopener">${hl(n, state.hl)} ↗</a>${pvN.has(n) ? ' <span class="inh">(pilt ülal)</span>' : ''}</div>`).join('') + '</div></div>';
+      h += '<div class="rules"><h4>Lisad</h4><div class="rjl">' + it.lisad.map(([n, u]) => `<div><a href="${esc(u)}" target="_blank" rel="noopener">${hl(n, state.hl)} ↗</a>${pvN.has(n) ? ' <span class="inh">(pilt ülal)</span>' : mkN && n.startsWith(mkN + '.') ? ' <span class="inh">(tabel ülal)</span>' : ''}</div>`).join('') + '</div></div>';
     }
     h += `<div class="actions"><a href="${esc(it.u)}" target="_blank" rel="noopener">Ava ravijuhend.ee-s ↗</a>`
       + (it.pdf ? `<a href="${esc(it.pdf)}" target="_blank" rel="noopener">Kogu juhend (PDF) ↗</a>` : '')
@@ -1169,7 +1170,7 @@
     const tabHint = (txt) => `<p class="tabhint">${esc(txt)} Otsing otsib alati kõigist andmetest.</p>`;
     const rjAll = d.items.filter((x) => x.t === 'g');
     const linkBtn = (id) => { const x = linkBy(id); return x ? `<a class="btn" href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.n)} ↗</a>` : ''; };
-    const rjCard = (x) => `<button class="qbtn rj" data-focus="${x._id}"><b>${esc(x.sn)}</b><small>${esc([...(x.pv || []).map((p) => (p.n.match(/^Lisa \d+/) || [p.n])[0] + ' pildina'), x.mk ? 'Medicumi riskitabelid' : ''].filter(Boolean).join(', '))}${x.kood ? ' · ' + esc(x.kood) : ''}</small></button>`;
+    const rjCard = (x) => `<button class="qbtn rj" data-focus="${x._id}"><b>${esc(x.sn)}</b><small>${esc([...(x.pv || []).filter((p) => !p.peida).map((p) => (p.n.match(/^Lisa \d+/) || [p.n])[0] + ' pildina'), x.mk ? (x.mk.lyh || 'tabel') : ''].filter(Boolean).join(', '))}${x.kood ? ' · ' + esc(x.kood) : ''}</small></button>`;
     const rjFeat = (title, more) => (!rjAll.length ? '' : sec(title, `<div class="quick">${rjAll.filter((x) => x.sn).map(rjCard).join('')}</div>`
       + `<div class="actions rjact">${more ? `<button class="btn solid" data-tab="rj">Kõik ravijuhendid (${rjAll.length})</button>` : ''}${linkBtn('rj-pj')}${linkBtn('abr')}</div>`
       + '<p class="hint">Otsi juhendi nime, teema või lisa sisu järgi (nt „tonsilliit“, „KNH“, „SCORE2“). Juhendi kirjes on kood, kuupäevad, lisade otselingid ja patsiendijuhend.</p>'));

@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "kommentaar": "Ravijuhendid ravijuhend.ee-st (build/ravijuhendid.py). Loendist võetakse kõik RJNK kinnitatud ravijuhendid ja käsitlusjuhendid, juhendi lehelt kood, kuupäevad, erialad, võtmesõnad (otsingu sünonüümid), lisad ja patsiendijuhendi link. 'juhendid' võti on 'rj<id>' (aadress /tervishoiuvarav/juhendid/<id>) või 'gp<id>' (aadress /tervishoiuvarav/juhendid-gp/<id>). 'eelvaade': lisa number ja kontrollsõna pealkirjas; lisa näidatakse juhendi kirjes pildina (PDF-ist või juhendi lehe piltidest). 'sn': lühinimi, millega juhend on avalehel esile tõstetud. 'kasitsi': käsitsi lisatud sisu (nt Medicumi majasisesed tabelid), mida automaatkontroll ei uuenda; juhendi uue versiooni korral tuleb aruandesse meeldetuletus.",
+    "kommentaar": "Ravijuhendid ravijuhend.ee-st (build/ravijuhendid.py). Loendist võetakse kõik RJNK kinnitatud ravijuhendid ja käsitlusjuhendid, juhendi lehelt kood, kuupäevad, erialad, võtmesõnad (otsingu sünonüümid), lisad ja patsiendijuhendi link. 'juhendid' võti on 'rj<id>' (aadress /tervishoiuvarav/juhendid/<id>) või 'gp<id>' (aadress /tervishoiuvarav/juhendid-gp/<id>). 'eelvaade': lisa number ja kontrollsõna pealkirjas; lisa näidatakse juhendi kirjes pildina (PDF-ist või juhendi lehe piltidest). 'sn': lühinimi, millega juhend on avalehel esile tõstetud. 'kasitsi': käsitsi lisatud sisu (Medicumi majasisesed tabelid, parandatud lisa), mida automaatkontroll ei uuenda; juhendi uue versiooni korral tuleb aruandesse meeldetuletus. Eelvaate 'peida': pilti ei näidata (käsitsi tabel asendab), kuid allikat jälgitakse; 'kasitsi_sha' on allika räsi, mille järgi käsitsi tabel tehti, ja selle muutumisel tuleb aruandesse meeldetuletus.",
     "loend": "https://ravijuhend.ee/tervishoiuvarav/juhendid",
     "patsiendijuhendid": "https://ravijuhend.ee/patsiendivarav/juhendid",
     "kontrollitud": "2026-10-20"
@@ -13,7 +13,8 @@
   "juhendid": {
     "rj250": {
       "sn": "Krooniline neeruhaigus",
-      "eelvaade": [{"lisa": 3, "sisaldab": "progresseerumine"}],
+      "eelvaade": [{"lisa": 3, "sisaldab": "progresseerumine", "peida": true, "kasitsi_sha": "f81baa8813445bd1"}],
+      "kasitsi": "knh-lisa3",
       "syn": ["KNH", "CKD", "krooniline neeruhaigus", "neeruhaigus", "neerupuudulikkus", "eGFR", "albuminuuria", "alb/krea", "KDIGO"]
     },
     "gp32": {
@@ -57,22 +58,46 @@
     "gp22": {"syn": ["peavalu"], "seotud": ["kys-peavalu"]}
   },
   "kasitsi": {
+    "knh-lisa3": {
+      "n": "Lisa 3. Kroonilise neeruhaiguse progresseerumine eGFR-i ja albuminuuria alusel",
+      "lyh": "Lisa 3 tabelina",
+      "allikas": "Ravijuhendi lisa 3 (kohandatud KDIGO 2012. aasta ravijuhendist) tabelina. Albuminuuria veergude päis (A1, U-Alb/U-Crea alusel) on parandatud lisa 2 järgi: algses lisas on A1 asemel „U-Alb/U-Crea alusel“. Lisatud käsitsi 20.10.2026; kui ravijuhend.ee lisa muutub, tuleb aruandesse meeldetuletus.",
+      "plokid": [
+        {"t": "tbl", "n": "Jälgimise sagedus (kordade arv aastas) eGFR-i ja albuminuuria kategooriate alusel",
+         "pais": [
+           [{"s": "KNH raskusaste eGFR-i (mL/min/1,73 m²) alusel", "r": 4, "c": 3}, {"s": "Albuminuuria kategooriad\nU-Alb/U-Crea alusel", "c": 3}],
+           ["A1", "A2", "A3"],
+           ["normaalne kuni kergelt suurenenud", "mõõdukalt suurenenud", "tugevalt suurenenud"],
+           ["< 3 mg/mmol", "3–30 mg/mmol", "> 30 mg/mmol"]
+         ],
+         "read": [
+           [{"s": "G1", "k": "kb", "h": 1}, {"s": "normaalne neerufunktsioon", "k": "kb"}, {"s": "≥ 90", "k": "kb"}, {"s": "1 kui on KNH", "k": "kg"}, {"s": "1", "k": "ky"}, {"s": "2", "k": "ko"}],
+           [{"s": "G2", "k": "kb", "h": 1}, {"s": "kerge neerufunktsiooni vähenemine", "k": "kb"}, {"s": "60–89", "k": "kb"}, {"s": "1 kui on KNH", "k": "kg"}, {"s": "1", "k": "ky"}, {"s": "2", "k": "ko"}],
+           [{"s": "G3a", "k": "kb", "h": 1}, {"s": "kerge kuni mõõdukas neerufunktsiooni vähenemine", "k": "kb"}, {"s": "45–59", "k": "kb"}, {"s": "1", "k": "ky"}, {"s": "2", "k": "ko"}, {"s": "3", "k": "kr"}],
+           [{"s": "G3b", "k": "kb", "h": 1}, {"s": "mõõdukas kuni märkimisväärne neerufunktsiooni vähenemine", "k": "kb"}, {"s": "30–44", "k": "kb"}, {"s": "2", "k": "ko"}, {"s": "3", "k": "kr"}, {"s": "3", "k": "kr"}],
+           [{"s": "G4", "k": "kb", "h": 1}, {"s": "märkimisväärne neerufunktsiooni vähenemine", "k": "kb"}, {"s": "15–29", "k": "kb"}, {"s": "3", "k": "kr"}, {"s": "3", "k": "kr"}, {"s": "4+", "k": "kd"}],
+           [{"s": "G5", "k": "kb", "h": 1}, {"s": "lõppstaadiumi neerupuudulikkus", "k": "kb"}, {"s": "< 15", "k": "kb"}, {"s": "4+", "k": "kd"}, {"s": "4+", "k": "kd"}, {"s": "4+", "k": "kd"}]
+         ]},
+        {"t": "small", "s": "Tabelis on märgitud KNH progresseerumise risk sõltuvalt selle raskusastmest. Ruutudes olevad numbrid tähendavad jälgimise sagedust aastas. Roheline tähistab haiguse stabiilset kulgu, mille puhul tuleb KNH esinemisel analüüse teha kord aastas. Kollane tähistab suuremat riski: analüüsid tuleks teha vähemalt kord aastas. Oranži tähistuse korral on vaja analüüse teha kaks korda, punase puhul kolm korda ja tumepunase korral neljal või rohkemal korral aastas (vähemalt iga 1–3 kuu järel). Need on üldised parameetrid, mis tuginevad ekspertide arvamusele. Arvestada tuleb iga üksiku patsiendi kaasnevaid haigusi ja üldseisundit, sh mõju patsiendi edasisele käsitlusele."}
+      ]
+    },
     "medicum-ht": {
       "n": "Vererõhu aste ja kardiovaskulaarne lisarisk; SCORE2 (Medicumi majasisene juhis)",
-      "allikas": "Medicum Perearstikeskuse majasisene juhis. Ei ole ravijuhendi osa; lisatud käsitsi 20.10.2026.",
+      "lyh": "Medicumi riskitabelid",
+      "allikas": "Medicum Perearstikeskuse majasisene juhis. Ei ole ravijuhendi osa; lisatud käsitsi 20.10.2026. Täiendatud 20.10.2026: kõrgenenud vererõhu veerus DVR 85–89 ja nimetus ravijuhendi tabeli 1 järgi („kõrgenenud“, ESC/ESH-s „kõrgenormaalne“), 3. staadiumi reas diabeet koos organikahjustusega (ESC/ESH 2018).",
       "plokid": [
         {"t": "p", "s": "Kardiovaskulaarne risk: 1 – madal; 2 – mõõdukas; 3 – kõrge või väga kõrge."},
         {"t": "tbl", "n": "Vererõhu aste ja kardiovaskulaarne lisarisk",
          "pais": [
            [{"s": "Hüpertensiooni staadium", "r": 2}, {"s": "Muud riskitegurid, HMOD, SVH või KNH", "r": 2}, {"s": "Vererõhu aste (mmHg)", "c": 4}],
-           ["Kõrgenormaalne\nSVR 130–139", "1. aste\nSVR 140–159\nDVR 90–99", "2. aste\nSVR 160–179\nDVR 100–109", "3. aste\nSVR ≥180\nDVR ≥110"]
+           ["Kõrgenenud\nSVR 130–139\nDVR 85–89", "1. aste\nSVR 140–159\nDVR 90–99", "2. aste\nSVR 160–179\nDVR 100–109", "3. aste\nSVR ≥180\nDVR ≥110"]
          ],
          "read": [
            [{"s": "1. staadium", "r": 3, "h": 1}, "Muud riskitegurid puuduvad", {"s": "Madal risk", "k": "r1"}, {"s": "Madal risk", "k": "r1"}, {"s": "Mõõdukas risk", "k": "r2"}, {"s": "Kõrge risk", "k": "r3"}],
            ["1–2 riskitegurit", {"s": "Madal risk", "k": "r1"}, {"s": "Mõõdukas risk", "k": "r2"}, {"s": "Mõõdukas kuni kõrge risk", "k": "r0"}, {"s": "Kõrge risk", "k": "r3"}],
            ["≥3 riskitegurit", {"s": "Madal kuni mõõdukas risk", "k": "r0"}, {"s": "Mõõdukas kuni kõrge risk", "k": "r0"}, {"s": "Kõrge risk", "k": "r3"}, {"s": "Kõrge risk", "k": "r3"}],
            [{"s": "2. staadium", "h": 1}, "HMOD, KNH 3. staadium või diabeet", {"s": "Mõõdukas kuni kõrge risk", "k": "r0"}, {"s": "Kõrge risk", "k": "r3"}, {"s": "Kõrge risk", "k": "r3"}, {"s": "Väga kõrge risk", "k": "r4"}],
-           [{"s": "3. staadium", "h": 1}, "Väljakujunenud SVH või KNH ≥4. staadium", {"s": "Väga kõrge risk", "k": "r4"}, {"s": "Väga kõrge risk", "k": "r4"}, {"s": "Väga kõrge risk", "k": "r4"}, {"s": "Väga kõrge risk", "k": "r4"}]
+           [{"s": "3. staadium", "h": 1}, "Väljakujunenud SVH, KNH ≥4. staadium või diabeet koos organikahjustusega", {"s": "Väga kõrge risk", "k": "r4"}, {"s": "Väga kõrge risk", "k": "r4"}, {"s": "Väga kõrge risk", "k": "r4"}, {"s": "Väga kõrge risk", "k": "r4"}]
          ]},
         {"t": "small", "s": "SVR – süstoolne; DVR – diastoolne vererõhk. HMOD – hüpertensioonist tingitud organikahjustus; SVH – südame-veresoonkonnahaigus; KNH – krooniline neeruhaigus. 1. staadiumis täiendav riskihindamine SCORE2 / SCORE2-OP abil (vt allpool)."},
         {"t": "def", "p": "Riskitegurid", "s": "suitsetamine, düslipideemia, ülekaal, vähene kehaline aktiivsus; mehed >55 a, naised >65 a; paastuglükoos 5,6–6,9 mmol/l, glükoositaluvuse häire; abdominaalne rasvumine, varane KVS haigus perekonnas, suur pulsirõhk eakatel."},

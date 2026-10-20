@@ -471,10 +471,19 @@ details.rjpv > summary, details.mk > summary { cursor: pointer; font-size: 0.88r
 .mkt th, .mkt td { border: 1px solid var(--line); padding: 4px 6px; vertical-align: middle; text-align: center; }
 .mkt th { background: var(--surface-2); font-weight: 600; }
 .mkt td.rh { font-weight: 600; }
+.mkt .nw { white-space: nowrap; }
+.mkt td.rk { min-width: 6.5em; }
 .mkt td.r1 { background: #c3d98a; color: #1c2a0c; }
 .mkt td.r2 { background: #e2b33f; color: #2a1d00; }
 .mkt td.r3 { background: #a8643a; color: #ffffff; }
 .mkt td.r4 { background: #98191c; color: #ffffff; }
 .mkt td.r0 { background: var(--surface); }
+/* KNH lisa 3 (KDIGO) värvid */
+.mkt td.kb { background: #eef2dc; color: #1c2a0c; text-align: left; }
+.mkt td.kg { background: #9bbb1f; color: #13200a; }
+.mkt td.ky { background: #ffe94a; color: #2a2300; }
+.mkt td.ko { background: #ef8a1a; color: #2a1400; }
+.mkt td.kr { background: #e2231f; color: #ffffff; }
+.mkt td.kd { background: #b80d14; color: #ffffff; }
 .mksrc { font-style: italic; }
-@media (max-width: 480px) { .mkt table { font-size: 0.74rem; } .mkt th, .mkt td { padding: 3px 4px; } }
+@media (max-width: 480px) { .mkt table { font-size: 0.74rem; } .mkt th, .mkt td { padding: 3px 4px; } .mkt td.rk { min-width: 4.2em; } }
