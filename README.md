@@ -1,6 +1,6 @@
 # Perearsti teatmik
 
-Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, sõeluuringute, haigus- ja hoolduslehtede, tervisetõendite, vaktsineerimise, retseptide, e-konsultatsiooni, patsiendi hüvitiste, abivahendite ja juhi tervisenõuete kohta, lisaks koolivaheajad, patsiendi küsimustike ja päevikute otselingid ning koloskoopia ja gastroskoopia ettevalmistusjuhendid. Näitab ka, mis allikates viimasel ajal muutus või peagi muutub. Töötab brauseris ja pärast esimest avamist ka võrguta.
+Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, sõeluuringute, haigus- ja hoolduslehtede, tervisetõendite, vaktsineerimise, retseptide, e-konsultatsiooni, patsiendi hüvitiste, abivahendite ja juhi tervisenõuete kohta, lisaks koolivaheajad, patsiendi küsimustike ja päevikute otselingid, koloskoopia ja gastroskoopia ettevalmistusjuhendid ning kõigi kinnitatud ravijuhendite otselingid koos valitud lisadega. Näitab ka, mis allikates viimasel ajal muutus või peagi muutub. Töötab brauseris ja pärast esimest avamist ka võrguta.
 
 Avalehe kohal on vahelehed: „Avaleht“ (kõik), „Rahastus“ (fondid, pearaha ja lisatasud, kvaliteedisüsteem, sõeluuringud, loetelu ja metoodika muudatused), „Seadused ja nõuded“ (igapäevatöö reeglid, abivahendid, meditsiiniseadmed, teiste aktide muudatused) ning „Küsimustikud ja infolehed“ (teemakaardirühmad „Küsimustikud ja päevikud“ ja „Infolehed patsiendile“, kasulikud lingid). Vaheleht määrab, mida näidatakse ilma otsinguta ja millised kategooriakiibid on reas; otsing otsib alati kõigist andmetest. Vahelehe saab avada aadressiga `?tab=rahastus`, `?tab=noud` või `?tab=kys`. Vahelehtede seadistus on `app.js` konstantides `TABS`, `TAB_CHIPS`, `KYS_GROUPS` ja `RAHASTUS_SRC`.
 
@@ -31,6 +31,7 @@ Avalehe kohal on vahelehed: „Avaleht“ (kõik), „Rahastus“ (fondid, peara
 | Tervisekassa: hüvitiste võrdlustabel | Haigus- ja hoolduslehe põhjused, kes maksab, määr, kestus ja päevane ülempiir (loetakse igal kontrollil) |
 | Toru (Tervisekassa) | Hinna kehtivuse algus, eelmine hind, koodid, mida loetelu tabelites ei ole |
 | Sotsiaalkindlustusamet | Lingid juhenditele ja vormidele |
+| ravijuhend.ee | Kõik RJNK kinnitatud ravijuhendid ja käsitlusjuhendid: kood, kinnitamise ja avaldamise kuupäev, erialad, võtmesõnad (otsingus sünonüümid), lisade otselingid, kogu juhendi PDF ja patsiendijuhend; valitud lisad pildina |
 
 ## Mis muutus
 
@@ -90,6 +91,18 @@ Iga punkti juures on viide sättele (avaneb rakenduses) või allikale. Automaatn
 3. Tervisekassa ja Terviseameti lehtede „Viimati uuendatud“ kuupäev ja PDF-ide sisu jälgitakse; muutusest tuleb teavitus koos soovitusega teemakaart üle vaadata. Kaardil võib olla ka ülevaatuse kuupäev (väli `ule`, nt töötasu alammäärade kaardil 01.01.2027, kui kollektiivleping lõpeb); sellest alates tuleb teavitusse meeldetuletus.
 
 Allikate omavahelised vastuolud on kaardil „Erinevused allikates“ all (nt õe õigused töövõimetuslehel, perearsti vahetuse kuupäev, P21 juhendi 15./16. päev, Tervisekassa aegunud patsiendilehed).
+
+## Ravijuhendid
+
+Skript `build/ravijuhendid.py` loeb igal kontrollil ravijuhend.ee loendist (sama JSON, mida kasutab leht https://ravijuhend.ee/tervishoiuvarav/juhendid) kõik RJNK kinnitatud ravijuhendid ja käsitlusjuhendid ning iga juhendi lehelt koodi, kinnitamise ja avaldamise kuupäeva, erialad, võtmesõnad, lisad, kogu juhendi PDF-i ja patsiendijuhendi lingi. Patsiendijuhendid on eraldi kirjena ainult üldlingina.
+
+Failis `build/ravijuhendid.json` on:
+
+- `eelvaade`: millised lisad näidatakse juhendi kirjes kohe pildina (lisa number ja kontrollsõna pealkirjas). Pilt tehakse lisa PDF-ist; kui lisal PDF-i pole, otsitakse lisa leheküljed kogu juhendi PDF-ist ja viimase võimalusena võetakse juhendi lehe pildid. Pildid on kaustas `lisad/` ja tehakse uuesti ainult siis, kui allika räsi muutus. Kui lisade numeratsioon muutub, otsitakse sama kontrollsõnaga lisa ja aruandesse tuleb märkus.
+- `syn`, `sn`, `ks`, `seotud`, `lingid`: lisasünonüümid, avalehe lühinimi, seos kvaliteedisüsteemi jaotisega, seotud teemakaardid ja lisalingid (nt TÜ Kliinikumi antimikroobse ravi rakendus infektsioonide juhendites).
+- `kasitsi`: käsitsi lisatud sisu, mida automaatkontroll ei uuenda (Medicumi majasisesed vererõhu ja SCORE2 riskitabelid kõrgvererõhktõve juhendi juures). Kui juhendist ilmub uus versioon, tuleb aruandesse meeldetuletus see üle vaadata.
+
+Uued ja kadunud juhendid, uued versioonid (kood või kinnitamise kuupäev muutus), muutunud lisad ja eelvaated on aruandes jaotises „Ravijuhendid“. Kui ravijuhend.ee pole kättesaadav, jääb alles eelmine seis.
 
 ## Sünonüümid
 

@@ -31,6 +31,7 @@ from lxml import html as lhtml
 
 import met_lisad
 import muutused
+import ravijuhendid
 
 BUILD_VERSION = "2"
 API = "https://www.riigiteataja.ee/public-api/api/v1"
@@ -51,7 +52,7 @@ FUND_SUB = {"f13": "keskuse enda füsioterapeut, psühholoog, logopeed"}
 _last_call = {}
 
 
-def http_get(url, timeout=300, tries=6):
+def http_get(url, timeout=300, tries=6, headers=None):
     """GET koos ettevaatliku tempoga: sama hosti päringute vahel vähemalt 0,6 s;
     vastuse 429 (liiga palju päringuid) korral oodatakse Retry-After või kasvava pausi võrra."""
     host = urllib.parse.urlsplit(url).netloc
@@ -62,7 +63,7 @@ def http_get(url, timeout=300, tries=6):
             time.sleep(wait)
         _last_call[host] = time.time()
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "perearsti-teatmik/1 (+github pages)"})
+            req = urllib.request.Request(url, headers=dict({"User-Agent": "perearsti-teatmik/1 (+github pages)"}, **(headers or {})))
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 return r.read()
         except urllib.error.HTTPError as e:
@@ -1015,7 +1016,8 @@ def build(args):
 
     toru_dir = os.path.join(HERE, "toru")
     aux_hash = hashlib.sha256()
-    for fn in ["synonyms.json", "links.json", "build.py", "muutused.py", "met_lisad.py", "ks_notes.json", "ms_ryhmakoodid.json", "soeluuringud.json", "teemad.json"]:
+    for fn in ["synonyms.json", "links.json", "build.py", "muutused.py", "met_lisad.py", "ks_notes.json", "ms_ryhmakoodid.json", "soeluuringud.json", "teemad.json",
+               "ravijuhendid.json", "ravijuhendid.py"]:
         with open(os.path.join(HERE, fn), "rb") as f:
             aux_hash.update(f.read())
     toru_loaded = load_toru_rows(toru_dir)  # xlsx olemasolul uuendab väljavõtet
@@ -1045,6 +1047,13 @@ def build(args):
     if huvitised:
         aux_hash.update(json.dumps([huvitised["rows"], huvitised.get("ylempiir")], ensure_ascii=False, sort_keys=True).encode())
     jalgimine = watch_sources(teemad_cfg.get("allikad", {}), prev)
+    # Ravijuhendid (ravijuhend.ee): loend, juhendite lehed ja valitud lisade eelvaated (pildid kaustas lisad/).
+    with open(os.path.join(HERE, "ravijuhendid.json"), encoding="utf-8") as f:
+        rj_cfg = json.load(f)
+    print("[ravijuhend.ee] loend ja juhendid", flush=True)
+    rj_items, rj_meta = ravijuhendid.collect(http_get, rj_cfg, [x for x in (prev or {}).get("items", []) if x["t"] == "g"],
+                                             ROOT, TODAY.isoformat())
+    aux_hash.update(ravijuhendid.fingerprint(rj_items).encode())
     # Ülevaatuse kuupäeva saabumine (teemakaardi väli „ule“) käivitab ehituse, et hoiatus jõuaks aruandesse.
     aux_hash.update(json.dumps(sorted(t["k"] for t in teemad_cfg["teemad"] if t.get("ule") and TODAY.isoformat() >= t["ule"]["alates"])).encode())
     # Sõrmejälge mõjutab sisu muutus ja püsiv (vähemalt kaks järjestikust) kättesaamatus, mitte ühekordne võrgutõrge.
@@ -1320,8 +1329,9 @@ def build(args):
                                        (prev or {}).get("muutused"), TODAY)
     teema_warn += muut_warn
 
-    # 8. fondid, lingid, sünonüümid
+    # 8. fondid, ravijuhendid, lingid, sünonüümid
     items.extend(funds)
+    items.extend(rj_items)
     with open(os.path.join(HERE, "links.json"), encoding="utf-8") as f:
         links = json.load(f)
     for ln in links:
@@ -1362,7 +1372,7 @@ def build(args):
         "toru": toru_meta,
         "abivCols": ab_cols,
         "starRule": star_rule,
-        "counts": {t: sum(1 for x in items if x["t"] == t) for t in ["s", "f", "l", "a", "k", "q", "b", "m", "v", "j"]},
+        "counts": {t: sum(1 for x in items if x["t"] == t) for t in ["s", "f", "l", "a", "k", "q", "b", "m", "v", "j", "g"]},
         "soel": soel_meta,
         "huvitised": huvitised,
         "jalgimine": jalgimine,
@@ -1373,6 +1383,7 @@ def build(args):
         "synlab": synlab_meta,
         "tk": tk,
         "ksNotes": ks_notes.get("_meta"),
+        "rj": rj_meta,
     }
     kulu = ml.get("kulu")
     if kulu:
@@ -1684,6 +1695,15 @@ def make_report(prev, data, missing):
     lines.append("## Igapäevatöö teemakaardid")
     lines.extend(tlines or ["- Kõik teemakaartide tekstikontrollid läbitud."])
     lines.append("")
+    rj = data["meta"].get("rj") or {}
+    gi = [x for x in data["items"] if x["t"] == "g"]
+    if gi or rj.get("warn") or rj.get("notes"):
+        lines.append("## Ravijuhendid (ravijuhend.ee)")
+        lines.append(f'- {sum(1 for x in gi if x.get("liik") == "ravijuhend")} ravijuhendit, {sum(1 for x in gi if x.get("liik") != "ravijuhend")} käsitlusjuhendit, '
+                     f'{sum(len(x.get("pv", [])) for x in gi)} lisa eelvaadet')
+        lines.extend(f"- {n}" for n in rj.get("notes", []))
+        lines.extend(f"- NB: {w}" for w in rj.get("warn", []))
+        lines.append("")
     if data["meta"].get("msUnmapped"):
         lines.append("## Meditsiiniseadme rühmad, millel puudub 9MS kood")
         lines.append(", ".join(data["meta"]["msUnmapped"]) + " (lisa kood faili build/ms_ryhmakoodid.json)")
@@ -1706,7 +1726,7 @@ def make_report(prev, data, missing):
         lines.append(", ".join(missing))
     c = data["meta"]["counts"]
     lines.append("")
-    lines.append(f"Kokku: {c['s']} teenust, {c.get('m', 0)} meditsiiniseadmete rühma, {c.get('b', 0)} SYNLABi analüüsi, {c['a']} abivahendit, {c['l']} sätet, {c['f']} fondi, {c.get('q', 0)} kvaliteedisüsteemi jaotist, {c.get('v', 0)} sõeluuringut, {c.get('j', 0)} teemakaarti, {c['k']} linki.")
+    lines.append(f"Kokku: {c['s']} teenust, {c.get('m', 0)} meditsiiniseadmete rühma, {c.get('b', 0)} SYNLABi analüüsi, {c['a']} abivahendit, {c['l']} sätet, {c['f']} fondi, {c.get('q', 0)} kvaliteedisüsteemi jaotist, {c.get('v', 0)} sõeluuringut, {c.get('j', 0)} teemakaarti, {c.get('g', 0)} ravijuhendit, {c['k']} linki.")
     return "\n".join(lines) + "\n"
 
 

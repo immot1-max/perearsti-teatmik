@@ -101,5 +101,8 @@
   "sate:mootorsoidukijuht:§ 10": ["tervisetõend", "tõendi kehtivus", "tõendi vormistamine"],
 
   "link:rhk-tehik": ["rhk", "rhk-10", "rhk10", "rhk 10", "rhk kood", "diagnoosikood", "diagnoosi kood", "diagnoosikoodid", "icd", "icd-10", "icd10"],
-  "link:rhk-sm": ["rhk", "rhk-10", "rhk10", "rhk 10", "rhk otsing", "diagnoosikood", "diagnoosi kood", "icd-10"]
+  "link:rhk-sm": ["rhk", "rhk-10", "rhk10", "rhk 10", "rhk otsing", "diagnoosikood", "diagnoosi kood", "icd-10"],
+  "link:ravijuhend": ["ravijuhendid", "ravijuhend.ee"],
+  "link:rj-pj": ["patsiendijuhend", "patsiendijuhendid", "patsiendi juhend", "ravijuhend patsiendile"],
+  "link:abr": ["antimikroobne ravi", "antibiootikum", "antibiootikumid", "antibakteriaalne ravi", "abr", "kliinikumi antibiootikumid"]
 }

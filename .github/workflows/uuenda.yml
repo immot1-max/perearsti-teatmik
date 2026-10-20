@@ -18,6 +18,8 @@ on:
       - "build/build.py"
       - "build/muutused.py"
       - "build/met_lisad.py"
+      - "build/ravijuhendid.json"
+      - "build/ravijuhendid.py"
 
 permissions:
   contents: write
@@ -59,6 +61,7 @@ jobs:
         run: |
           git config user.name "teatmiku-robot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A lisad
           git add data build/sources.json build/report.md build/toru/toru_valjavote.json
           git commit -m "Andmete uuendus $(date +%Y-%m-%d)" || exit 0
           git push

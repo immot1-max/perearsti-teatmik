@@ -52,7 +52,7 @@
   const TAB_CHIPS = {
     rahastus: ['s', 'fund', 'q', 'v', 'b', 'pa'],
     noud: ['j', 'l', 'a', 'm', 'u'],
-    kys: [],
+    kys: ['g'],
   };
   // Vahelehe „Küsimustikud ja infolehed“ rühmad (teemad.json väli grupp); need ei ole vahelehel „Seadused ja nõuded“.
   const KYS_GROUPS = ['Küsimustikud ja päevikud', 'Infolehed patsiendile'];
@@ -215,6 +215,7 @@
       else if (it.t === 'v') cls = 'soel';
       else if (it.t === 'j') cls = ('teema ' + tgCls(it.g)).trim();
       else if (it.t === 'u') cls = 'muutus';
+      else if (it.t === 'g') cls = 'rj';
       it._cls = cls;
       let name = it.n || '';
       let ctx = '', txt = '', code = '';
@@ -267,6 +268,11 @@
           (tb.rows || []).map((r) => [r.pohjus.join(' '), r.nr.join(' '), r.liik, r.kord.join(' '), r.kestus].join(' ')).join(' ')].join(' ')).join(' ');
         txt = [...(it.r || []), ...(it.e || []), ...(it.tul || [])].map((r) => (r.p || '') + ' ' + r.s + ' ' + (r.a || []).map((a) => a.n).join(' ')).join(' ') + ' ' + tabTxt;
         boost += 45 + (it.boost || 0);
+      } else if (it.t === 'g') {
+        name = `${it.n} ${it.sn || ''}`;
+        ctx = `${it.liik || ''} ravijuhend ${it.kood || ''} ${(it.er || []).join(' ')}`;
+        txt = (it.lisad || []).map((l) => l[0]).join(' ') + ' ' + (it.pv || []).map((p) => p.txt || '').join(' ') + ' ' + mkText(it.mk);
+        boost += it.liik === 'ravijuhend' ? 30 : 15;
       } else if (it.t === 'u') {
         name = `${it.n} ${it.lyh || ''} ${fmtDate(it.alates)}`;
         ctx = 'muutus muudatus muudatused mis muutus uus redaktsioon ' + (it.tul ? 'tulekul jõustub ' : 'jõustus ');
@@ -406,10 +412,11 @@
       + '<small>Avaneb GitHubi tagasisidevorm (vajab GitHubi kontot), otsisõna on juba sees. Puuduvad sõnad lisatakse sünonüümidesse.</small></div>';
   }
   // Kategooria- ja fondivaade (ilma otsinguta) näitab kirjeid rühmade kaupa.
-  const isGrouped = (hasQ) => !hasQ && !!(state.fund || ['a', 'l', 'q', 'b', 's', 'm', 'j', 'u'].includes(state.filter));
+  const isGrouped = (hasQ) => !hasQ && !!(state.fund || ['a', 'l', 'q', 'b', 's', 'm', 'j', 'u', 'g'].includes(state.filter));
   function groupKey(it) {
     if (it.t === 'u') return it.tul ? 'Tulekul: avaldatud, veel jõustumata' : 'Jõustunud viimase aasta jooksul';
     if (it.t === 'j') return it.g;
+    if (it.t === 'g') return it.liik === 'ravijuhend' ? 'Ravijuhendid (RJNK kinnitatud)' : 'Käsitlusjuhendid';
     if (it.t === 'm') return 'Tervisekassa meditsiiniseadmed';
     if (it.t === 'a') return (it.g || [])[0] || it.n;
     if (it.t === 'l') return srcName(it.src);
@@ -550,6 +557,10 @@
     } else if (it.t === 'u') {
       head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${it.tul ? 'jõustub ' : ''}${fmtDate(it.alates)}</small></span>
         <span class="meta">${it.tul ? '<span class="badge warn">tulekul</span>' : '<span class="badge muutus">jõustunud</span>'}<span>${esc(uSummary(it))}</span>${via ? '<span class="via">· vaste sisus</span>' : ''}</span>`;
+    } else if (it.t === 'g') {
+      const nl = (it.lisad || []).length;
+      head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${esc(it.kood || '')}</small></span>
+        <span class="meta"><span class="badge rj">${esc(it.liik || 'ravijuhend')}</span>${it.kinnitatud ? `<span>kinnitatud ${fmtDate(it.kinnitatud)}</span>` : ''}${nl ? `<span>${nl} lisa</span>` : ''}${(it.pv || []).length ? '<span class="badge rjpv">lisa pildina</span>' : ''}${it.mk ? '<span class="badge rjpv">+ Medicumi tabelid</span>' : ''}${via ? '<span class="via">· vaste lisades</span>' : ''}</span>`;
     } else if (it.t === 'v') {
       const yrs = it.sy ? `${it.aasta}: ${it.sy.length} sünniaastat` : (it.lyh || '');
       head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${esc(ageRange(it))}</small></span>
@@ -724,6 +735,68 @@
     if (p) p.outerHTML = pinHtml(); else route();
   }
 
+  // ------------------------------------------------------------ ravijuhendid
+  // Käsitsi lisatud sisu (nt Medicumi majasisesed tabelid): plokid p, small, def ja tbl (lahtris s, r = rowspan,
+  // c = colspan, k = riskivärv r0–r4, h = reapäis).
+  const mkCells = (b) => [...(b.pais || []), ...(b.read || [])].flat();
+  function mkText(mk) {
+    if (!mk) return '';
+    return [mk.n, ...(mk.plokid || []).map((b) => (b.t === 'tbl' ? [b.n, ...mkCells(b).map((c) => (typeof c === 'string' ? c : c.s))].join(' ') : `${b.p || ''} ${b.s || ''}`))].join(' ');
+  }
+  function mkCell(c, tag) {
+    const o = typeof c === 'string' ? { s: c } : c;
+    const attrs = (o.r ? ` rowspan="${o.r}"` : '') + (o.c ? ` colspan="${o.c}"` : '');
+    const cls = [o.k ? 'rk ' + o.k : '', o.h ? 'rh' : ''].filter(Boolean).join(' ');
+    return `<${tag}${attrs}${cls ? ` class="${cls}"` : ''}>${hl(o.s, state.hl).replace(/\n/g, '<br>')}</${tag}>`;
+  }
+  function mkHtml(mk) {
+    let h = `<details class="mk" open><summary>${esc(mk.n)}</summary><div class="mkb">`;
+    for (const b of mk.plokid || []) {
+      if (b.t === 'p') h += `<p>${hl(b.s, state.hl)}</p>`;
+      else if (b.t === 'small') h += `<p class="small">${hl(b.s, state.hl)}</p>`;
+      else if (b.t === 'def') h += `<p class="mkdef"><b>${esc(b.p)}:</b> ${hl(b.s, state.hl)}</p>`;
+      else if (b.t === 'tbl') {
+        h += `<h5>${esc(b.n)}</h5><div class="mkt"><table>`
+          + (b.pais || []).map((r) => `<tr>${r.map((c) => mkCell(c, 'th')).join('')}</tr>`).join('')
+          + (b.read || []).map((r) => `<tr>${r.map((c) => mkCell(c, 'td')).join('')}</tr>`).join('') + '</table></div>';
+      }
+    }
+    return h + `<p class="small mksrc">${esc(mk.allikas || '')}</p></div></details>`;
+  }
+  function rjDetail(it) {
+    const d = state.data;
+    let h = '';
+    const ks = (it.ks || []).map((k) => state.qByKey[k]).filter(Boolean);
+    const rel = (it.seotud || []).map((k) => state.teemaByKey[k]).filter(Boolean);
+    if (ks.length || rel.length) {
+      h += `<div class="seotud"><span>Vaata ka</span>${ks.map((q) => `<button class="badge ks" data-focus="${q._id}">Kvaliteedisüsteem: ${esc(q.sn)}</button>`).join('')}`
+        + `${rel.map((x) => `<button class="badge teema ${tgCls(x.g)}" data-focus="${x._id}">${esc(x.sn)}</button>`).join('')}</div>`;
+    }
+    h += '<dl class="kv">';
+    if (it.kood) h += `<div><dt>Juhendi kood</dt><dd>${esc(it.kood)}</dd></div>`;
+    if (it.kinnitatud || it.avaldatud) h += `<div><dt>Kinnitatud</dt><dd>${fmtDate(it.kinnitatud) || '–'}${it.avaldatud ? ` <span class="inh">avaldatud ${fmtDate(it.avaldatud)}</span>` : ''}</dd></div>`;
+    if ((it.er || []).length) h += `<div><dt>Erialad</dt><dd>${it.er.map(esc).join('<br>')}</dd></div>`;
+    h += '</dl>';
+    if (it.mk) h += mkHtml(it.mk);
+    for (const pv of it.pv || []) {
+      const lk = pv.lk ? ` · juhendi PDF lk ${pv.lk.join('–')}` : '';
+      h += `<details class="rjpv" open><summary>${hl(pv.n, state.hl)}</summary><div class="pvimgs">`
+        + pv.img.map(([src, w, hh], i) => `<a href="${esc(src)}" target="_blank" rel="noopener" title="Ava suurelt"><img src="${esc(src)}" width="${w}" height="${hh}" loading="lazy" alt="${esc(pv.n)}${pv.img.length > 1 ? `, osa ${i + 1}` : ''}"></a>`).join('')
+        + `</div><p class="small">Pilt ravijuhendi lisast (ravijuhend.ee${lk}). Klõps avab suurelt. <a href="${esc(pv.u)}" target="_blank" rel="noopener">Lisa allikas ↗</a></p></details>`;
+    }
+    const pvN = new Set((it.pv || []).map((p) => p.n));
+    if ((it.lisad || []).length) {
+      h += '<div class="rules"><h4>Lisad</h4><div class="rjl">' + it.lisad.map(([n, u]) => `<div><a href="${esc(u)}" target="_blank" rel="noopener">${hl(n, state.hl)} ↗</a>${pvN.has(n) ? ' <span class="inh">(pilt ülal)</span>' : ''}</div>`).join('') + '</div></div>';
+    }
+    h += `<div class="actions"><a href="${esc(it.u)}" target="_blank" rel="noopener">Ava ravijuhend.ee-s ↗</a>`
+      + (it.pdf ? `<a href="${esc(it.pdf)}" target="_blank" rel="noopener">Kogu juhend (PDF) ↗</a>` : '')
+      + (it.pj ? `<a href="${esc(it.pj)}" target="_blank" rel="noopener">Patsiendijuhend ↗</a>` : '')
+      + (it.lingid || []).map(([n, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)} ↗</a>`).join('') + '</div>';
+    const rm = d.meta.rj || {};
+    h += `<p class="small">Andmed ravijuhend.ee lehelt (kontrollitud ${fmtDate(rm.date || d.meta.date)}); kehtib alati ravijuhend.ee-s avaldatud juhend.</p>`;
+    return h;
+  }
+
   function detail(it) {
     const d = state.data;
     const re = state.hl;
@@ -876,6 +949,8 @@
       for (const v of d.items.filter((x) => x.t === 'v' && x.sy && (x.ks || []).includes(it.k))) {
         h += `<div class="rules"><h4>Sihtrühm ${v.aasta} (terviseportaal)</h4><div class="rule">Sünniaastad ${v.sy.join(', ')} (${esc(ageRange(v))}, ${esc(intText(v))}). <button class="badge soel" data-focus="${v._id}">${esc(v.n)}</button></div></div>`;
       }
+      const rjs = d.items.filter((x) => x.t === 'g' && (x.ks || []).includes(it.k));
+      if (rjs.length) h += `<div class="seotud"><span>Ravijuhend</span>${rjs.map((x) => `<button class="badge rj" data-focus="${x._id}">${esc(x.sn || x.n)}</button>`).join('')}</div>`;
       if (it.notes && it.notes.length) {
         const src = d.meta.ksNotes && d.meta.ksNotes.allikas ? d.meta.ksNotes.allikas : 'Tervisekassa juhendid';
         h += `<div class="rules"><h4>Selgitused (${esc(src)})</h4>${it.notes.map((n) => `<div class="rule">${hl(n, re)}</div>`).join('')}</div>`;
@@ -937,6 +1012,7 @@
       return h;
     }
     if (it.t === 'u') return uDetail(it);
+    if (it.t === 'g') return rjDetail(it);
     if (it.t === 'v') {
       let h = '<dl class="kv">';
       h += `<div><dt>Kellele</dt><dd>${esc(it.kes || '')}</dd></div>`;
@@ -1010,6 +1086,7 @@
         <p>„Mis muutus“ (avalehe lõpus) näitab iga jälgitava seaduse ja määruse viimase aasta jooksul jõustunud ja juba avaldatud tulevasi redaktsioone: uued ja kadunud koodid, hinnamuutused, fondide koodid ning muutunud sätete varasem ja uus sõnastus (muutunud sõnad on esile tõstetud).</p>
         <p>Teenuse koodi avades on näha ka „Mis on hinnas“: metoodika standardkulu lisa järgi personal (sh arsti minutid), ruumid, seadmed ja materjalid.</p>
         <p>„Igapäevatöö reeglid“ koondavad haigus- ja hoolduslehe, P21, tervisetõendite, nakkushaiguse teatiste, vaktsineerimise, retseptide, e-konsultatsiooni, patsiendi hüvitiste, töökorralduse ja nimistu põhireeglid, koolivaheajad, patsiendi küsimustike ja päevikute otselingid (EEK-2, SNAP-IV, uni, peavalu, urineerimine, AUDIT), patsiendi infolehed (koloskoopia ja gastroskoopia ettevalmistusjuhendid haiglate kaupa) (võimalusel eesti, vene ja inglise keeles) ning peremeditsiini residentuuri, 6. kursuse praktika ja abiarsti info (palk, tööaeg, puhkus, juhendamine); igal rühmal on oma värv. Iga punkti juures on viide sättele; ⚠ märgib allikate omavahelisi erinevusi. Otsida võib ka küsimusena (nt „kui kaua makstakse haigushüvitist“).</p>
+        <p>„Ravijuhendid“ sisaldab kõigi ravijuhend.ee kinnitatud ravijuhendite ja käsitlusjuhendite otselinke koos koodi, kuupäevade, lisade ja patsiendijuhendiga. Mõne juhendi sageli vajalik lisa (nt KNH progresseerumise tabel, antibiootikumide valik ja annused, osteoporoosi, ATH ja 2. tüüpi diabeedi algoritm) on kirjes kohe pildina näha; kõrgvererõhktõve juures on Medicumi majasisesed riskitabelid. Lisasid kontrollitakse kord kuus ja pilt uueneb, kui ravijuhend.ee-s lisa muutub.</p>
         <p>Linnuke „Ainult perearstiabi“ peidab teenused, mis ei kuulu perearsti fondidesse, kvaliteedisüsteemi ega perearstiabi peatükki (nt operatsioonid). Täpse koodi otsing näitab koodi alati.</p>
         <p>Rakendus töötab pärast esimest avamist ka võrguta. Telefonis lisa see avakuvale: iPhone'is Safari jagamismenüü → „Lisa avakuvale“, Androidis Chrome'i menüü → „Installi rakendus“.</p>
         <p>Andmed tulevad Riigi Teataja avalikust liidesest ja neid kontrollitakse automaatselt kord kuus. Õiguslikult kehtib alati Riigi Teatajas avaldatud tekst.</p>
@@ -1088,6 +1165,12 @@
         ${funds.map((f) => `<button class="fund ${f.k}" data-fund="${f.k}"><strong>${esc(f.n)}</strong><span>${fundHelp(f.k, false, true)}</span><span class="cnt">${f.cnt} teenust · ${esc(f.par)}</span></button>`).join('')}
       </div>${ftl ? `<p class="fundlink"><a href="${esc(ftl.u)}" target="_blank" rel="noopener">Perearstide fondide täitmised (Tervisekassa) ↗</a></p>` : ''}`);
     const tabHint = (txt) => `<p class="tabhint">${esc(txt)} Otsing otsib alati kõigist andmetest.</p>`;
+    const rjAll = d.items.filter((x) => x.t === 'g');
+    const linkBtn = (id) => { const x = linkBy(id); return x ? `<a class="btn" href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.n)} ↗</a>` : ''; };
+    const rjCard = (x) => `<button class="qbtn rj" data-focus="${x._id}"><b>${esc(x.sn)}</b><small>${esc([...(x.pv || []).map((p) => (p.n.match(/^Lisa \d+/) || [p.n])[0] + ' pildina'), x.mk ? 'Medicumi riskitabelid' : ''].filter(Boolean).join(', '))}${x.kood ? ' · ' + esc(x.kood) : ''}</small></button>`;
+    const rjHtml = !rjAll.length ? '' : sec('Ravijuhendid', `<div class="quick">${rjAll.filter((x) => x.sn).map(rjCard).join('')}</div>`
+      + `<div class="actions rjact"><button class="btn solid" data-filter="g">Kõik ravijuhendid (${rjAll.length})</button>${linkBtn('rj-pj')}${linkBtn('abr')}</div>`
+      + '<p class="hint">Otsi juhendi nime, teema või lisa sisu järgi (nt „tonsilliit“, „KNH“, „SCORE2“). Juhendi kirjes on kood, kuupäevad, lisade otselingid ja patsiendijuhend.</p>');
 
     if (tab === 'rahastus') {
       el.results.innerHTML = tabHint('Perearsti fondid, pearaha, lisatasud, kvaliteedisüsteem ja sõeluuringud.')
@@ -1108,22 +1191,24 @@
       return;
     }
     if (tab === 'kys') {
-      el.results.innerHTML = tabHint('Patsiendi küsimustikud, päevikud ja ettevalmistusjuhendid, võimalusel eesti, vene ja inglise keeles.')
+      el.results.innerHTML = tabHint('Patsiendi küsimustikud, päevikud ja ettevalmistusjuhendid (võimalusel eesti, vene ja inglise keeles) ning ravijuhendid.')
         + KYS_GROUPS.map((g) => {
           const cards = tj.filter((x) => x.g === g);
           return cards.length ? `<section class="section tgsec ${tgCls(g)}"><h2>${esc(g)}</h2><div class="quick">${cards.map(tCard).join('')}</div></section>` : '';
         }).join('')
+        + rjHtml
         + linksHtml(['ravijuhend', 'rhk-tehik', 'rhk-sm', 'ravimiregister', 'raviminfo'])
-        + examples(['EEK-2', 'unepäevik', 'AUDIT', 'SNAP-IV', 'peavalupäevik', 'koloskoopia', 'RHK']);
+        + examples(['EEK-2', 'unepäevik', 'AUDIT', 'SNAP-IV', 'peavalupäevik', 'koloskoopia', 'RHK', 'KNH', 'tonsilliit', 'SCORE2']);
       return;
     }
 
     const quick = [...QB_RAHA, ...QB_NOUD].map(qb).join('');
-    const ex = ['holter', 'IGRA', 'HCV', 'jalaortoos', '7115', 'hüpertoonia', '1966', 'haigusleht', 'P21', 'relvaluba', 'meremees', 'nakkushaiguse teatis', 'õe retsept', 'hambaravihüvitis', 'e-konsultatsioon', 'ratastool', 'juhiload', 'residendi puhkus', 'abiarst', 'EEK-2', 'unepäevik', 'koolivaheaeg'];
+    const ex = ['holter', 'IGRA', 'HCV', 'jalaortoos', '7115', 'hüpertoonia', '1966', 'haigusleht', 'P21', 'relvaluba', 'meremees', 'nakkushaiguse teatis', 'õe retsept', 'hambaravihüvitis', 'e-konsultatsioon', 'ratastool', 'juhiload', 'residendi puhkus', 'abiarst', 'EEK-2', 'unepäevik', 'koolivaheaeg', 'KNH', 'tonsilliit'];
     const teemaHtml = !tj.length ? '' : sec('Igapäevatöö reeglid', tGroups(allGroups));
     el.results.innerHTML = `
       ${fundsHtml('Rahastus (metoodika § 6)')}
       ${teemaHtml}
+      ${rjHtml}
       ${ksHtml}
       ${soelHtml}
       ${sec('Kiirvalikud', `<div class="quick">${quick}${msBtn}</div>`)}
@@ -1133,7 +1218,7 @@
       <section class="section"><h2>Andmete seis</h2><div class="status" id="status"></div></section>
       <section class="section"><h2>Värvid</h2><div class="legend">
         <span><i style="--k:var(--c-f37)"></i>uuringufond 37%</span><span><i style="--k:var(--c-lisaks)"></i>tegevusfond</span><span><i style="--k:var(--c-f13)"></i>teraapiafond 13%</span>
-        <span><i style="--k:var(--c-teenus)"></i>muu teenus</span><span><i style="--k:var(--c-abiv)"></i>abivahend</span><span><i style="--k:var(--c-sate)"></i>säte</span><span><i style="--k:var(--c-ks)"></i>kvaliteedisüsteem</span><span><i style="--k:var(--c-lab)"></i>SYNLABi analüüs</span><span><i style="--k:var(--c-ms)"></i>meditsiiniseade</span><span><i style="--k:var(--c-soel)"></i>sõeluuring</span><span><i style="--k:var(--c-muutus)"></i>muudatus (seadused, määrused)</span>
+        <span><i style="--k:var(--c-teenus)"></i>muu teenus</span><span><i style="--k:var(--c-abiv)"></i>abivahend</span><span><i style="--k:var(--c-sate)"></i>säte</span><span><i style="--k:var(--c-ks)"></i>kvaliteedisüsteem</span><span><i style="--k:var(--c-lab)"></i>SYNLABi analüüs</span><span><i style="--k:var(--c-ms)"></i>meditsiiniseade</span><span><i style="--k:var(--c-soel)"></i>sõeluuring</span><span><i style="--k:var(--c-muutus)"></i>muudatus (seadused, määrused)</span><span><i style="--k:var(--c-rj)"></i>ravijuhend</span>
         <b class="legend-h">Igapäevatöö reeglid</b><span><i style="--k:var(--c-g-too)"></i>töövõimetus</span><span><i style="--k:var(--c-g-toend)"></i>tervisetõendid, sh juhi tervisenõuded</span><span><i style="--k:var(--c-g-nakk)"></i>nakkushaigused ja vaktsineerimine</span><span><i style="--k:var(--c-g-rav)"></i>ravimid, suunamine ja hüvitised</span><span><i style="--k:var(--c-g-kys)"></i>küsimustikud, päevikud ja patsiendi infolehed</span><span><i style="--k:var(--c-g-tk)"></i>töökorraldus ja nimistu</span><span><i style="--k:var(--c-g-ope)"></i>residendid, praktikandid ja abiarstid</span>
       </div></section>
       ${HOME_INFO}`;
@@ -1153,6 +1238,8 @@
     }
     if (m.toru) h += `<div class="src"><span>Toru (${esc(m.toru.file)})</span><span>seis ${fmtDate(m.toru.seisuga)}</span></div>`;
     if (m.synlab) h += `<div class="src"><span><a href="${esc(m.synlab.page)}" target="_blank" rel="noopener">SYNLABi hinnakiri</a></span><span>kehtib alates ${esc(m.synlab.seisuga || '')}</span></div>`;
+    const rjN = d.items.filter((x) => x.t === 'g').length;
+    if (rjN && m.rj) h += `<div class="src"><span><a href="${esc(m.rj.page || 'https://ravijuhend.ee/tervishoiuvarav/juhendid')}" target="_blank" rel="noopener">Ravijuhendid (ravijuhend.ee)</a></span><span>${rjN} juhendit${m.rj.ok === false ? ', eelmine seis' : ''}</span></div>`;
     const tm = m.teemad;
     if (tm) h += `<div class="src"><span>Igapäevatöö reeglite tekstikontroll</span><span>${(tm.warn || []).length ? (tm.warn.length + ' märkust') : 'korras'}</span></div>`;
     const sv = d.items.filter((x) => x.t === 'v' && x.aasta);
@@ -1183,6 +1270,7 @@
       q: c.q ? `<button class="chip kschip" data-filter="q" aria-pressed="${pressed('q')}">Kvaliteedisüsteem<span class="n">${c.q - 1}</span></button>` : '',
       v: c.v ? `<button class="chip soelchip" data-filter="v" aria-pressed="${pressed('v')}">Sõeluuringud<span class="n">${c.v}</span></button>` : '',
       j: c.j ? `<button class="chip teemachip" data-filter="j" aria-pressed="${pressed('j')}">Igapäevatöö reeglid<span class="n">${c.j}</span></button>` : '',
+      g: c.g ? `<button class="chip rjchip" data-filter="g" aria-pressed="${pressed('g')}">Ravijuhendid<span class="n">${c.g}</span></button>` : '',
       u: nU ? `<button class="chip uchip" data-filter="u" title="Seaduste ja määruste muudatused" aria-pressed="${pressed('u')}">Mis muutus<span class="n">${nU}</span></button>` : '',
       b: c.b ? `<button class="chip labchip" data-filter="b" aria-pressed="${pressed('b')}">Labor (SYNLAB)<span class="n">${c.b}</span></button>` : '',
       a: cat(['a', 'Abivahendid', c.a]),
@@ -1191,7 +1279,7 @@
       k: cat(['k', 'Lingid', c.k]),
       pa: `<label class="chip pa-toggle" title="Väljas: kõik teenused, ka operatsioonid ja haiglateenused"><input type="checkbox" id="pa" ${state.pa ? 'checked' : ''}> Ainult perearstiabi</label>`,
     };
-    const keys = TAB_CHIPS[state.tab] || ['all', 's', 'fund', 'q', 'v', 'j', 'u', 'b', 'a', 'm', 'l', 'k', 'pa'];
+    const keys = TAB_CHIPS[state.tab] || ['all', 's', 'fund', 'q', 'v', 'j', 'g', 'u', 'b', 'a', 'm', 'l', 'k', 'pa'];
     el.chips.innerHTML = keys.map((k) => CH[k] || '').join('');
   }
 

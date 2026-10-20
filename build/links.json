@@ -57,7 +57,19 @@
     "id": "ravijuhend",
     "n": "Eesti ravijuhendid (ravijuhend.ee)",
     "u": "https://www.ravijuhend.ee/",
-    "d": "Kehtivad Eesti ravijuhendid ja patsiendijuhendid."
+    "d": "Kehtivad Eesti ravijuhendid. Iga kinnitatud ravijuhendi otselink on teatmikus ka eraldi kirjena (otsi juhendi nime või teemaga)."
+  },
+  {
+    "id": "rj-pj",
+    "n": "Patsiendijuhendid (ravijuhend.ee)",
+    "u": "https://ravijuhend.ee/patsiendivarav/juhendid",
+    "d": "Ravijuhenditel põhinevad patsiendijuhendid. Ravijuhendi kirjes on link selle juhendi patsiendijuhendile, kui see on olemas."
+  },
+  {
+    "id": "abr",
+    "n": "Antimikroobse ravi veebirakendus (TÜ Kliinikum)",
+    "u": "https://www.kliinikum.ee/abr/app/avaleht",
+    "d": "TÜ Kliinikumi antibakteriaalse ravi juhised veebirakendusena. Ambulatoorsete infektsioonide ravimite valik, annused ja kestus on ka ravijuhendite lisades (otsi nt „tonsilliit“)."
   },
   {
     "id": "rhk-tehik",

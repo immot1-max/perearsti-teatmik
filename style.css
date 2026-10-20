@@ -26,6 +26,7 @@
   --c-soel: #4b3fc4;
   --c-teema: #34495e;
   --c-muutus: #1565c0;
+  --c-rj: #b8243c;
   /* Igapäevatöö reeglite rühmad */
   --c-g-too: #8a6d00; --c-g-toend: var(--c-juhi); --c-g-nakk: #8e3a9d; --c-g-rav: #007b86; --c-g-tk: #34495e; --c-g-ope: #7a4a2a; --c-g-kys: #2e6e3c;
 
@@ -41,7 +42,7 @@
     --bg: #0f1513; --surface: #161e1b; --surface-2: #1e2824; --ink: #e5ece8; --muted: #9aa8a0; --line: #2b3732;
     --accent: #8fc0dc; --accent-ink: #0f1513; --mark: #6b5310; --warn-bg: #3a2c0c; --warn-ink: #f3cf85;
     --c-f37: #6cc48c; --c-lisaks: #e3a646; --c-f13: #b39be8; --c-teenus: #7fb3d1; --c-abiv: #4fc7c2;
-    --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a; --c-soel: #aaa3f5; --c-teema: #c3d0dd; --c-muutus: #6cb2f2;
+    --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a; --c-soel: #aaa3f5; --c-teema: #c3d0dd; --c-muutus: #6cb2f2; --c-rj: #f2899a;
     --c-g-too: #e0c050; --c-g-toend: var(--c-juhi); --c-g-nakk: #d39be0; --c-g-rav: #4fc3d0; --c-g-tk: #c3d0dd; --c-g-ope: #d9a679; --c-g-kys: #7cc88a;
     color-scheme: dark;
   }
@@ -50,7 +51,7 @@
   --bg: #0f1513; --surface: #161e1b; --surface-2: #1e2824; --ink: #e5ece8; --muted: #9aa8a0; --line: #2b3732;
   --accent: #8fc0dc; --accent-ink: #0f1513; --mark: #6b5310; --warn-bg: #3a2c0c; --warn-ink: #f3cf85;
   --c-f37: #6cc48c; --c-lisaks: #e3a646; --c-f13: #b39be8; --c-teenus: #7fb3d1; --c-abiv: #4fc7c2;
-  --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a; --c-soel: #aaa3f5; --c-teema: #c3d0dd; --c-muutus: #6cb2f2;
+  --c-sate: #bbae9c; --c-juhi: #f08a6e; --c-link: #a3ada8; --c-ks: #f27bb3; --c-lab: #93aef0; --c-ms: #b5d26a; --c-soel: #aaa3f5; --c-teema: #c3d0dd; --c-muutus: #6cb2f2; --c-rj: #f2899a;
     --c-g-too: #e0c050; --c-g-toend: var(--c-juhi); --c-g-nakk: #d39be0; --c-g-rav: #4fc3d0; --c-g-tk: #c3d0dd; --c-g-ope: #d9a679; --c-g-kys: #7cc88a;
   color-scheme: dark;
 }
@@ -442,3 +443,36 @@ details.tblbox[open] > summary { margin-bottom: 6px; }
 .tbl td.num.kq { white-space: normal; }
 .tbl td.num.kq .x { color: var(--muted); }
 @media (max-width: 480px) { .kulu .tbl table { font-size: 0.8rem; } .kulu .tbl td { padding: 3px 5px; } }
+
+/* ---------- ravijuhendid ---------- */
+.row.rj { --stripe: var(--c-rj); }
+.badge.rj { color: var(--c-rj); background: transparent; font: inherit; font-size: 0.74rem; font-weight: 500; }
+button.badge.rj { cursor: pointer; }
+.badge.rjpv { color: var(--muted); }
+.chip.rjchip { border-color: var(--c-rj); color: var(--c-rj); }
+.chip.rjchip[aria-pressed="true"] { background: var(--c-rj); color: var(--surface); }
+.qbtn.rj { border-left: 4px solid var(--c-rj); }
+.rjact { margin-top: 8px; align-items: center; }
+.rjact a.btn { text-decoration: none; }
+details.rjpv, details.mk { border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; }
+details.rjpv > summary, details.mk > summary { cursor: pointer; font-size: 0.88rem; font-weight: 600; color: var(--accent); }
+.pvimgs { display: grid; gap: 8px; margin: 8px 0 6px; justify-items: start; }
+.pvimgs a { display: block; max-width: 100%; }
+.pvimgs img { display: block; width: auto; height: auto; max-width: 100%; max-height: 85vh; background: #fff; border: 1px solid var(--line); border-radius: 4px; cursor: zoom-in; }
+.rjl { display: grid; gap: 4px; font-size: 0.9rem; }
+.mkb { display: grid; gap: 6px; margin-top: 8px; }
+.mkb p { margin: 0; max-width: 80ch; font-size: 0.9rem; }
+.mkb p.small { font-size: 0.8rem; }
+.mkb h5 { margin: 6px 0 0; font-size: 0.86rem; font-weight: 600; }
+.mkt { overflow-x: auto; }
+.mkt table { border-collapse: collapse; font-size: 0.82rem; min-width: 100%; }
+.mkt th, .mkt td { border: 1px solid var(--line); padding: 4px 6px; vertical-align: middle; text-align: center; }
+.mkt th { background: var(--surface-2); font-weight: 600; }
+.mkt td.rh { font-weight: 600; }
+.mkt td.r1 { background: #c3d98a; color: #1c2a0c; }
+.mkt td.r2 { background: #e2b33f; color: #2a1d00; }
+.mkt td.r3 { background: #a8643a; color: #ffffff; }
+.mkt td.r4 { background: #98191c; color: #ffffff; }
+.mkt td.r0 { background: var(--surface); }
+.mksrc { font-style: italic; }
+@media (max-width: 480px) { .mkt table { font-size: 0.74rem; } .mkt th, .mkt td { padding: 3px 4px; } }

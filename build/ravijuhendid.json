@@ -1,0 +1,93 @@
+{
+  "_meta": {
+    "kommentaar": "Ravijuhendid ravijuhend.ee-st (build/ravijuhendid.py). Loendist võetakse kõik RJNK kinnitatud ravijuhendid ja käsitlusjuhendid, juhendi lehelt kood, kuupäevad, erialad, võtmesõnad (otsingu sünonüümid), lisad ja patsiendijuhendi link. 'juhendid' võti on 'rj<id>' (aadress /tervishoiuvarav/juhendid/<id>) või 'gp<id>' (aadress /tervishoiuvarav/juhendid-gp/<id>). 'eelvaade': lisa number ja kontrollsõna pealkirjas; lisa näidatakse juhendi kirjes pildina (PDF-ist või juhendi lehe piltidest). 'sn': lühinimi, millega juhend on avalehel esile tõstetud. 'kasitsi': käsitsi lisatud sisu (nt Medicumi majasisesed tabelid), mida automaatkontroll ei uuenda; juhendi uue versiooni korral tuleb aruandesse meeldetuletus.",
+    "loend": "https://ravijuhend.ee/tervishoiuvarav/juhendid",
+    "patsiendijuhendid": "https://ravijuhend.ee/patsiendivarav/juhendid",
+    "kontrollitud": "2026-10-20"
+  },
+  "tyybid": [
+    {"types": "2", "status": "6", "liik": "ravijuhend"},
+    {"types": "3", "status": "all", "liik": "käsitlusjuhend"}
+  ],
+  "valja": [],
+  "juhendid": {
+    "rj250": {
+      "sn": "Krooniline neeruhaigus",
+      "eelvaade": [{"lisa": 3, "sisaldab": "progresseerumine"}],
+      "syn": ["KNH", "CKD", "krooniline neeruhaigus", "neeruhaigus", "neerupuudulikkus", "eGFR", "albuminuuria", "alb/krea", "KDIGO"]
+    },
+    "gp32": {
+      "sn": "Hingamis- ja kuseteede infektsioonid",
+      "eelvaade": [{"lisa": 1, "sisaldab": "ravimite valik"}],
+      "syn": ["antibiootikum", "antibiootikumid", "antibakteriaalne ravi", "tonsilliit", "rinosinusiit", "sinusiit", "keskkõrvapõletik", "otiit", "kopsupõletik", "pneumoonia", "tsüstiit", "püelonefriit", "kuseteede infektsioon", "KTI"],
+      "lingid": [["TÜ Kliinikumi antimikroobse ravi veebirakendus", "https://www.kliinikum.ee/abr/app/avaleht"]]
+    },
+    "gp48": {
+      "sn": "Naha, pehmete kudede ja seedetrakti infektsioonid",
+      "eelvaade": [{"lisa": 1, "sisaldab": "ravimite valik"}],
+      "syn": ["antibiootikum", "antibiootikumid", "antibakteriaalne ravi", "erüsiipel", "tselluliit", "impetiigo", "furunkul", "karbunkel", "hammustus", "loomahammustus", "Helicobacter", "H. pylori", "kõhulahtisus", "Clostridioides difficile", "Campylobacter", "Salmonella", "Shigella"],
+      "lingid": [["TÜ Kliinikumi antimikroobse ravi veebirakendus", "https://www.kliinikum.ee/abr/app/avaleht"]]
+    },
+    "gp36": {
+      "sn": "Osteoporoos",
+      "eelvaade": [{"lisa": 3, "sisaldab": "algoritm"}],
+      "syn": ["osteoporoos", "FRAX", "luutihedus", "densitomeetria", "DXA", "haprusmurd", "bisfosfonaat", "alendronaat"]
+    },
+    "gp29": {
+      "sn": "ATH",
+      "eelvaade": [{"lisa": 1, "sisaldab": "algoritm"}],
+      "syn": ["ATH", "ADHD", "tähelepanuhäire", "hüperaktiivsus", "metüülfenidaat"],
+      "seotud": ["kys-ath"]
+    },
+    "rj154": {
+      "sn": "2. tüüpi diabeet",
+      "eelvaade": [{"lisa": 1, "sisaldab": "algoritm"}],
+      "syn": ["T2D", "2. tüüpi diabeet", "II tüüpi diabeet", "diabeet", "suhkruhaigus", "metformiin", "HbA1c", "E11"],
+      "ks": ["diabeet"]
+    },
+    "rj280": {
+      "sn": "Kõrgvererõhktõbi",
+      "syn": ["hüpertoonia", "hüpertensioon", "kõrge vererõhk", "vererõhk", "HT", "I10", "SCORE2", "SCORE2-OP", "kardiovaskulaarne risk", "lisarisk"],
+      "ks": ["hypertoonia"],
+      "kasitsi": "medicum-ht"
+    },
+    "rj193": {"seotud": ["kys-uni"]},
+    "rj149": {"seotud": ["kys-alkohol"]},
+    "rj178": {"syn": ["suitsetamine", "nikotiin", "e-sigaret"], "seotud": ["kys-alkohol"]},
+    "gp22": {"syn": ["peavalu"], "seotud": ["kys-peavalu"]}
+  },
+  "kasitsi": {
+    "medicum-ht": {
+      "n": "Vererõhu aste ja kardiovaskulaarne lisarisk; SCORE2 (Medicumi majasisene juhis)",
+      "allikas": "Medicum Perearstikeskuse majasisene juhis. Ei ole ravijuhendi osa; lisatud käsitsi 20.10.2026.",
+      "plokid": [
+        {"t": "p", "s": "Kardiovaskulaarne risk: 1 – madal; 2 – mõõdukas; 3 – kõrge või väga kõrge."},
+        {"t": "tbl", "n": "Vererõhu aste ja kardiovaskulaarne lisarisk",
+         "pais": [
+           [{"s": "Hüpertensiooni staadium", "r": 2}, {"s": "Muud riskitegurid, HMOD, SVH või KNH", "r": 2}, {"s": "Vererõhu aste (mmHg)", "c": 4}],
+           ["Kõrgenormaalne\nSVR 130–139", "1. aste\nSVR 140–159\nDVR 90–99", "2. aste\nSVR 160–179\nDVR 100–109", "3. aste\nSVR ≥180\nDVR ≥110"]
+         ],
+         "read": [
+           [{"s": "1. staadium", "r": 3, "h": 1}, "Muud riskitegurid puuduvad", {"s": "Madal risk", "k": "r1"}, {"s": "Madal risk", "k": "r1"}, {"s": "Mõõdukas risk", "k": "r2"}, {"s": "Kõrge risk", "k": "r3"}],
+           ["1–2 riskitegurit", {"s": "Madal risk", "k": "r1"}, {"s": "Mõõdukas risk", "k": "r2"}, {"s": "Mõõdukas kuni kõrge risk", "k": "r0"}, {"s": "Kõrge risk", "k": "r3"}],
+           ["≥3 riskitegurit", {"s": "Madal kuni mõõdukas risk", "k": "r0"}, {"s": "Mõõdukas kuni kõrge risk", "k": "r0"}, {"s": "Kõrge risk", "k": "r3"}, {"s": "Kõrge risk", "k": "r3"}],
+           [{"s": "2. staadium", "h": 1}, "HMOD, KNH 3. staadium või diabeet", {"s": "Mõõdukas kuni kõrge risk", "k": "r0"}, {"s": "Kõrge risk", "k": "r3"}, {"s": "Kõrge risk", "k": "r3"}, {"s": "Väga kõrge risk", "k": "r4"}],
+           [{"s": "3. staadium", "h": 1}, "Väljakujunenud SVH või KNH ≥4. staadium", {"s": "Väga kõrge risk", "k": "r4"}, {"s": "Väga kõrge risk", "k": "r4"}, {"s": "Väga kõrge risk", "k": "r4"}, {"s": "Väga kõrge risk", "k": "r4"}]
+         ]},
+        {"t": "small", "s": "SVR – süstoolne; DVR – diastoolne vererõhk. HMOD – hüpertensioonist tingitud organikahjustus; SVH – südame-veresoonkonnahaigus; KNH – krooniline neeruhaigus. 1. staadiumis täiendav riskihindamine SCORE2 / SCORE2-OP abil (vt allpool)."},
+        {"t": "def", "p": "Riskitegurid", "s": "suitsetamine, düslipideemia, ülekaal, vähene kehaline aktiivsus; mehed >55 a, naised >65 a; paastuglükoos 5,6–6,9 mmol/l, glükoositaluvuse häire; abdominaalne rasvumine, varane KVS haigus perekonnas, suur pulsirõhk eakatel."},
+        {"t": "def", "p": "Organikahjustus", "s": "vasaku vatsakese hüpertroofia EKG-l/ehhoKG-l, seerumi kreatiniini suurenemine, eGFR <60 ml/min/1,73 m², albuminuuria (uriini alb/krea >3 g/mol)."},
+        {"t": "def", "p": "SV- või neeruhaigus", "s": "isheemiline insult, ajuhemorraagia, TIA, MI, stenokardia, koronaarrevaskularisatsioon anamneesis, südamepuudulikkus, diabeetiline nefropaatia, neerupuudulikkus, proteinuuria, perifeersete arterite haigus, väljendunud retinopaatia (hemorraagiad, eksudaadid, papilloödeem)."},
+        {"t": "tbl", "n": "SCORE2 / SCORE2-OP: näiliselt terved",
+         "pais": [["KVH risk / ravi", "<50 a", "50–69 a", "≥70 a"]],
+         "read": [
+           [{"s": "Väike-keskmine: üldiselt ei soovitata", "k": "r1"}, {"s": "<2,5%", "k": "r1"}, {"s": "<5%", "k": "r1"}, {"s": "<7,5%", "k": "r1"}],
+           [{"s": "Suur: tuleks kaaluda", "k": "r2"}, {"s": "2,5–<7,5%", "k": "r2"}, {"s": "5–<10%", "k": "r2"}, {"s": "7,5–<15%", "k": "r2"}],
+           [{"s": "Väga suur: üldiselt soovitatav*", "k": "r4"}, {"s": "≥7,5%", "k": "r4"}, {"s": "≥10%", "k": "r4"}, {"s": "≥15%", "k": "r4"}]
+         ]},
+        {"t": "small", "s": "* ≥70 a näiliselt tervetel: lipiidravi soovitus IIb (võib kaaluda)."},
+        {"t": "def", "p": "SCORE2", "s": "kalkulaator, eesmärkväärtus, doos → rosuvastatiin 10 / atorvastatiin 20 koos suurema doosi retseptidega."}
+      ]
+    }
+  }
+}

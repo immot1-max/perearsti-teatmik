@@ -41,5 +41,8 @@
 ## Igapäevatöö teemakaardid
 - NB: Standardkulu lisa: 1 rida ei õnnestunud lugeda (koodid 52625).
 
+## Ravijuhendid (ravijuhend.ee)
+- 47 ravijuhendit, 11 käsitlusjuhendit, 6 lisa eelvaadet
 
-Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 187 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 31 teemakaarti, 41 linki.
+
+Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 187 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 31 teemakaarti, 58 ravijuhendit, 43 linki.
