@@ -35,10 +35,28 @@
     'Nakkushaigused ja vaktsineerimine': 'tg-nakk',
     'Ravimid, suunamine ja hüvitised': 'tg-rav',
     'Küsimustikud ja päevikud': 'tg-kys',
+    'Infolehed patsiendile': 'tg-kys',
     'Töökorraldus ja nimistu': 'tg-tk',
     'Residendid, praktikandid ja abiarstid': 'tg-ope',
   };
   const tgCls = (g) => TEEMA_GRP[g] || '';
+  // Vahelehed: avalehe sisu jaotatud teemade kaupa. Otsing otsib alati kõigist andmetest; vaheleht määrab ainult,
+  // mida näidatakse ilma otsinguta ja millised kategooriakiibid on reas. „Avaleht“ näitab kõike nagu varem.
+  const TABS = [
+    { k: 'avaleht', n: 'Avaleht' },
+    { k: 'rahastus', n: 'Rahastus' },
+    { k: 'noud', n: 'Seadused ja nõuded', sn: 'Nõuded' },
+    { k: 'kys', n: 'Küsimustikud ja infolehed', sn: 'Küsimustikud' },
+  ];
+  const tabName = (k) => (TABS.find((t) => t.k === k) || TABS[0]).n;
+  const TAB_CHIPS = {
+    rahastus: ['s', 'fund', 'q', 'v', 'b', 'pa'],
+    noud: ['j', 'l', 'a', 'm', 'u'],
+    kys: [],
+  };
+  // Vahelehe „Küsimustikud ja infolehed“ rühmad (teemad.json väli grupp); need ei ole vahelehel „Seadused ja nõuded“.
+  const KYS_GROUPS = ['Küsimustikud ja päevikud', 'Infolehed patsiendile'];
+  const RAHASTUS_SRC = new Set(['ttl', 'metoodika']); // „Mis muutus“ rahastuse vahelehel
   const FUND_HELP = {
     f37: 'Tasutakse kuni 37% ulatuses nimistu pearahadeks arvestatud summast aastas.',
     f13: 'Füsioteraapia, massaaž, psühholoog, psühhoteraapia ja logopeed kuni 13% ulatuses nimistu pearahadeks arvestatud summast aastas.',
@@ -144,7 +162,7 @@
   // tühjendab (siis naaseb sinna, kus kirje oli: täisvaatesse või samasse nimekirja). pinFrom = nimekirja olek (q, filter, fund).
   // Kui pin on olemas, näidatakse esialgu PIN_LIMIT vastet, et avatud kirje jääks lähedale.
   const PIN_LIMIT = 10;
-  const state = { data: null, idx: [], filter: 'all', fund: null, q: '', open: new Set(), limit: 60, focus: null, pin: null, pinFrom: null, pinOpen: false, lastOpen: null, pa: paPref, labsAll: new Set(), msAll: new Set(), uAll: new Set() };
+  const state = { data: null, idx: [], tab: 'avaleht', filter: 'all', fund: null, q: '', open: new Set(), limit: 60, focus: null, pin: null, pinFrom: null, pinOpen: false, lastOpen: null, pa: paPref, labsAll: new Set(), msAll: new Set(), uAll: new Set() };
   const el = {};
 
   // ------------------------------------------------------------ andmed
@@ -414,7 +432,7 @@
     if (state.focus != null) {
       const it = state.data.items[state.focus];
       state.open.add(it._id);
-      r.innerHTML = `<div class="summary"><span>${esc(srcName(it.src) || '')}</span><button class="btn" data-act="home">← Avaleht</button></div><div class="list">${row(it)}</div>`;
+      r.innerHTML = `<div class="summary"><span>${esc(srcName(it.src) || '')}</span><button class="btn" data-act="home">← ${esc(tabName(state.tab))}</button></div><div class="list">${row(it)}</div>`;
       return;
     }
     if (!q && !state.fund && state.filter === 'all') {
@@ -982,28 +1000,48 @@
       }).join('') + '</div>';
   }
 
+  // Avalehe kasutusjuhend (ainult vahelehel „Avaleht“).
+  const HOME_INFO = `<section class="section info"><h2>Kasutamine</h2>
+        <p>Otsi nimetuse, koodi, lühendi või argisõnaga (nt „holter“, „TSH“, „6417“). Täpitähti pole vaja. Koodil klõpsates kopeerub see.</p>
+        <p>Vahelehed „Rahastus“, „Seadused ja nõuded“ ning „Küsimustikud ja infolehed“ näitavad avalehe sisust ühe osa ja selle osa kategooriad; „Avaleht“ näitab kõike. Otsing otsib alati kõigist andmetest, vahelehest sõltumata. Vahelehe aadressi (nt lõpuga ?tab=rahastus) saab kolleegile saata.</p>
+        <p>Kui avad kirje (nt „Hüpertooniatõbi“ avalehelt või „Diabeet II“ kvaliteedisüsteemi loetelust) ja otsid seejärel koodi või valid kategooria, tulevad vasted kõigist kategooriatest üles ja avatud kirje jääb lahtisena nende alla, nii et selle koode saab järjest edasi klõpsata. „Peida“ teeb selle üherealiseks, „Sulge“ eemaldab. Otsingu tühjendamine (× või Esc) viib tagasi sinna, kus kirje oli avatud, nupp „←“ avalehele või vahelehele, kust kirje avati.</p>
+        <p>Laborianalüüsi saab otsida SYNLABi nime või lühendiga (nt „IGRA“, „HCV“). Vastes on Tervisekassa kood ja see, kas analüüs kuulub perearsti fondi. Koodi avades on näha kõik selle koodi alla kuuluvad SYNLABi analüüsid.</p>
+        <p>Sünniaasta otsing (nt „1966“) näitab, millise rinna-, emakakaela- või soolevähi sõeluuringu sihtrühma inimene sel aastal kuulub. Sünniaastad tulevad terviseportaalist ja neid kontrollitakse kord kuus.</p>
+        <p>„Mis muutus“ (avalehe lõpus) näitab iga jälgitava seaduse ja määruse viimase aasta jooksul jõustunud ja juba avaldatud tulevasi redaktsioone: uued ja kadunud koodid, hinnamuutused, fondide koodid ning muutunud sätete varasem ja uus sõnastus (muutunud sõnad on esile tõstetud).</p>
+        <p>Teenuse koodi avades on näha ka „Mis on hinnas“: metoodika standardkulu lisa järgi personal (sh arsti minutid), ruumid, seadmed ja materjalid.</p>
+        <p>„Igapäevatöö reeglid“ koondavad haigus- ja hoolduslehe, P21, tervisetõendite, nakkushaiguse teatiste, vaktsineerimise, retseptide, e-konsultatsiooni, patsiendi hüvitiste, töökorralduse ja nimistu põhireeglid, koolivaheajad, patsiendi küsimustike ja päevikute otselingid (EEK-2, SNAP-IV, uni, peavalu, urineerimine, AUDIT), patsiendi infolehed (koloskoopia ja gastroskoopia ettevalmistusjuhendid haiglate kaupa) (võimalusel eesti, vene ja inglise keeles) ning peremeditsiini residentuuri, 6. kursuse praktika ja abiarsti info (palk, tööaeg, puhkus, juhendamine); igal rühmal on oma värv. Iga punkti juures on viide sättele; ⚠ märgib allikate omavahelisi erinevusi. Otsida võib ka küsimusena (nt „kui kaua makstakse haigushüvitist“).</p>
+        <p>Linnuke „Ainult perearstiabi“ peidab teenused, mis ei kuulu perearsti fondidesse, kvaliteedisüsteemi ega perearstiabi peatükki (nt operatsioonid). Täpse koodi otsing näitab koodi alati.</p>
+        <p>Rakendus töötab pärast esimest avamist ka võrguta. Telefonis lisa see avakuvale: iPhone'is Safari jagamismenüü → „Lisa avakuvale“, Androidis Chrome'i menüü → „Installi rakendus“.</p>
+        <p>Andmed tulevad Riigi Teataja avalikust liidesest ja neid kontrollitakse automaatselt kord kuus. Õiguslikult kehtib alati Riigi Teatajas avaldatud tekst.</p>
+        <p id="install-slot"></p>
+      </section>`;
   function renderHome() {
     const d = state.data;
+    const tab = state.tab;
+    const sec = (h, body, extra = '') => `<section class="section${extra}"><h2>${h}</h2>${body}</section>`;
     const funds = d.items.filter((x) => x.t === 'f');
     const order = ['f37', 'lisaks', 'f13'];
     funds.sort((a, b) => order.indexOf(a.k) - order.indexOf(b.k));
     const q = (src, par) => d.items.find((x) => x.t === 'l' && x.src === src && x.par === par);
-    const quick = [
+    const qb = ([cls, src, par, t, sub]) => {
+      const it = q(src, par);
+      return it ? `<button class="qbtn ${cls}" data-focus="${it._id}"><b>${esc(t)}</b><small>${esc(srcName(src))} ${esc(par)} · ${esc(sub)}</small></button>` : '';
+    };
+    const QB_RAHA = [
       ['sate', 'ttl', '§ 2', 'Pearaha', 'Piirhinnad vanuse ja haiguskoormuse järgi'],
       ['sate', 'ttl', '§ 3', 'Baasraha ja lisatasud', 'Koodid 3315, 3317 jt'],
       ['sate', 'metoodika', '§ 5', 'Pearaha arvel osutatavad teenused', 'Mis kuulub pearaha sisse'],
       ['sate', 'metoodika', '§ 8', 'Lisatasud perearstile', 'Kvaliteedisüsteem, lisapädevus jm'],
+    ];
+    const QB_NOUD = [
       ['abiv', 'abivahendid', '§ 2¹', 'Abivahendi tõend', 'Kohustuslikud andmed'],
       ['abiv', 'abivahendid', '§ 3', 'Abivahendi kaart', 'Kaardi andmed ja kord'],
       ['juhi', 'mootorsoidukijuht', '§ 10', 'Juhi tervisetõendi vormistamine', 'Väljastamine ja kehtivus'],
       ['msq', 'meditsiiniseadmed', '§ 64', 'Meditsiiniseadme kaart', 'Kes kirjutab ja kuidas hüvitatakse'],
-    ].map(([cls, src, par, t, sub]) => {
-      const it = q(src, par);
-      return it ? `<button class="qbtn ${cls}" data-focus="${it._id}"><b>${esc(t)}</b><small>${esc(srcName(src))} ${esc(par)} · ${esc(sub)}</small></button>` : '';
-    }).join('');
-    const ex = ['holter', 'IGRA', 'HCV', 'jalaortoos', '7115', 'hüpertoonia', '1966', 'haigusleht', 'P21', 'relvaluba', 'meremees', 'nakkushaiguse teatis', 'õe retsept', 'hambaravihüvitis', 'e-konsultatsioon', 'ratastool', 'juhiload', 'residendi puhkus', 'abiarst', 'EEK-2', 'unepäevik', 'koolivaheaeg'];
-    const tj = d.items.filter((x) => x.t === 'j');
-    const groups = [...new Set(tj.map((x) => x.g))];
+    ];
+    const msBtn = `<button class="qbtn msq" data-filter="m"><b>Meditsiiniseadmed (9MS)</b><small>${d.meta.counts.m || 0} rühma · ortoosid, testribad, sensorid, kompressioontooted jm</small></button>`;
+    const examples = (ws) => sec('Proovi otsida', `<div class="examples">${ws.map((w) => `<button class="chip" data-q="${esc(w)}">${esc(w)}</button>`).join('')}</div>`);
+
     // Juhi tervisetõend on tervisetõendite rühmas esimene, eraldi 1. ja 2. grupp (määruse § 2 lg 2; „kategooria“ on juhiloa A, B, C jne).
     const juhiBtns = [
       ['§ 3', 'Juhi tervisetõend, 1. grupp', 'A, AM, B, BE, T · nõuded § 3, vastunäidustused § 4'],
@@ -1012,62 +1050,93 @@
       const it = q('mootorsoidukijuht', par);
       return it ? `<button class="qbtn juhi" data-focus="${it._id}"><b>${esc(t)}</b><small>${esc(sub)}</small></button>` : '';
     }).join('');
-    const teemaHtml = !tj.length ? '' : `<section class="section"><h2>Igapäevatöö reeglid</h2><div class="tgroups">`
-      + groups.map((g) => `<div class="tgroup ${tgCls(g)}"><h3>${esc(g)}</h3><div class="quick">`
-        + (g === 'Tervisetõendid' ? juhiBtns : '')
-        + tj.filter((x) => x.g === g).map((x) => `<button class="qbtn teema" data-focus="${x._id}"><b>${esc(x.sn)}</b><small>${x.n !== x.sn ? esc(x.n) + ' · ' : ''}${(x.r || []).length} punkti${(x.e || []).length ? ' · ⚠ ' + x.e.length : ''}</small></button>`).join('')
-        + '</div></div>').join('') + '</div></section>';
+    const tj = d.items.filter((x) => x.t === 'j');
+    const tCard = (x) => `<button class="qbtn teema" data-focus="${x._id}"><b>${esc(x.sn)}</b><small>${x.n !== x.sn ? esc(x.n) + ' · ' : ''}${(x.r || []).length} punkti${(x.e || []).length ? ' · ⚠ ' + x.e.length : ''}</small></button>`;
+    const tGroups = (gs) => `<div class="tgroups">` + gs.map((g) => `<div class="tgroup ${tgCls(g)}"><h3>${esc(g)}</h3><div class="quick">`
+      + (g === 'Tervisetõendid' ? juhiBtns : '')
+      + tj.filter((x) => x.g === g).map(tCard).join('') + '</div></div>').join('') + '</div>';
+    const allGroups = [...new Set(tj.map((x) => x.g))];
+
     const uu = d.items.filter((x) => x.t === 'u' && !x.tyhi);
-    const uFut = uu.filter((x) => x.tul).sort((a, b) => a.alates.localeCompare(b.alates));
-    const uPast = uu.filter((x) => !x.tul).sort((a, b) => b.alates.localeCompare(a.alates));
-    const uShow = [...uFut, ...uPast.slice(0, 4)];
-    const muutHtml = !uu.length ? '' : `<section class="section"><h2>Mis muutus (seadused ja määrused)</h2><p class="hint">Jälgitavate seaduste ja määruste viimase aasta jooksul jõustunud ning Riigi Teatajas juba avaldatud tulevased muudatused.</p><div class="ulist">`
-      + uShow.map((x) => `<button class="urow${x.tul ? ' fut' : ''}" data-focus="${x._id}"><span class="ud8">${x.tul ? 'jõustub<br>' : ''}${fmtDate(x.alates)}</span><span class="un"><b>${esc(x.n)}</b><small>${esc(uSummary(x))}</small></span></button>`).join('')
-      + `</div><div class="actions"><button class="btn" data-filter="u">Kõik muudatused (${uu.length})</button></div></section>`;
+    const muutHtml = (keep, title, hint) => {
+      const list = uu.filter(keep);
+      if (!list.length) return '';
+      const uFut = list.filter((x) => x.tul).sort((a, b) => a.alates.localeCompare(b.alates));
+      const uPast = list.filter((x) => !x.tul).sort((a, b) => b.alates.localeCompare(a.alates));
+      const uShow = [...uFut, ...uPast.slice(0, 4)];
+      return sec(title, `<p class="hint">${esc(hint)}</p><div class="ulist">`
+        + uShow.map((x) => `<button class="urow${x.tul ? ' fut' : ''}" data-focus="${x._id}"><span class="ud8">${x.tul ? 'jõustub<br>' : ''}${fmtDate(x.alates)}</span><span class="un"><b>${esc(x.n)}</b><small>${esc(uSummary(x))}</small></span></button>`).join('')
+        + `</div><div class="actions"><button class="btn" data-filter="u">Kõik muudatused (${uu.length})</button></div>`);
+    };
     const linkBy = (id) => d.items.find((x) => x.t === 'k' && x.id === id);
     const ftl = linkBy('tk-fondid');
-    const usefulIds = ['tk-fondid', 'ravijuhend', 'rhk-tehik', 'rhk-sm', 'tk-soodusravimid', 'tk-ekons-erialad', 'ravimiregister', 'raviminfo'];
-    const useful = usefulIds.map(linkBy).filter(Boolean);
-    const linksHtml = !useful.length ? '' : `<section class="section"><h2>Kasulikud lingid</h2><div class="quick">`
-      + useful.map((x) => `<a class="qbtn linkq" href="${esc(x.u)}" target="_blank" rel="noopener"><b>${esc(x.n)} ↗</b><small>${esc(x.d || '')}</small></a>`).join('') + '</div></section>';
+    const linksHtml = (ids) => {
+      const useful = ids.map(linkBy).filter(Boolean);
+      return !useful.length ? '' : sec('Kasulikud lingid', `<div class="quick">`
+        + useful.map((x) => `<a class="qbtn linkq" href="${esc(x.u)}" target="_blank" rel="noopener"><b>${esc(x.n)} ↗</b><small>${esc(x.d || '')}</small></a>`).join('') + '</div>');
+    };
     const sv = d.items.filter((x) => x.t === 'v');
     const sy0 = soelYear();
-    const soelHtml = !sv.length ? '' : `<section class="section"><h2>Vähi sõeluuringud ${sy0}</h2><div class="soel">`
+    const soelHtml = !sv.length ? '' : sec(`Vähi sõeluuringud ${sy0}`, `<div class="soel">`
       + sv.map((v) => `<button class="srow" data-focus="${v._id}"><span class="sn"><b>${esc(v.sn)}</b><small>${v.sy ? `${esc(v.kes || '')} · ${esc(ageRange(v))} · ${esc(intText(v))}` : esc(ageRange(v))}</small></span>${v.sy ? `<span class="sy">${v.sy.join(' ')}</span>` : `<span class="sy txt">${esc(v.lyh || '')}</span>`}</button>`).join('')
       + `</div><p class="hint">Sisesta otsingusse sünniaasta (nt 1966): näed, millise sõeluuringu sihtrühma inimene ${sy0}. aastal kuulub.</p>`
-      + (new Date().getFullYear() > sy0 ? `<p class="note">Terviseportaalis on veel ${sy0}. aasta sihtrühmad.</p>` : '') + '</section>';
+      + (new Date().getFullYear() > sy0 ? `<p class="note">Terviseportaalis on veel ${sy0}. aasta sihtrühmad.</p>` : ''));
     const ksCards = d.items.filter((x) => x.t === 'q').sort((a, b) => KS_ORDER.indexOf(a.cat) - KS_ORDER.indexOf(b.cat))
       .map((x) => `<button class="qbtn ks" data-focus="${x._id}"><b>${esc(x.k === 'ylevaade' ? 'Ülevaade ja lisatasud' : x.sn)}</b><small>${esc(KS_CAT[x.cat])}${ksValue(x) ? ' · ' + esc(ksValue(x)) : ''} · ${esc(x.par)}</small></button>`).join('');
-    el.results.innerHTML = `
-      <section class="section"><h2>Rahastus (metoodika § 6)</h2><div class="funds">
+    const ksHtml = sec('Kvaliteedisüsteem (metoodika § 8)', `<div class="quick">${ksCards}</div>`);
+    const fundsHtml = (title) => sec(title, `<div class="funds">
         ${funds.map((f) => `<button class="fund ${f.k}" data-fund="${f.k}"><strong>${esc(f.n)}</strong><span>${fundHelp(f.k, false, true)}</span><span class="cnt">${f.cnt} teenust · ${esc(f.par)}</span></button>`).join('')}
-      </div>${ftl ? `<p class="fundlink"><a href="${esc(ftl.u)}" target="_blank" rel="noopener">Perearstide fondide täitmised (Tervisekassa) ↗</a></p>` : ''}</section>
+      </div>${ftl ? `<p class="fundlink"><a href="${esc(ftl.u)}" target="_blank" rel="noopener">Perearstide fondide täitmised (Tervisekassa) ↗</a></p>` : ''}`);
+    const tabHint = (txt) => `<p class="tabhint">${esc(txt)} Otsing otsib alati kõigist andmetest.</p>`;
+
+    if (tab === 'rahastus') {
+      el.results.innerHTML = tabHint('Perearsti fondid, pearaha, lisatasud, kvaliteedisüsteem ja sõeluuringud.')
+        + fundsHtml('Fondid (metoodika § 6)')
+        + sec('Pearaha ja lisatasud', `<div class="quick">${QB_RAHA.map(qb).join('')}</div>`)
+        + ksHtml
+        + soelHtml
+        + muutHtml((x) => RAHASTUS_SRC.has(x.src), 'Mis muutus (rahastus)', 'Tervishoiuteenuste loetelu ja metoodika viimase aasta jooksul jõustunud ning juba avaldatud tulevased muudatused.')
+        + examples(['holter', 'IGRA', 'HCV', '7115', '7050', 'hüpertoonia', 'vaimse tervise õde', '1966']);
+      return;
+    }
+    if (tab === 'noud') {
+      el.results.innerHTML = tabHint('Töövõimetus, tervisetõendid, vaktsineerimine, retseptid, töökorraldus, abivahendid ja meditsiiniseadmed.')
+        + sec('Igapäevatöö reeglid', tGroups(allGroups.filter((g) => !KYS_GROUPS.includes(g))))
+        + sec('Abivahendid, meditsiiniseadmed ja juhi tõend', `<div class="quick">${QB_NOUD.map(qb).join('')}${msBtn}</div>`)
+        + muutHtml((x) => !RAHASTUS_SRC.has(x.src), 'Mis muutus (seadused ja määrused)', 'Jälgitavate seaduste ja määruste viimase aasta jooksul jõustunud ning juba avaldatud tulevased muudatused (v.a tervishoiuteenuste loetelu ja metoodika).')
+        + examples(['haigusleht', 'P21', 'relvaluba', 'meremees', 'juhiload', 'nakkushaiguse teatis', 'õe retsept', 'e-konsultatsioon', 'ratastool', 'jalaortoos', 'abiarst', 'koolivaheaeg']);
+      return;
+    }
+    if (tab === 'kys') {
+      el.results.innerHTML = tabHint('Patsiendi küsimustikud, päevikud ja ettevalmistusjuhendid, võimalusel eesti, vene ja inglise keeles.')
+        + KYS_GROUPS.map((g) => {
+          const cards = tj.filter((x) => x.g === g);
+          return cards.length ? `<section class="section tgsec ${tgCls(g)}"><h2>${esc(g)}</h2><div class="quick">${cards.map(tCard).join('')}</div></section>` : '';
+        }).join('')
+        + linksHtml(['ravijuhend', 'rhk-tehik', 'rhk-sm', 'ravimiregister', 'raviminfo'])
+        + examples(['EEK-2', 'unepäevik', 'AUDIT', 'SNAP-IV', 'peavalupäevik', 'koloskoopia', 'RHK']);
+      return;
+    }
+
+    const quick = [...QB_RAHA, ...QB_NOUD].map(qb).join('');
+    const ex = ['holter', 'IGRA', 'HCV', 'jalaortoos', '7115', 'hüpertoonia', '1966', 'haigusleht', 'P21', 'relvaluba', 'meremees', 'nakkushaiguse teatis', 'õe retsept', 'hambaravihüvitis', 'e-konsultatsioon', 'ratastool', 'juhiload', 'residendi puhkus', 'abiarst', 'EEK-2', 'unepäevik', 'koolivaheaeg'];
+    const teemaHtml = !tj.length ? '' : sec('Igapäevatöö reeglid', tGroups(allGroups));
+    el.results.innerHTML = `
+      ${fundsHtml('Rahastus (metoodika § 6)')}
       ${teemaHtml}
-      <section class="section"><h2>Kvaliteedisüsteem (metoodika § 8)</h2><div class="quick">${ksCards}</div></section>
+      ${ksHtml}
       ${soelHtml}
-      <section class="section"><h2>Kiirvalikud</h2><div class="quick">${quick}<button class="qbtn msq" data-filter="m"><b>Meditsiiniseadmed (9MS)</b><small>${d.meta.counts.m || 0} rühma · ortoosid, testribad, sensorid, kompressioontooted jm</small></button></div></section>
-      ${linksHtml}
-      <section class="section"><h2>Proovi otsida</h2><div class="examples">${ex.map((w) => `<button class="chip" data-q="${esc(w)}">${esc(w)}</button>`).join('')}</div></section>
-      ${muutHtml}
+      ${sec('Kiirvalikud', `<div class="quick">${quick}${msBtn}</div>`)}
+      ${linksHtml(['tk-fondid', 'ravijuhend', 'rhk-tehik', 'rhk-sm', 'tk-soodusravimid', 'tk-ekons-erialad', 'ravimiregister', 'raviminfo'])}
+      ${examples(ex)}
+      ${muutHtml(() => true, 'Mis muutus (seadused ja määrused)', 'Jälgitavate seaduste ja määruste viimase aasta jooksul jõustunud ning Riigi Teatajas juba avaldatud tulevased muudatused.')}
       <section class="section"><h2>Andmete seis</h2><div class="status" id="status"></div></section>
       <section class="section"><h2>Värvid</h2><div class="legend">
         <span><i style="--k:var(--c-f37)"></i>uuringufond 37%</span><span><i style="--k:var(--c-lisaks)"></i>tegevusfond</span><span><i style="--k:var(--c-f13)"></i>teraapiafond 13%</span>
         <span><i style="--k:var(--c-teenus)"></i>muu teenus</span><span><i style="--k:var(--c-abiv)"></i>abivahend</span><span><i style="--k:var(--c-sate)"></i>säte</span><span><i style="--k:var(--c-ks)"></i>kvaliteedisüsteem</span><span><i style="--k:var(--c-lab)"></i>SYNLABi analüüs</span><span><i style="--k:var(--c-ms)"></i>meditsiiniseade</span><span><i style="--k:var(--c-soel)"></i>sõeluuring</span><span><i style="--k:var(--c-muutus)"></i>muudatus (seadused, määrused)</span>
-        <b class="legend-h">Igapäevatöö reeglid</b><span><i style="--k:var(--c-g-too)"></i>töövõimetus</span><span><i style="--k:var(--c-g-toend)"></i>tervisetõendid, sh juhi tervisenõuded</span><span><i style="--k:var(--c-g-nakk)"></i>nakkushaigused ja vaktsineerimine</span><span><i style="--k:var(--c-g-rav)"></i>ravimid, suunamine ja hüvitised</span><span><i style="--k:var(--c-g-kys)"></i>küsimustikud ja päevikud</span><span><i style="--k:var(--c-g-tk)"></i>töökorraldus ja nimistu</span><span><i style="--k:var(--c-g-ope)"></i>residendid, praktikandid ja abiarstid</span>
+        <b class="legend-h">Igapäevatöö reeglid</b><span><i style="--k:var(--c-g-too)"></i>töövõimetus</span><span><i style="--k:var(--c-g-toend)"></i>tervisetõendid, sh juhi tervisenõuded</span><span><i style="--k:var(--c-g-nakk)"></i>nakkushaigused ja vaktsineerimine</span><span><i style="--k:var(--c-g-rav)"></i>ravimid, suunamine ja hüvitised</span><span><i style="--k:var(--c-g-kys)"></i>küsimustikud, päevikud ja patsiendi infolehed</span><span><i style="--k:var(--c-g-tk)"></i>töökorraldus ja nimistu</span><span><i style="--k:var(--c-g-ope)"></i>residendid, praktikandid ja abiarstid</span>
       </div></section>
-      <section class="section info"><h2>Kasutamine</h2>
-        <p>Otsi nimetuse, koodi, lühendi või argisõnaga (nt „holter“, „TSH“, „6417“). Täpitähti pole vaja. Koodil klõpsates kopeerub see.</p>
-        <p>Kui avad kirje (nt „Hüpertooniatõbi“ avalehelt või „Diabeet II“ kvaliteedisüsteemi loetelust) ja otsid seejärel koodi või valid kategooria, tulevad vasted kõigist kategooriatest üles ja avatud kirje jääb lahtisena nende alla, nii et selle koode saab järjest edasi klõpsata. „Peida“ teeb selle üherealiseks, „Sulge“ eemaldab. Otsingu tühjendamine (× või Esc) viib tagasi sinna, kus kirje oli avatud, „← Avaleht“ avalehele.</p>
-        <p>Laborianalüüsi saab otsida SYNLABi nime või lühendiga (nt „IGRA“, „HCV“). Vastes on Tervisekassa kood ja see, kas analüüs kuulub perearsti fondi. Koodi avades on näha kõik selle koodi alla kuuluvad SYNLABi analüüsid.</p>
-        <p>Sünniaasta otsing (nt „1966“) näitab, millise rinna-, emakakaela- või soolevähi sõeluuringu sihtrühma inimene sel aastal kuulub. Sünniaastad tulevad terviseportaalist ja neid kontrollitakse kord kuus.</p>
-        <p>„Mis muutus“ (avalehe lõpus) näitab iga jälgitava seaduse ja määruse viimase aasta jooksul jõustunud ja juba avaldatud tulevasi redaktsioone: uued ja kadunud koodid, hinnamuutused, fondide koodid ning muutunud sätete varasem ja uus sõnastus (muutunud sõnad on esile tõstetud).</p>
-        <p>Teenuse koodi avades on näha ka „Mis on hinnas“: metoodika standardkulu lisa järgi personal (sh arsti minutid), ruumid, seadmed ja materjalid.</p>
-        <p>„Igapäevatöö reeglid“ koondavad haigus- ja hoolduslehe, P21, tervisetõendite, nakkushaiguse teatiste, vaktsineerimise, retseptide, e-konsultatsiooni, patsiendi hüvitiste, töökorralduse ja nimistu põhireeglid, koolivaheajad, patsiendi küsimustike ja päevikute otselingid (EEK-2, SNAP-IV, uni, peavalu, urineerimine, AUDIT) ja koloskoopia ning gastroskoopia ettevalmistusjuhendid haiglate kaupa (võimalusel eesti, vene ja inglise keeles) ning peremeditsiini residentuuri, 6. kursuse praktika ja abiarsti info (palk, tööaeg, puhkus, juhendamine); igal rühmal on oma värv. Iga punkti juures on viide sättele; ⚠ märgib allikate omavahelisi erinevusi. Otsida võib ka küsimusena (nt „kui kaua makstakse haigushüvitist“).</p>
-        <p>Linnuke „Ainult perearstiabi“ peidab teenused, mis ei kuulu perearsti fondidesse, kvaliteedisüsteemi ega perearstiabi peatükki (nt operatsioonid). Täpse koodi otsing näitab koodi alati.</p>
-        <p>Rakendus töötab pärast esimest avamist ka võrguta. Telefonis lisa see avakuvale: iPhone'is Safari jagamismenüü → „Lisa avakuvale“, Androidis Chrome'i menüü → „Installi rakendus“.</p>
-        <p>Andmed tulevad Riigi Teataja avalikust liidesest ja neid kontrollitakse automaatselt kord kuus. Õiguslikult kehtib alati Riigi Teatajas avaldatud tekst.</p>
-        <p id="install-slot"></p>
-      </section>`;
+      ${HOME_INFO}`;
     renderStatus();
     renderInstall();
   }
@@ -1092,24 +1161,38 @@
     box.innerHTML = h;
   }
 
+  function renderTabs() {
+    if (!el.tabs) return;
+    el.tabs.innerHTML = TABS.map((t) => `<button class="tab${t.sn ? ' has-sn' : ''}" data-tab="${t.k}" aria-current="${state.tab === t.k ? 'page' : 'false'}"><span class="tl">${esc(t.n)}</span>${t.sn ? `<span class="ts">${esc(t.sn)}</span>` : ''}</button>`).join('');
+  }
+
   function renderChips() {
+    renderTabs();
     const d = state.data;
     const c = d.meta.counts;
-    const cat = ([k, t, n]) => `<button class="chip" data-filter="${k}" aria-pressed="${!state.fund && state.filter === k}">${t}${n != null ? `<span class="n">${n}</span>` : ''}</button>`;
+    const pressed = (k) => !state.fund && state.filter === k;
+    const cat = ([k, t, n]) => `<button class="chip" data-filter="${k}" aria-pressed="${pressed(k)}">${t}${n != null ? `<span class="n">${n}</span>` : ''}</button>`;
     const fund = (f) => `<button class="chip fchip" style="--stripe:var(--c-${f.k})" data-fund="${f.k}" aria-pressed="${state.fund === f.k}">${esc(FUND_SHORT[f.k])}<span class="n">${f.cnt}</span></button>`;
     const order = ['f37', 'lisaks', 'f13'];
     const funds = d.items.filter((x) => x.t === 'f').sort((a, b) => order.indexOf(a.k) - order.indexOf(b.k));
-    el.chips.innerHTML = [['all', 'Kõik', null], ['s', 'Teenused', state.pa ? d.meta.countsPa || c.s : c.s]].map(cat).join('')
-      + funds.map(fund).join('')
-      + (c.q ? `<button class="chip kschip" data-filter="q" aria-pressed="${!state.fund && state.filter === 'q'}">Kvaliteedisüsteem<span class="n">${c.q - 1}</span></button>` : '')
-      + (c.v ? `<button class="chip soelchip" data-filter="v" aria-pressed="${!state.fund && state.filter === 'v'}">Sõeluuringud<span class="n">${c.v}</span></button>` : '')
-      + (c.j ? `<button class="chip teemachip" data-filter="j" aria-pressed="${!state.fund && state.filter === 'j'}">Igapäevatöö reeglid<span class="n">${c.j}</span></button>` : '')
-      + ((d.muutused || []).some((x) => !x.tyhi) ? `<button class="chip uchip" data-filter="u" title="Seaduste ja määruste muudatused" aria-pressed="${!state.fund && state.filter === 'u'}">Mis muutus<span class="n">${d.muutused.filter((x) => !x.tyhi).length}</span></button>` : '')
-      + (c.b ? `<button class="chip labchip" data-filter="b" aria-pressed="${!state.fund && state.filter === 'b'}">Labor (SYNLAB)<span class="n">${c.b}</span></button>` : '')
-      + [['a', 'Abivahendid', c.a]].map(cat).join('')
-      + (c.m ? `<button class="chip mschip" data-filter="m" aria-pressed="${!state.fund && state.filter === 'm'}">Meditsiiniseadmed<span class="n">${c.m}</span></button>` : '')
-      + [['l', 'Sätted', c.l + c.f], ['k', 'Lingid', c.k]].map(cat).join('')
-      + `<label class="chip pa-toggle" title="Väljas: kõik teenused, ka operatsioonid ja haiglateenused"><input type="checkbox" id="pa" ${state.pa ? 'checked' : ''}> Ainult perearstiabi</label>`;
+    const nU = (d.muutused || []).filter((x) => !x.tyhi).length;
+    const CH = {
+      all: cat(['all', 'Kõik', null]),
+      s: cat(['s', 'Teenused', state.pa ? d.meta.countsPa || c.s : c.s]),
+      fund: funds.map(fund).join(''),
+      q: c.q ? `<button class="chip kschip" data-filter="q" aria-pressed="${pressed('q')}">Kvaliteedisüsteem<span class="n">${c.q - 1}</span></button>` : '',
+      v: c.v ? `<button class="chip soelchip" data-filter="v" aria-pressed="${pressed('v')}">Sõeluuringud<span class="n">${c.v}</span></button>` : '',
+      j: c.j ? `<button class="chip teemachip" data-filter="j" aria-pressed="${pressed('j')}">Igapäevatöö reeglid<span class="n">${c.j}</span></button>` : '',
+      u: nU ? `<button class="chip uchip" data-filter="u" title="Seaduste ja määruste muudatused" aria-pressed="${pressed('u')}">Mis muutus<span class="n">${nU}</span></button>` : '',
+      b: c.b ? `<button class="chip labchip" data-filter="b" aria-pressed="${pressed('b')}">Labor (SYNLAB)<span class="n">${c.b}</span></button>` : '',
+      a: cat(['a', 'Abivahendid', c.a]),
+      m: c.m ? `<button class="chip mschip" data-filter="m" aria-pressed="${pressed('m')}">Meditsiiniseadmed<span class="n">${c.m}</span></button>` : '',
+      l: cat(['l', 'Sätted', c.l + c.f]),
+      k: cat(['k', 'Lingid', c.k]),
+      pa: `<label class="chip pa-toggle" title="Väljas: kõik teenused, ka operatsioonid ja haiglateenused"><input type="checkbox" id="pa" ${state.pa ? 'checked' : ''}> Ainult perearstiabi</label>`,
+    };
+    const keys = TAB_CHIPS[state.tab] || ['all', 's', 'fund', 'q', 'v', 'j', 'u', 'b', 'a', 'm', 'l', 'k', 'pa'];
+    el.chips.innerHTML = keys.map((k) => CH[k] || '').join('');
   }
 
   // ------------------------------------------------------------ sündmused
@@ -1217,6 +1300,7 @@
     try {
       const u = new URL(location.href);
       if (state.q) u.searchParams.set('q', state.q); else u.searchParams.delete('q');
+      if (state.tab !== 'avaleht') u.searchParams.set('tab', state.tab); else u.searchParams.delete('tab');
       history.replaceState(null, '', u);
     } catch (e) { /* ignoreeri */ }
   }
@@ -1228,7 +1312,7 @@
   }
 
   function bind() {
-    el.q = $('#q'); el.results = $('#results'); el.chips = $('#chips');
+    el.q = $('#q'); el.results = $('#results'); el.chips = $('#chips'); el.tabs = $('#tabs');
     let deb;
     el.q.addEventListener('input', () => {
       clearTimeout(deb);
@@ -1249,8 +1333,9 @@
       if (e.key === '/' && document.activeElement !== el.q) { e.preventDefault(); el.q.focus(); el.q.select(); }
     });
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('[data-copy],[data-open],[data-fund],[data-filter],[data-q],[data-focus],[data-goto],[data-act],[data-labs-all],[data-ms-all],[data-uall]');
+      const t = e.target.closest('[data-tab],[data-copy],[data-open],[data-fund],[data-filter],[data-q],[data-focus],[data-goto],[data-act],[data-labs-all],[data-ms-all],[data-uall]');
       if (!t || !state.data) return;
+      if (t.dataset.tab) { state.tab = t.dataset.tab; goHome(); return; }
       if (t.dataset.copy) { e.stopPropagation(); e.preventDefault(); copy(t.dataset.copy); return; }
       if (t.dataset.open) {
         const id = +t.dataset.open;
@@ -1322,7 +1407,10 @@
     $('#install').addEventListener('click', doInstall);
     renderInstall();
     try {
-      const q0 = new URLSearchParams(location.search).get('q');
+      const sp = new URLSearchParams(location.search);
+      const tab0 = sp.get('tab');
+      if (tab0 && TABS.some((x) => x.k === tab0)) state.tab = tab0;
+      const q0 = sp.get('q');
       if (q0) { el.q.value = q0; state.q = q0; }
     } catch (e) { /* ignoreeri */ }
   }

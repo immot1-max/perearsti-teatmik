@@ -2,6 +2,8 @@
 
 Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, sõeluuringute, haigus- ja hoolduslehtede, tervisetõendite, vaktsineerimise, retseptide, e-konsultatsiooni, patsiendi hüvitiste, abivahendite ja juhi tervisenõuete kohta, lisaks koolivaheajad, patsiendi küsimustike ja päevikute otselingid ning koloskoopia ja gastroskoopia ettevalmistusjuhendid. Näitab ka, mis allikates viimasel ajal muutus või peagi muutub. Töötab brauseris ja pärast esimest avamist ka võrguta.
 
+Avalehe kohal on vahelehed: „Avaleht“ (kõik), „Rahastus“ (fondid, pearaha ja lisatasud, kvaliteedisüsteem, sõeluuringud, loetelu ja metoodika muudatused), „Seadused ja nõuded“ (igapäevatöö reeglid, abivahendid, meditsiiniseadmed, teiste aktide muudatused) ning „Küsimustikud ja infolehed“ (teemakaardirühmad „Küsimustikud ja päevikud“ ja „Infolehed patsiendile“, kasulikud lingid). Vaheleht määrab, mida näidatakse ilma otsinguta ja millised kategooriakiibid on reas; otsing otsib alati kõigist andmetest. Vahelehe saab avada aadressiga `?tab=rahastus`, `?tab=noud` või `?tab=kys`. Vahelehtede seadistus on `app.js` konstantides `TABS`, `TAB_CHIPS`, `KYS_GROUPS` ja `RAHASTUS_SRC`.
+
 **Rakendus:** https://immot1-max.github.io/perearsti-teatmik/
 
 ## Mis seal on
@@ -25,7 +27,7 @@ Kiirotsing perearsti töös vajalike koodide, piirhindade, fondide, sõeluuringu
 | Riigi Teataja: ravimid ja hüvitised | Ravimite väljakirjutamise määrus § 2 (pereõe retseptiõigus, kogused, korduvretsept, bensodiasepiinid), RaKS § 29, 33, 33¹, 41, 42, 44, 49¹, 69, 70, 72; tervishoiuteenuste loetelu § 77 ja § 80 (hambaravi- ja proteesihüvitis) |
 | Riigi Teataja: meremehe tervisenõuded | Meremehe ja mereõppeasutusse õppima asuja tervisenõuete määrus § 5, 6, 7, 12, 13 |
 | Riigi Teataja: koolivaheajad | Haridus- ja teadusministri määrused nr 45 (2026/2027) ja nr 36 (2027/2028–2029/2030, jõustub 01.09.2027); tabel teemakaardil „Koolivaheajad“, ülevaatuse meeldetuletus 01.09.2027 |
-| Küsimustikud ja päevikud | Otselingid ja kasutusreeglid: EEK-2 ja Peaasi enesetundetest, SNAP-IV-26, unepäevik ja uneküsimustikud (Epworth, STOP-BANG, ISI, PSQI), peavalupäevik ja testid, urineerimispäevikud ja IPSS, AUDIT ja nikotiinisõltuvuse test, koloskoopia ja gastroskoopia ettevalmistusjuhendid haiglate kaupa (Kliinikum, ITK, Medicum, Tervisekassa, Regionaalhaigla, LTKH) koos dieedi erinevustega; eesti, vene ja inglise keeles, kui olemas. Linkide kättesaadavust kontrollitakse igal kuul |
+| Küsimustikud, päevikud ja patsiendi infolehed | Otselingid ja kasutusreeglid: EEK-2 ja Peaasi enesetundetest, SNAP-IV-26, unepäevik ja uneküsimustikud (Epworth, STOP-BANG, ISI, PSQI), peavalupäevik ja testid, urineerimispäevikud ja IPSS, AUDIT ja nikotiinisõltuvuse test; rühmas „Infolehed patsiendile“ koloskoopia ja gastroskoopia ettevalmistusjuhendid haiglate kaupa (Kliinikum, ITK, Medicum, Tervisekassa, Regionaalhaigla, LTKH) koos dieedi erinevustega; eesti, vene ja inglise keeles, kui olemas. Linkide kättesaadavust kontrollitakse igal kuul |
 | Tervisekassa: hüvitiste võrdlustabel | Haigus- ja hoolduslehe põhjused, kes maksab, määr, kestus ja päevane ülempiir (loetakse igal kontrollil) |
 | Toru (Tervisekassa) | Hinna kehtivuse algus, eelmine hind, koodid, mida loetelu tabelites ei ole |
 | Sotsiaalkindlustusamet | Lingid juhenditele ja vormidele |
