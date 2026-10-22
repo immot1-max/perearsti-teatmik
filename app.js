@@ -59,6 +59,8 @@
   // Vahelehe „Küsimustikud ja infolehed“ rühmad (teemad.json väli grupp); need ei ole vahelehel „Seadused ja nõuded“.
   const KYS_GROUPS = ['Küsimustikud ja päevikud', 'Infolehed patsiendile'];
   const RAHASTUS_SRC = new Set(['ttl', 'metoodika']); // „Mis muutus“ rahastuse vahelehel
+  // Juhendid, mida ravijuhend.ee-s ei ole (build/ravijuhendid.json „valised“, kirje väli ext = allika domeen).
+  const RJ_EXT_TITLE = 'Muud tegevusjuhendid (väljaspool ravijuhend.ee)';
   const FUND_HELP = {
     f37: 'Tasutakse kuni 37% ulatuses nimistu pearahadeks arvestatud summast aastas.',
     f13: 'Füsioteraapia, massaaž, psühholoog, psühhoteraapia ja logopeed kuni 13% ulatuses nimistu pearahadeks arvestatud summast aastas.',
@@ -418,7 +420,7 @@
   function groupKey(it) {
     if (it.t === 'u') return it.tul ? 'Tulekul: avaldatud, veel jõustumata' : 'Jõustunud viimase aasta jooksul';
     if (it.t === 'j') return it.g;
-    if (it.t === 'g') return it.liik === 'ravijuhend' ? 'Ravijuhendid (RJNK kinnitatud)' : 'Käsitlusjuhendid';
+    if (it.t === 'g') return it.ext ? RJ_EXT_TITLE : it.liik === 'ravijuhend' ? 'Ravijuhendid (RJNK kinnitatud)' : 'Käsitlusjuhendid';
     if (it.t === 'm') return 'Tervisekassa meditsiiniseadmed';
     if (it.t === 'a') return (it.g || [])[0] || it.n;
     if (it.t === 'l') return srcName(it.src);
@@ -561,8 +563,8 @@
         <span class="meta">${it.tul ? '<span class="badge warn">tulekul</span>' : '<span class="badge muutus">jõustunud</span>'}<span>${esc(uSummary(it))}</span>${via ? '<span class="via">· vaste sisus</span>' : ''}</span>`;
     } else if (it.t === 'g') {
       const nl = (it.lisad || []).length;
-      head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${esc(it.kood || '')}</small></span>
-        <span class="meta"><span class="badge rj">${esc(it.liik || 'ravijuhend')}</span>${it.kinnitatud ? `<span>kinnitatud ${fmtDate(it.kinnitatud)}</span>` : ''}${nl ? `<span>${nl} lisa</span>` : ''}${(it.pv || []).some((p) => !p.peida) ? '<span class="badge rjpv">lisa pildina</span>' : ''}${it.mk ? `<span class="badge rjpv">${esc(it.mk.lyh || 'tabel')}</span>` : ''}${via ? '<span class="via">· vaste lisades</span>' : ''}</span>`;
+      head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${esc(it.kood || (it.versioon ? 'v' + it.versioon.split(' ')[0] : ''))}</small></span>
+        <span class="meta"><span class="badge rj">${esc(it.liik || 'ravijuhend')}</span>${it.ext ? `<span>${esc(it.ext)}</span>` : ''}${it.kinnitatud ? `<span>kinnitatud ${fmtDate(it.kinnitatud)}</span>` : ''}${nl ? `<span>${nl} lisa</span>` : ''}${(it.pv || []).some((p) => !p.peida) ? '<span class="badge rjpv">lisa pildina</span>' : ''}${it.mk ? `<span class="badge rjpv">${esc(it.mk.lyh || 'tabel')}</span>` : ''}${via ? '<span class="via">· vaste lisades</span>' : ''}</span>`;
     } else if (it.t === 'v') {
       const yrs = it.sy ? `${it.aasta}: ${it.sy.length} sünniaastat` : (it.lyh || '');
       head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${esc(ageRange(it))}</small></span>
@@ -739,7 +741,7 @@
 
   // ------------------------------------------------------------ ravijuhendid
   // Käsitsi lisatud sisu (nt Medicumi majasisesed tabelid): plokid p, small, def ja tbl (lahtris s, r = rowspan,
-  // c = colspan, k = riskivärv r0–r4, h = reapäis).
+  // c = colspan, k = riskivärv r0–r4, h = reapäis). kinni: true = plokk on alguses kokku volditud.
   const mkCells = (b) => [...(b.pais || []), ...(b.read || [])].flat();
   function mkText(mk) {
     if (!mk) return '';
@@ -752,7 +754,7 @@
     return `<${tag}${attrs}${cls ? ` class="${cls}"` : ''}>${hl(o.s, state.hl).replace(/\n/g, '<br>')}</${tag}>`;
   }
   function mkHtml(mk) {
-    let h = `<details class="mk" open><summary>${esc(mk.n)}</summary><div class="mkb">`;
+    let h = `<details class="mk"${mk.kinni ? '' : ' open'}><summary>${esc(mk.n)}</summary><div class="mkb">`;
     for (const b of mk.plokid || []) {
       if (b.t === 'p') h += `<p>${hl(b.s, state.hl)}</p>`;
       else if (b.t === 'small') h += `<p class="small">${hl(b.s, state.hl)}</p>`;
@@ -776,27 +778,34 @@
     }
     h += '<dl class="kv">';
     if (it.kood) h += `<div><dt>Juhendi kood</dt><dd>${esc(it.kood)}</dd></div>`;
-    if (it.kinnitatud || it.avaldatud) h += `<div><dt>Kinnitatud</dt><dd>${fmtDate(it.kinnitatud) || '–'}${it.avaldatud ? ` <span class="inh">avaldatud ${fmtDate(it.avaldatud)}</span>` : ''}</dd></div>`;
-    if ((it.er || []).length) h += `<div><dt>Erialad</dt><dd>${it.er.map(esc).join('<br>')}</dd></div>`;
+    if (it.versioon) h += `<div><dt>Versioon</dt><dd>${esc(it.versioon)}</dd></div>`;
+    if (it.kinnitatud) h += `<div><dt>Kinnitatud</dt><dd>${fmtDate(it.kinnitatud)}${it.avaldatud ? ` <span class="inh">avaldatud ${fmtDate(it.avaldatud)}</span>` : ''}</dd></div>`;
+    else if (it.avaldatud) h += `<div><dt>Avaldatud</dt><dd>${fmtDate(it.avaldatud)}</dd></div>`;
+    if (it.valjaandja) h += `<div><dt>Väljaandja</dt><dd>${esc(it.valjaandja)}</dd></div>`;
+    if ((it.er || []).length) h += `<div><dt>${it.ext ? 'Kellele' : 'Erialad'}</dt><dd>${it.er.map(esc).join('<br>')}</dd></div>`;
     h += '</dl>';
+    if (it.markus) h += `<p class="rjnote">${esc(it.markus)}</p>`;
     if (it.mk) h += mkHtml(it.mk);
     for (const pv of (it.pv || []).filter((p) => !p.peida)) {
       const lk = pv.lk ? ` · juhendi PDF lk ${pv.lk.join('–')}` : '';
       h += `<details class="rjpv" open><summary>${hl(pv.n, state.hl)}</summary><div class="pvimgs">`
         + pv.img.map(([src, w, hh], i) => `<a href="${esc(src)}" target="_blank" rel="noopener" title="Ava suurelt"><img src="${esc(src)}" width="${w}" height="${hh}" loading="lazy" alt="${esc(pv.n)}${pv.img.length > 1 ? `, osa ${i + 1}` : ''}"></a>`).join('')
-        + `</div><p class="small">Pilt ravijuhendi lisast (ravijuhend.ee${lk}). Klõps avab suurelt. <a href="${esc(pv.u)}" target="_blank" rel="noopener">Lisa allikas ↗</a></p></details>`;
+        + `</div><p class="small">Pilt ${it.ext ? 'juhendi' : 'ravijuhendi'} lisast (${esc(it.ext || 'ravijuhend.ee')}${lk}). Klõps avab suurelt. <a href="${esc(pv.u)}" target="_blank" rel="noopener">Lisa allikas ↗</a></p></details>`;
     }
     const pvN = new Set((it.pv || []).filter((p) => !p.peida).map((p) => p.n));
     const mkN = it.mk && /^Lisa \d+/.test(it.mk.n || '') ? (it.mk.n.match(/^Lisa \d+/) || [])[0] : null;
     if ((it.lisad || []).length) {
       h += '<div class="rules"><h4>Lisad</h4><div class="rjl">' + it.lisad.map(([n, u]) => `<div><a href="${esc(u)}" target="_blank" rel="noopener">${hl(n, state.hl)} ↗</a>${pvN.has(n) ? ' <span class="inh">(pilt ülal)</span>' : mkN && n.startsWith(mkN + '.') ? ' <span class="inh">(tabel ülal)</span>' : ''}</div>`).join('') + '</div></div>';
     }
-    h += `<div class="actions"><a href="${esc(it.u)}" target="_blank" rel="noopener">Ava ravijuhend.ee-s ↗</a>`
-      + (it.pdf ? `<a href="${esc(it.pdf)}" target="_blank" rel="noopener">Kogu juhend (PDF) ↗</a>` : '')
+    h += '<div class="actions">'
+      + (it.ext ? '' : `<a href="${esc(it.u)}" target="_blank" rel="noopener">Ava ravijuhend.ee-s ↗</a>`)
+      + (it.pdf ? `<a href="${esc(it.pdf)}" target="_blank" rel="noopener">Kogu juhend (PDF${it.ext ? ', ' + esc(it.ext) : ''}) ↗</a>` : '')
       + (it.pj ? `<a href="${esc(it.pj)}" target="_blank" rel="noopener">Patsiendijuhend ↗</a>` : '')
       + (it.lingid || []).map(([n, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)} ↗</a>`).join('') + '</div>';
     const rm = d.meta.rj || {};
-    h += `<p class="small">Andmed ravijuhend.ee lehelt (kontrollitud ${fmtDate(rm.date || d.meta.date)}); kehtib alati ravijuhend.ee-s avaldatud juhend.</p>`;
+    h += it.ext
+      ? `<p class="small">Juhendi PDF ${esc(it.ext)} lehelt (kontrollitud ${fmtDate(rm.date || d.meta.date)}); kehtib alati väljaandja avaldatud juhend.</p>`
+      : `<p class="small">Andmed ravijuhend.ee lehelt (kontrollitud ${fmtDate(rm.date || d.meta.date)}); kehtib alati ravijuhend.ee-s avaldatud juhend.</p>`;
     return h;
   }
 
@@ -1089,7 +1098,7 @@
         <p>„Mis muutus“ (avalehe lõpus) näitab iga jälgitava seaduse ja määruse viimase aasta jooksul jõustunud ja juba avaldatud tulevasi redaktsioone: uued ja kadunud koodid, hinnamuutused, fondide koodid ning muutunud sätete varasem ja uus sõnastus (muutunud sõnad on esile tõstetud).</p>
         <p>Teenuse koodi avades on näha ka „Mis on hinnas“: metoodika standardkulu lisa järgi personal (sh arsti minutid), ruumid, seadmed ja materjalid.</p>
         <p>„Igapäevatöö reeglid“ koondavad haigus- ja hoolduslehe, P21, tervisetõendite, nakkushaiguse teatiste, vaktsineerimise, retseptide, e-konsultatsiooni, patsiendi hüvitiste, töökorralduse ja nimistu põhireeglid, koolivaheajad, patsiendi küsimustike ja päevikute otselingid (EEK-2, SNAP-IV, uni, peavalu, urineerimine, AUDIT), patsiendi infolehed (koloskoopia ja gastroskoopia ettevalmistusjuhendid haiglate kaupa) (võimalusel eesti, vene ja inglise keeles) ning peremeditsiini residentuuri, 6. kursuse praktika ja abiarsti info (palk, tööaeg, puhkus, juhendamine); igal rühmal on oma värv. Iga punkti juures on viide sättele; ⚠ märgib allikate omavahelisi erinevusi. Otsida võib ka küsimusena (nt „kui kaua makstakse haigushüvitist“).</p>
-        <p>Vaheleht „Ravijuhendid“ sisaldab kõigi ravijuhend.ee kinnitatud ravijuhendite ja käsitlusjuhendite otselinke koos koodi, kuupäevade, lisade ja patsiendijuhendiga. Mõne juhendi sageli vajalik lisa (nt KNH progresseerumise tabel, antibiootikumide valik ja annused, osteoporoosi, ATH ja 2. tüüpi diabeedi algoritm) on kirjes kohe pildina näha; kõrgvererõhktõve juures on Medicumi majasisesed riskitabelid. Lisasid kontrollitakse kord kuus ja pilt uueneb, kui ravijuhend.ee-s lisa muutub.</p>
+        <p>Vaheleht „Ravijuhendid“ sisaldab kõigi ravijuhend.ee kinnitatud ravijuhendite ja käsitlusjuhendite otselinke koos koodi, kuupäevade, lisade ja patsiendijuhendiga. Mõne juhendi sageli vajalik lisa (nt KNH progresseerumise tabel, antibiootikumide valik ja annused, osteoporoosi, ATH ja 2. tüüpi diabeedi algoritm) on kirjes kohe pildina näha; kõrgvererõhktõve juures on Medicumi majasisesed riskitabelid. Lisaks on seal valitud tegevusjuhendid, mida ravijuhend.ee-s ei ole (nt „Lähisuhtevägivalla käsitlus perearstiabis“, justdigi.ee), koos lisade piltide ja lühikokkuvõttega. Lisasid kontrollitakse kord kuus ja pilt uueneb, kui allikas muutub.</p>
         <p>Linnuke „Ainult perearstiabi“ peidab teenused, mis ei kuulu perearsti fondidesse, kvaliteedisüsteemi ega perearstiabi peatükki (nt operatsioonid). Täpse koodi otsing näitab koodi alati.</p>
         <p>Rakendus töötab pärast esimest avamist ka võrguta. Telefonis lisa see avakuvale: iPhone'is Safari jagamismenüü → „Lisa avakuvale“, Androidis Chrome'i menüü → „Installi rakendus“.</p>
         <p>Andmed tulevad Riigi Teataja avalikust liidesest ja neid kontrollitakse automaatselt kord kuus. Õiguslikult kehtib alati Riigi Teatajas avaldatud tekst.</p>
@@ -1205,16 +1214,17 @@
     }
     if (tab === 'rj') {
       // Kõik juhendid on vahelehel kohe nimekirjana; kirje avaneb samas kohas.
-      const rjList = (liik, title) => {
-        const l = rjAll.filter((x) => (liik === 'ravijuhend') === (x.liik === 'ravijuhend'));
+      const rjList = (keep, title) => {
+        const l = rjAll.filter(keep);
         return l.length ? sec(`${title} (${l.length})`, `<div class="list">${l.map((x) => row(x)).join('')}</div>`) : '';
       };
-      el.results.innerHTML = tabHint('Kõik ravijuhend.ee kinnitatud ravijuhendid ja käsitlusjuhendid. Kirje avaneb samas kohas: kood, kuupäevad, lisade otselingid ja patsiendijuhend; mõne juhendi sageli vajalik lisa on kohe pildina.')
-        + rjFeat('Lisa pildina või Medicumi tabelitega', false)
-        + rjList('ravijuhend', 'Ravijuhendid (RJNK kinnitatud)')
-        + rjList('kasitlus', 'Käsitlusjuhendid')
+      el.results.innerHTML = tabHint('Kõik ravijuhend.ee kinnitatud ravijuhendid ja käsitlusjuhendid ning valitud tegevusjuhendid mujalt. Kirje avaneb samas kohas: kood, kuupäevad, lisade otselingid ja patsiendijuhend; mõne juhendi sageli vajalik lisa on kohe pildina.')
+        + rjFeat('Lisa pildina, tabeli või kokkuvõttega', false)
+        + rjList((x) => !x.ext && x.liik === 'ravijuhend', 'Ravijuhendid (RJNK kinnitatud)')
+        + rjList((x) => !x.ext && x.liik !== 'ravijuhend', 'Käsitlusjuhendid')
+        + rjList((x) => x.ext, RJ_EXT_TITLE)
         + linksHtml(['ravijuhend', 'rj-pj', 'abr'])
-        + examples(['KNH', 'tonsilliit', 'antibiootikum', 'SCORE2', 'osteoporoos', 'ATH', 'diabeet', 'kolorektaalvähk']);
+        + examples(['KNH', 'tonsilliit', 'antibiootikum', 'SCORE2', 'osteoporoos', 'ATH', 'diabeet', 'kolorektaalvähk', 'lähisuhtevägivald']);
       return;
     }
 

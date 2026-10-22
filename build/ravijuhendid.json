@@ -1,9 +1,9 @@
 {
   "_meta": {
-    "kommentaar": "Ravijuhendid ravijuhend.ee-st (build/ravijuhendid.py). Loendist võetakse kõik RJNK kinnitatud ravijuhendid ja käsitlusjuhendid, juhendi lehelt kood, kuupäevad, erialad, võtmesõnad (otsingu sünonüümid), lisad ja patsiendijuhendi link. 'juhendid' võti on 'rj<id>' (aadress /tervishoiuvarav/juhendid/<id>) või 'gp<id>' (aadress /tervishoiuvarav/juhendid-gp/<id>). 'eelvaade': lisa number ja kontrollsõna pealkirjas; lisa näidatakse juhendi kirjes pildina (PDF-ist või juhendi lehe piltidest). 'sn': lühinimi, millega juhend on avalehel esile tõstetud. 'kasitsi': käsitsi lisatud sisu (Medicumi majasisesed tabelid, parandatud lisa), mida automaatkontroll ei uuenda; juhendi uue versiooni korral tuleb aruandesse meeldetuletus. Eelvaate 'peida': pilti ei näidata (käsitsi tabel asendab), kuid allikat jälgitakse; 'kasitsi_sha' on allika räsi, mille järgi käsitsi tabel tehti, ja selle muutumisel tuleb aruandesse meeldetuletus.",
+    "kommentaar": "Ravijuhendid ravijuhend.ee-st (build/ravijuhendid.py). Loendist võetakse kõik RJNK kinnitatud ravijuhendid ja käsitlusjuhendid, juhendi lehelt kood, kuupäevad, erialad, võtmesõnad (otsingu sünonüümid), lisad ja patsiendijuhendi link. 'juhendid' võti on 'rj<id>' (aadress /tervishoiuvarav/juhendid/<id>) või 'gp<id>' (aadress /tervishoiuvarav/juhendid-gp/<id>). 'eelvaade': lisa number ja kontrollsõna pealkirjas; lisa näidatakse juhendi kirjes pildina (PDF-ist või juhendi lehe piltidest). 'sn': lühinimi, millega juhend on avalehel esile tõstetud. 'kasitsi': käsitsi lisatud sisu (Medicumi majasisesed tabelid, parandatud lisa), mida automaatkontroll ei uuenda; juhendi uue versiooni korral tuleb aruandesse meeldetuletus. Eelvaate 'peida': pilti ei näidata (käsitsi tabel asendab), kuid allikat jälgitakse; 'kasitsi_sha' on allika räsi, mille järgi käsitsi tabel tehti, ja selle muutumisel tuleb aruandesse meeldetuletus. 'valised': juhendid, mida ravijuhend.ee-s ei ole (allikaks PDF mujal); lisad leitakse PDF-ist, 'kontroll' on tekstilõigud, mis peavad juhendis alles olema, ja 'kasitsi_sha' on PDF-i räsi, mille järgi käsitsi kokkuvõte tehti.",
     "loend": "https://ravijuhend.ee/tervishoiuvarav/juhendid",
     "patsiendijuhendid": "https://ravijuhend.ee/patsiendivarav/juhendid",
-    "kontrollitud": "2026-10-20"
+    "kontrollitud": "2026-10-22"
   },
   "tyybid": [
     {"types": "2", "status": "6", "liik": "ravijuhend"},
@@ -56,6 +56,31 @@
     "rj149": {"seotud": ["kys-alkohol"]},
     "rj178": {"syn": ["suitsetamine", "nikotiin", "e-sigaret"], "seotud": ["kys-alkohol"]},
     "gp22": {"syn": ["peavalu"], "seotud": ["kys-peavalu"]}
+  },
+  "valised": {
+    "x-lsv": {
+      "n": "Lähisuhtevägivalla käsitlus perearstiabis",
+      "liik": "tegevusjuhend",
+      "pdf": "https://www.justdigi.ee/sites/default/files/documents/2026-10/Impact_LSV_juhend%20v2.0%20KU%CC%88LJENDATUD_16.10.2026_LO%CC%83PLIK.pdf",
+      "allikas": "justdigi.ee",
+      "versioon": "2.0 (16.10.2026)",
+      "valjaandja": "Koostaja Tartu Ülikooli tõenduspõhise praktika keskus; kuriteoohvrite kaitse projekt IMPACT (Justiits- ja Digiministeerium, Sotsiaalministeerium, Victim Support Europe), rahastanud Euroopa Liit",
+      "er": ["Perearstiabi: arst, õde, ämmaemand"],
+      "markus": "Ei ole RJNK kinnitatud ega ravijuhend.ee-s; koostatud Eesti ravijuhendite koostamise käsiraamatu põhimõtete järgi. WAST-i soovitusel on rakenduspiirang kuni küsimustiku eesti keelde tõlkimise ja kohandamiseni.",
+      "sn": "Lähisuhtevägivald",
+      "eelvaade": [{"lisa": 1, "sisaldab": "algoritm"}, {"lisa": 2, "sisaldab": "edasise abi"}],
+      "kasitsi": "lsv-kokkuvote",
+      "kasitsi_sha": "1ebf88a83e1b7034",
+      "kontroll": ["kehtib rakenduspiirang kuni selle eesti keelde tõlkimise ja kohandamiseni", "Ohvriabi 116 006"],
+      "syn": ["LSV", "lähisuhtevägivald", "perevägivald", "koduvägivald", "paarisuhtevägivald", "PSV", "naistevastane vägivald", "vägivald", "väärkohtlemine", "füüsiline vägivald", "vaimne vägivald", "seksuaalvägivald", "vägistamine", "majanduslik vägivald", "sundiv kontroll", "vägivallaohver", "ohver", "ohvriabi", "116 006", "lasteabi", "116 111", "abivajav laps", "hädaohus laps", "seksuaalvägivalla kriisiabikeskus", "kehakaart", "vigastuste dokumenteerimine", "vigastuste pildistamine", "WAST", "IMPACT", "domestic violence", "domestic abuse", "intimate partner violence", "IPV", "домашнее насилие"],
+      "seotud": ["kys-meeleolu"],
+      "lingid": [
+        ["Ohvriabi 116 006 (palunabi.ee)", "https://www.palunabi.ee"],
+        ["Lasteabi 116 111 (lasteabi.ee)", "https://www.lasteabi.ee"],
+        ["Sotsiaalkindlustusamet: lähisuhtevägivald", "https://www.sotsiaalkindlustusamet.ee/abivajav-laps-ja-taiskasvanu/abi-vagivalla-ohvrile/lahisuhtevagivald"],
+        ["Ohvri andmete edastamine SKA-le (vorm, docx)", "https://www.sotsiaalkindlustusamet.ee/sites/default/files/documents/2026-02/ohvri_andmete_edastamine_sotsiaalkindlustusametile%20%283%29.docx"]
+      ]
+    }
   },
   "kasitsi": {
     "knh-lisa3": {
@@ -112,6 +137,24 @@
          ]},
         {"t": "small", "s": "* ≥70 a näiliselt tervetel: lipiidravi soovitus IIb (võib kaaluda)."},
         {"t": "def", "p": "SCORE2", "s": "kalkulaator, eesmärkväärtus, doos → rosuvastatiin 10 / atorvastatiin 20 koos suurema doosi retseptidega."}
+      ]
+    },
+    "lsv-kokkuvote": {
+      "n": "Peamine perearstiabis (juhendi kokkuvõte)",
+      "lyh": "kokkuvõte",
+      "kinni": true,
+      "allikas": "Kokkuvõte juhendi „Lähisuhtevägivalla käsitlus perearstiabis“ (tegevusjuhend, versioon 2.0, 16.10.2026) soovitustest ja peatükkidest 4.1–4.6. Õigusviited kontrollitud Riigi Teataja kehtivast tekstist 22.10.2026. TTKS § 59³ lg 1 on siin seaduse sõnastuses: juhend kirjutab „piirata andmete esitamist Tervise infosüsteemi“, seadus annab õiguse määrata tähtaja, mille jooksul patsient näeb andmeid ainult tervishoiutöötaja vahendusel. Ohvriabi seaduse § 7 lg 3 järgi edastab tervishoiuasutus andmed ohvri ohvriabi soovi korral (juhendis „võib edastada patsiendi nõusolekul“). Lisatud käsitsi 22.10.2026; kui juhendi PDF muutub, tuleb aruandesse meeldetuletus.",
+      "plokid": [
+        {"t": "def", "p": "Millal kahtlustada", "s": "Indikaatoritele pööratakse tähelepanu kliinilise kahtluse korral, universaalset sõelumist juhend ei soovita (soovitus 2). Indikaatorite rühmad: mittejärjepidev tervishoiuteenuste kasutamine; vigastused, eriti korduvad, riietega kaetud kohtades või ebamäärase selgitusega; seletamatud seedetrakti sümptomid, fibromüalgia, kroonilised peavalud ja valusündroomid; reproduktiiv- ja seksuaaltervise probleemid; depressiivsus, ärevus, uneprobleemid, enesevigastamine, riskikäitumine; sekkuv saatja. Indikaatoreid hinnatakse koosmõjus, kindlat arvu ei ole (ptk 4.1–4.2)."},
+        {"t": "def", "p": "WAST", "s": "Vähemalt ühe indikaatori korral soovitab juhend WAST-i küsimustikku (soovitus 3), kuid kuni eesti keelde tõlkimise ja kohandamiseni kehtib rakenduspiirang. Lisas 4 on ingliskeelne töövorm; positiivse tulemuse piiri juhend ei esita. Negatiivne tulemus ei välista lähisuhtevägivalda (ptk 4.4)."},
+        {"t": "def", "p": "Vestlus", "s": "Ainult kahekesi ja kui see on patsiendile turvaline; mitte küsida, kui juures on partner, pereliige, sõber või rääkiv laps (alates umbes 18 kuu vanusest). Pereliiget, sõpra ega last tõlgina mitte kasutada; tehisintellekti- või veebitõlge patsiendi nõusolekul, kui lahendus ei salvesta terviseandmeid. Mitte survestada suhtest lahkuma ega politseisse pöörduma (ptk 4.3)."},
+        {"t": "def", "p": "Dokumenteerimine", "s": "Patsiendi sõnad jutumärkides, neutraalne keel. Iga vigastuse asukoht (kehapool, jäseme kolmandik, sirutus- või painutuspool), suurus sentimeetrites, muster, kuju ja servad, värvus ja tüüp. Mitte märkida patsiendi kaasas olevatesse dokumentidesse (rasedakaart, paberil saatekiri). Vajadusel asutusesisene märge, mis tervise infosüsteemi ei lähe; juhend nimetab näitena Perearst 2 ja 3 ning Watsoni (ptk 4.5.4)."},
+        {"t": "def", "p": "Tervise infosüsteem", "s": "Patsiendi elu või tervise kaitseks võib tervishoiuteenuse osutaja andmete edastamisel määrata kuni kuuekuulise tähtaja, mille jooksul saab patsient andmetega esmakordselt tutvuda ainult tervishoiutöötaja vahendusel (TTKS § 59³ lg 1). Küsi, kas toimepanijal võib olla ligipääs patsiendi terviseportaalile või volitatud esindaja õigus (ptk 4.5.4, 4.5.6)."},
+        {"t": "def", "p": "Fotod", "s": "Suulise nõusolekuga; igast vigastusest vähemalt 2 fotot (üldvaade ja mõõtkavaga detailvaade), välguta. Isiklikul telefonil mitte tavagaleriisse ega pilve, pärast talletamist seadmest kustutada. Pildipank ei ole parim koht, sest sinna on ligipääs ka teistel tervishoiutöötajatel (ptk 4.5.5)."},
+        {"t": "def", "p": "Seksuaalvägivald", "s": "Kuni 7 päeva tagasi: eelistada seksuaalvägivalla kriisiabikeskust. HIV-i kokkupuutejärgne profülaktika 3 ööpäeva jooksul (kriisiabikeskus või nakkushaiguste arst), SOS-tablett kuni 5 ööpäeva, STLI ravi ilma eelneva testimiseta, vajadusel B-hepatiidi vaktsineerimine. Perearsti ülesanne ei ole koguda kohtumeditsiinilisi tõendeid (ptk 4.5.3)."},
+        {"t": "def", "p": "Teavitamine", "s": "Täiskasvanu kohta teabe edastamiseks on üldjuhul vaja tema nõusolekut. Ohvriabi soovi korral edastatakse Sotsiaalkindlustusametile nimi, kontaktandmed, juhtumi liik ja abisoov (ohvriabi seadus § 7 lg 3). Vahetult eesseisva ründe korral võib teavitada politseid (juhend viitab KarS § 29). Abivajavast lapsest teatamine on kohustuslik (KOV või Lasteabi 116 111), hädaohus laps: 112 (lastekaitseseadus 6. ja 7. peatükk; ptk 4.6)."},
+        {"t": "def", "p": "Kontaktid", "s": "Hädaabi 112; Ohvriabi 116 006 (24/7, eesti, vene ja inglise keeles, palunabi.ee); Lasteabi 116 111 (24/7, lasteabi.ee); seksuaalvägivalla kriisiabikeskused 24/7 Tallinnas, Tartus, Pärnus, Kohtla-Järvel ja Kuressaares; KOV kontaktid eesti.ee-s. Ohvriabi infomaterjale saab perearstikeskusesse tasuta tellida Sotsiaalkindlustusameti kataloogist (lisa 2)."},
+        {"t": "small", "s": "Tõendus pärineb peamiselt naistevastase paarisuhtevägivalla uuringutest (kaudne tõendus). Juhend ei käsitle lastevastast vägivalda, eakate väärkohtlemist, raseduse- ja sünnitusjärgset perioodi ega vägivalla toimepanija käsitlust."}
       ]
     }
   }

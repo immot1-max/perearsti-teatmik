@@ -1699,7 +1699,8 @@ def make_report(prev, data, missing):
     gi = [x for x in data["items"] if x["t"] == "g"]
     if gi or rj.get("warn") or rj.get("notes"):
         lines.append("## Ravijuhendid (ravijuhend.ee)")
-        lines.append(f'- {sum(1 for x in gi if x.get("liik") == "ravijuhend")} ravijuhendit, {sum(1 for x in gi if x.get("liik") != "ravijuhend")} käsitlusjuhendit, '
+        lines.append(f'- {sum(1 for x in gi if x.get("liik") == "ravijuhend")} ravijuhendit, {sum(1 for x in gi if x.get("liik") == "käsitlusjuhend")} käsitlusjuhendit, '
+                     f'{sum(1 for x in gi if x.get("ext"))} muud juhendit (väljaspool ravijuhend.ee), '
                      f'{sum(len(x.get("pv", [])) for x in gi)} lisa eelvaadet')
         lines.extend(f"- {n}" for n in rj.get("notes", []))
         lines.extend(f"- NB: {w}" for w in rj.get("warn", []))

@@ -8,6 +8,7 @@ juhendi lehe lisa piltidest. Pilt tehakse uuesti ainult siis, kui allika räsi m
 kustutatakse. Kui ravijuhend.ee pole kättesaadav, jääb alles eelmine seis ja aruandesse tuleb märkus.
 
 Seadistus: build/ravijuhendid.json (millised lisad eelvaatena, lisasünonüümid, käsitsi lisatud tabelid).
+Võti 'valised': juhendid, mida ravijuhend.ee-s ei ole (allikas on PDF mujal, nt justdigi.ee); vt collect_external.
 """
 import hashlib
 import html
@@ -219,20 +220,15 @@ def make_preview(get, key, lisa, info, prev_pv, root, want):
             raise RuntimeError(f"{name}: lisal pole PDF-i ega pilte")
         mode, parts = "img", [get(urllib.parse.quote(u, safe=":/?=&%"), timeout=90, tries=3) for u in imgs]
     sha = hashlib.sha256(b"".join(parts) + json.dumps(pages).encode()).hexdigest()[:16]
-    if prev_pv and prev_pv.get("sha") == sha and all(os.path.exists(os.path.join(root, p)) for p, _, _ in prev_pv.get("img", [])):
+    if prev_ok(prev_pv, sha, root):
         return dict(prev_pv, n=name, u=url), False
-    os.makedirs(os.path.join(root, PV_DIR), exist_ok=True)
     out, txt = [], ""
     if mode in ("pdf", "juhend"):
         with pdfplumber.open(io.BytesIO(parts[0])) as pdf:
             idx = pages if mode == "juhend" else list(range(min(len(pdf.pages), 12)))
-            for i, pi in enumerate(idx, 1):
-                page = pdf.pages[pi]
-                im = page.to_image(resolution=DPI).original
-                rel = f"{PV_DIR}/{key}-l{nr}-{sha[:8]}-{i}.png"
-                out.append([rel] + save_png(im, os.path.join(root, rel), footer=mode == "juhend"))
-                txt += " " + (page.extract_text() or "")
+            out, txt = render_pdf_pages(pdf, idx, key, nr, sha, root, footer=mode == "juhend")
     else:
+        os.makedirs(os.path.join(root, PV_DIR), exist_ok=True)
         for i, b in enumerate(parts, 1):
             im = Image.open(io.BytesIO(b))
             rel = f"{PV_DIR}/{key}-l{nr}-{sha[:8]}-{i}.png"
@@ -241,6 +237,126 @@ def make_preview(get, key, lisa, info, prev_pv, root, want):
     if mode == "juhend":
         pv["lk"] = [p + 1 for p in pages]  # juhendi PDF-i leheküljed
     return pv, True
+
+
+def prev_ok(prev_pv, sha, root):
+    """Eelmine eelvaade sobib, kui allika räsi on sama ja pildid on alles."""
+    return bool(prev_pv and prev_pv.get("sha") == sha
+                and all(os.path.exists(os.path.join(root, p)) for p, _, _ in prev_pv.get("img", [])))
+
+
+def render_pdf_pages(pdf, idx, key, nr, sha, root, footer):
+    """PDF-i leheküljed pildiks (kaust lisad/); tagastab [[tee, laius, kõrgus], …] ja lehtede teksti."""
+    os.makedirs(os.path.join(root, PV_DIR), exist_ok=True)
+    out, txt = [], ""
+    for i, pi in enumerate(idx, 1):
+        page = pdf.pages[pi]
+        im = page.to_image(resolution=DPI).original
+        rel = f"{PV_DIR}/{key}-l{nr}-{sha[:8]}-{i}.png"
+        out.append([rel] + save_png(im, os.path.join(root, rel), footer=footer))
+        txt += " " + (page.extract_text() or "")
+    return out, txt
+
+
+# ------------------------------------------------------------ välised juhendid
+# Juhendid, mida ravijuhend.ee-s ei ole (nt IMPACT-i lähisuhtevägivalla tegevusjuhend justdigi.ee-s).
+# Seadistus: build/ravijuhendid.json võti 'valised'. Allikaks on PDF; lisad leitakse PDF-ist (leht, mille
+# esimene rida on „Lisa N. …“), eelvaated tehakse samadest lehtedest. PDF-i räsi muutusest tuleb aruandesse märkus.
+
+def norm_txt(s):
+    return re.sub(r"\s+", " ", (s or "").replace("\xad", "")).strip()
+
+
+def ext_lisad(pdf):
+    """[(lisa nimi, [lehtede indeksid]), …]: lisa algab lehelt, mille esimene rida on „Lisa N. …“, ja kestab
+    järgmise lisa või kirjanduse loetelu alguseni."""
+    firsts = []
+    for p in pdf.pages:
+        t = p.extract_text() or ""
+        firsts.append(next((ln.strip() for ln in t.split("\n") if ln.strip()), ""))
+    heads = []
+    for i, f in enumerate(firsts):
+        if re.match(r"Lisa\s+\d+\s*\.\s*\S", f):
+            # pealkirja lõpus olev joonealuse märkuse number välja (nt „hindamisvahend19“)
+            heads.append([re.sub(r"(?<=[^\W\d_])\d{1,2}$", "", f).strip(), i])
+    out = []
+    for j, (name, i) in enumerate(heads):
+        if j + 1 < len(heads):
+            stop = heads[j + 1][1]
+        else:
+            stop = next((k for k in range(i + 1, len(firsts)) if re.match(r"(Kasutatud kirjandus|Viited|Kirjandus)\b", firsts[k])), len(firsts))
+        out.append((name, list(range(i, stop))))
+    return out
+
+
+def collect_external(get, cfg, prev, root, warn, notes):
+    items = []
+    manual = cfg.get("kasitsi", {})
+    for k, c in (cfg.get("valised") or {}).items():
+        old = prev.get(k) or {}
+        it = {"t": "g", "k": k, "liik": c.get("liik", "tegevusjuhend"), "n": c["n"], "u": c.get("leht") or c["pdf"], "pdf": c["pdf"],
+              "ext": c.get("allikas") or urllib.parse.urlsplit(c["pdf"]).netloc.removeprefix("www.")}
+        for f in ("valjaandja", "versioon", "avaldatud", "kinnitatud", "kood", "er", "markus", "syn", "sn", "ks", "lingid", "seotud"):
+            if c.get(f):
+                it[f] = c[f]
+        if c.get("kasitsi"):
+            mk = manual.get(c["kasitsi"])
+            if mk:
+                it["mk"] = mk
+            else:
+                warn.append(f"{it['n']}: käsitsi sisu „{c['kasitsi']}“ puudub")
+        try:
+            raw = get(c["pdf"], timeout=180, tries=3)
+            if not raw.startswith(b"%PDF"):
+                raise RuntimeError("vastus ei ole PDF")
+        except Exception as e:  # noqa: BLE001
+            warn.append(f"{it['n']}: juhendi PDF-i ei saanud ({str(e)[:80]}); {'jääb eelmine seis' if old else 'ainult link'}. "
+                        "Kontrolli, kas juhend on viidud uuele aadressile (build/ravijuhendid.json, valised).")
+            items.append(dict(old, **it) if old else it)
+            continue
+        sha = hashlib.sha256(raw).hexdigest()[:16]
+        it["sha"] = sha
+        with pdfplumber.open(io.BytesIO(raw)) as pdf:
+            found = ext_lisad(pdf)
+            full = norm_txt(" ".join(p.extract_text() or "" for p in pdf.pages))
+            it["lisad"] = [[n, f"{c['pdf']}#page={pages[0] + 1}"] for n, pages in found]
+            if not old:
+                notes.append(f"Uus juhend (väljaspool ravijuhend.ee): {it['n']}")
+            elif old.get("sha") and old["sha"] != sha:
+                notes.append(f"Juhendi PDF muutus: {it['n']}")
+            if old and [x[0] for x in old.get("lisad", [])] != [x[0] for x in it["lisad"]]:
+                notes.append(f"Lisad muutusid: {it['n']}")
+            if it.get("mk") and c.get("kasitsi_sha") and sha != c["kasitsi_sha"]:
+                warn.append(f"{it['n']}: juhendi PDF muutus; käsitsi kokkuvõte „{it['mk'].get('n')}“ vajab ülevaatust "
+                            "(build/ravijuhendid.json, kasitsi_sha)")
+            for phrase in c.get("kontroll", []):
+                if norm_txt(phrase) not in full:
+                    warn.append(f"{it['n']}: juhendi tekstis ei ole enam „{phrase}“; käsitsi kokkuvõte vajab ülevaatust")
+            pvs = []
+            old_pv = {lisa_nr(p["n"]): p for p in old.get("pv", [])}
+            pages_by = dict(found)
+            for want in c.get("eelvaade", []):
+                lisa, w = pick_lisa({"lisad": it["lisad"]}, want)
+                if w:
+                    warn.append(f"{it['n']}: eelvaade: {w}")
+                if not lisa:
+                    continue
+                nr = lisa_nr(lisa[0]) or 0
+                pages = pages_by[lisa[0]][:want.get("lk", 3)]
+                psha = hashlib.sha256(raw + json.dumps(pages).encode()).hexdigest()[:16]
+                p0 = old_pv.get(nr) or old_pv.get(want.get("lisa"))
+                if prev_ok(p0, psha, root):
+                    pv = dict(p0, n=lisa[0], u=lisa[1])
+                else:
+                    img, txt = render_pdf_pages(pdf, pages, k, nr, psha, root, footer=True)
+                    pv = {"n": lisa[0], "u": lisa[1], "sha": psha, "img": img, "txt": norm_txt(txt)[:TXT_MAX], "lk": [p + 1 for p in pages]}
+                    if old:
+                        notes.append(f"Eelvaade uuenes: {it['n']}, {lisa[0]}")
+                pvs.append(pv)
+        if pvs:
+            it["pv"] = pvs
+        items.append(it)
+    return items
 
 
 def collect(get, cfg, prev_items, root, today):
@@ -329,8 +445,11 @@ def collect(get, cfg, prev_items, root, today):
         if pvs:
             it["pv"] = pvs
         items.append(it)
-    gone = [v["n"] for kk, v in prev.items() if kk not in seen]
     new = [x["n"] for x in items if prev and x["k"] not in prev]
+    for x in collect_external(get, cfg, prev, root, warn, notes):
+        seen.add(x["k"])
+        items.append(x)
+    gone = [v["n"] for kk, v in prev.items() if kk not in seen]
     for n in new:
         notes.append(f"Uus juhend loendis: {n}")
     for n in gone:
@@ -355,4 +474,5 @@ def collect(get, cfg, prev_items, root, today):
 def fingerprint(items):
     return json.dumps([[x["k"], x["n"], x.get("kood"), x.get("kinnitatud"), x.get("avaldatud"), x.get("pdf"), x.get("pj"),
                         x.get("lisad"), [p.get("sha") for p in x.get("pv", [])], x.get("syn"), x.get("sn"), x.get("ks"), x.get("lingid"),
-                        x.get("seotud"), x.get("mk")] for x in items], ensure_ascii=False, sort_keys=True)
+                        x.get("seotud"), x.get("mk"), x.get("sha"), x.get("valjaandja"), x.get("versioon"), x.get("markus")]
+                       for x in items], ensure_ascii=False, sort_keys=True)
