@@ -825,6 +825,8 @@ def build_teemad(cfg, sources, par_text, dyn, lisad):
     yl = hu.get("ylempiir")
     for t in cfg["teemad"]:
         it = {"t": "j", "k": t["k"], "n": t["n"], "sn": t.get("sn") or t["n"], "g": t["grupp"], "syn": t.get("syn", [])}
+        if t.get("koodid"):
+            it["kd"] = list(t["koodid"])
         if t.get("boost"):
             it["boost"] = t["boost"]
         # Kaardipõhine kontrollikuupäev (hiljem lisatud kaardid); muidu kehtib _meta.kontrollitud.
@@ -842,6 +844,8 @@ def build_teemad(cfg, sources, par_text, dyn, lisad):
                 row = {"s": s, "a": [x for x in (ref(a) for a in r.get("allikas", [])) if x]}
                 if r.get("p"):
                     row["p"] = r["p"]
+                if r.get("koodid"):
+                    row["kd"] = r["koodid"]
                 if check(r, f'{t["sn"]} ({s[:50]}…)'):
                     row["muutus"] = True
                 out.append(row)
@@ -895,6 +899,43 @@ def build_teemad(cfg, sources, par_text, dyn, lisad):
             it["seotud"] = [k for k in t["seotud"] if k in known]
         items.append(it)
     return items, warn
+
+
+def link_teema_codes(cfg, by_code, text_rules, rules, sources):
+    """Teemakaardi väli „koodid“: koodikirjele kaardi viide (tm), vajadusel perearstiabi tunnus ja koodi liik,
+    ning kaardis nimetatud sätete lõiked koodi tingimusteks (ka siis, kui lõige koodi ise ei nimeta)."""
+    warn = []
+    by_lo = {(s, p["nr"], (lo["nr"] or "").strip("()")): (p, lo, txt) for (s, p, lo, txt) in text_rules}
+    by_url = {r["url"]: i for i, r in enumerate(rules)}
+    for t in cfg["teemad"]:
+        name = t.get("sn") or t["n"]
+        for c, refs in (t.get("koodid") or {}).items():
+            it = by_code.get(c)
+            if it is None:
+                warn.append(f"{name}: koodi {c} ei leitud loetelust ega Torust")
+                continue
+            tm = it.setdefault("tm", [])
+            if t["k"] not in tm:
+                tm.append(t["k"])
+            if t.get("pa"):
+                it["pa"] = True
+            if t.get("koodi_liik") and it.get("p") in (0, 0.0, None):
+                it["zl"] = t["koodi_liik"]
+            for src_key, parnr, lg in refs:
+                x = by_lo.get((src_key, parnr, str(lg)))
+                if not x:
+                    warn.append(f"{name}: koodi {c} sätet {src_key} {parnr} lg {lg} ei leitud kehtivast tekstist")
+                    continue
+                p, lo, txt = x
+                url = sources[src_key]["url"] + "#" + lo["id"]
+                ri = by_url.get(url)
+                if ri is None:
+                    rules.append({"src": src_key, "par": f'{p["nr"]} {lo["nr"]}'.strip(), "s": txt, "url": url})
+                    ri = by_url[url] = len(rules) - 1
+                rl = it.setdefault("r", [])
+                if ri not in rl:
+                    rl.append(ri)
+    return warn
 
 
 # ----------------------------------------------------------------- meditsiiniseadmed
@@ -1323,6 +1364,7 @@ def build(args):
     teema_items, teema_warn = build_teemad(teemad_cfg, sources, par_text, dyn, lisad)
     teema_warn = hu_warn + imm_warn + ml.get("warn", []) + fund_warn + teema_warn
     items.extend(teema_items)
+    teema_warn += link_teema_codes(teemad_cfg, by_code, text_rules, rules, sources)
 
     # 7d. mis muutus: jõustunud (viimase aasta) ja avaldatud tulevaste redaktsioonide vahe
     muut, muut_warn = muutused.compute(sys.modules[__name__], sources_cfg, sources, chains, cache,

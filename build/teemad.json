@@ -1,7 +1,7 @@
 {
   "_meta": {
     "kontrollitud": "2026-10-15",
-    "kommentaar": "Igapäevatöö teemakaardid. Iga rida viitab sättele ([allikas, §]) või allikale (võti 'allikad' all). 'kontroll' on tekstilõik, mis peab kehtivas sättes alles olema; kui see kaob, märgib automaatkontroll rea ülevaatust vajavaks. 'tulevik' kirjed kuvatakse kuni nende kuupäevani. Väited on kontrollitud allikatest 15.10.2026 (Tommi allikaregister ja aktide tekst)."
+    "kommentaar": "Igapäevatöö teemakaardid. Iga rida viitab sättele ([allikas, §]) või allikale (võti 'allikad' all). 'kontroll' on tekstilõik, mis peab kehtivas sättes alles olema; kui see kaob, märgib automaatkontroll rea ülevaatust vajavaks. 'tulevik' kirjed kuvatakse kuni nende kuupäevani. 'koodid' ({kood: [[allikas, §, lõige], …]}) seob kaardi teenuse koodidega; rea 'koodid' näitab, millise koodi kirjes rida kuvatakse. Väited on kontrollitud allikatest 15.10.2026 (Tommi allikaregister ja aktide tekst)."
   },
   "allikad": {
     "tk-haigus": {"n": "Tervisekassa: haigushüvitis ja hüvitiste võrdlustabel", "u": "https://tervisekassa.ee/inimesele/huvitised/haigushuvitis"},
@@ -64,6 +64,10 @@
     "rt-koolivaheajad-45": {"n": "Haridus- ja teadusministri määrus nr 45 „2024/2025., 2025/2026. ja 2026/2027. õppeaasta koolivaheajad“ (Riigi Teataja)", "u": "https://www.riigiteataja.ee/akt/119032025005"},
     "rt-koolivaheajad-36": {"n": "Haridus- ja teadusministri määrus nr 36 „2027/2028., 2028/2029. ja 2029/2030. õppeaasta koolivaheajad“ (RT I, 04.08.2026, 22)", "u": "https://www.riigiteataja.ee/akt/104082026022"},
     "hm-koolivaheajad": {"n": "Haridus- ja Teadusministeerium: järgmise kolme õppeaasta koolivaheajad on kinnitatud", "u": "https://hm.ee/uudised/haridus-ja-teadusministeerium-kinnitas-jargmise-kolme-oppeaasta-koolivaheajad-1"},
+    "tk-tasuta-hambaravi": {"n": "Tervisekassa: tasuta hambaravi täiskasvanud inimesele (kriteeriumid, kood 9072)", "u": "https://tervisekassa.ee/inimesele/hambaravi/taiskasvanute-hambaravi/tasuta-hambaravi"},
+    "tk-url-lisa3": {"n": "Üldarstiabi rahastamise lepingu lisa 3 (2025): pearahasiseste tegevuste koodid (PDF)", "u": "https://tervisekassa.ee/sites/default/files/perearstid/%C3%9CRL%202025/url_lisa_3.pdf"},
+    "tk-rrl-hambaravi": {"n": "Ravi rahastamise lepingu lisa 2c (2024): hambaravi, elupuhune hambaravi (PDF)", "u": "https://www.tervisekassa.ee/sites/default/files/RRL/2024/otsus_nr_416_Lisa_2c_hambaravi.pdf"},
+    "tk-infopaev-hambaravi": {"n": "Tervisekassa perearstide infopäev: hambaravi laiendatud õiguste määramine (PDF)", "u": "https://tervisekassa.ee/sites/default/files/perearstid/Infop%C3%A4evad/Hambaravi%20laiendatud%20%C3%B5iguste%20m%C3%A4%C3%A4ramine.pdf"},
     "err-koolivaheajad-plaan": {"n": "ERR 28.05.2026: ülejärgmisel õppeaastal lõpeb talvine koolivaheaeg juba 2. jaanuaril (plaan)", "u": "https://www.err.ee/1610040062/ulejargmisel-oppeaastal-lopeb-talvine-koolivaheaeg-juba-2-jaanuaril"},
     "rj-eek2": {"n": "EEK-2 küsimustik ja tulemuste tõlgendamine (ravijuhend.ee, PDF)", "u": "https://www.ravijuhend.ee/uploads/userifles/Unehaired/EEK-2.pdf"},
     "ea-depr-2011": {"n": "Depressiooni ravijuhend perearstidele, Eesti Arst 2011;90(9), lisa 3: EEK-2 eesti ja vene keeles (PDF)", "u": "https://ojs.utlib.ee/index.php/EA/article/download/10860/6045/"},
@@ -559,7 +563,7 @@
       "grupp": "Ravimid, suunamine ja hüvitised",
       "n": "Patsiendi hüvitised ja omaosalus: hambaravi, proteesid, ravimid, visiiditasu",
       "sn": "Hüvitised ja omaosalus (hambaravi)",
-      "seotud": ["ravimid", "haigusleht"],
+      "seotud": ["hambaravi-oigused", "ravimid", "haigusleht"],
       "syn": ["hambaravi", "hambaravihüvitis", "hambaarst", "hambaprotees", "proteesihüvitis", "protees", "prillid", "prillihüvitis", "kontaktläätsed", "visiiditasu", "koduvisiit", "omaosalus", "täiendav ravimihüvitis", "hüvitis", "hüvitised", "suurenenud vajadus", "sjögren", "voodipäevatasu"],
       "read": [
         {"p": "Hambaravi", "s": "Vähemalt 19-aastasele tasub Tervisekassa kuni 60 € aastas, patsient maksab 50%. Kõrgendatud hüvitis on kuni 105 € aastas (omaosalus 12,5%) vanadus- või töövõimetuspensionärile, töötule, toimetulekutoetuse saajale, üle 63-aastasele, rasedale, alla 1-aastase lapse emale ja suurenenud hambaravivajadusega inimesele. Kasutamata hüvitis järgmisse aastasse ei kandu.",
@@ -568,8 +572,8 @@
         {"p": "Lapse hambaravi", "s": "Alla 19-aastase hambaravi on tasuta (loetelu teenused), samuti aasta jooksul pärast 19-aastaseks saamist, kui ravivajadus oli ilmne viimasel visiidil enne 19. sünnipäeva.",
          "allikas": [["raks", "§ 33"]],
          "kontroll": [["raks", "§ 33", "ühe aasta jooksul pärast isiku 19-aastaseks saamist"]]},
-        {"p": "Suurenenud vajadus", "s": "Pea-kaela kasvajate kirurgiline või kiiritusravi, huule-, alveolaarjätke- ja suulaelõhe ravi, näo-lõualuu väärarenguid põhjustavate haiguste ravi, näo-lõualuu traumade ja põletike kirurgiline ravi, protseduuri käigus tekkinud näo-lõualuu trauma, elundi- või tüvirakusiirdamine või selleks ettevalmistus, puusa- või põlve endoproteesimiseks ettevalmistus; samuti I tüüpi diabeet ja Sjögreni sündroom. Ravist tingitud vajaduse korral kinnitab raviarst (mitte hambaarst) jätkuvat vajadust üks kord 2 aasta jooksul.",
-         "allikas": [["ttl", "§ 77"]],
+        {"p": "Suurenenud vajadus", "s": "Pea-kaela kasvajate kirurgiline või kiiritusravi, huule-, alveolaarjätke- ja suulaelõhe ravi, näo-lõualuu väärarenguid põhjustavate haiguste ravi, näo-lõualuu traumade ja põletike kirurgiline ravi, protseduuri käigus tekkinud näo-lõualuu trauma, elundi- või tüvirakusiirdamine või selleks ettevalmistus, puusa- või põlve endoproteesimiseks ettevalmistus; samuti I tüüpi diabeet ja Sjögreni sündroom. Ravist tingitud vajaduse korral kinnitab raviarst (mitte hambaarst) jätkuvat vajadust üks kord 2 aasta jooksul. Raviarvele märgitakse kood 9071; tasuta (elupuhune) hambaravi on kood 9072 (vt kaart „Tasuta hambaravi“).",
+         "allikas": [["ttl", "§ 77"], "tk-lisa2"],
          "kontroll": [["ttl", "§ 77", "kinnitab isiku raviarst (välja arvatud hambaarst) isiku jätkuvat suurenenud vajadust"], ["ttl", "§ 77", "Sjögreni sündroom"]]},
         {"p": "Hambaproteesid", "s": "Tervisekassa tasub kuni 260 € kolme aasta kohta vanadus- või töövõimetuspensionärile, osalise või puuduva töövõimega ja üle 63-aastasele inimesele.",
          "allikas": [["raks", "§ 29"], ["ttl", "§ 80"], "tk-proteesid"],
@@ -587,6 +591,62 @@
          "allikas": [["abivahendid", "lisa"], ["meditsiiniseadmed", "§ 38"]]}
       ],
       "lingid": ["tk-hambaravi", "tk-proteesid", "tk-taiendav", "tk-ravimihuvitis"]
+    },
+    {
+      "k": "hambaravi-oigused",
+      "kontrollitud": "2026-10-26",
+      "grupp": "Ravimid, suunamine ja hüvitised",
+      "n": "Tasuta (elupuhune) hambaravi ja kõrgendatud hambaravihüvitis: koodid 9072 ja 9071",
+      "sn": "Tasuta hambaravi (9072, 9071)",
+      "seotud": ["patsiendihuvitised", "ekons"],
+      "pa": true,
+      "koodi_liik": "pearahasisene",
+      "koodid": {
+        "9072": [["ttl", "§ 77", "20"], ["ttl", "§ 77", "21"], ["ttl", "§ 77", "22"]],
+        "9071": [["ttl", "§ 77", "15"], ["ttl", "§ 77", "16"], ["ttl", "§ 77", "17"], ["ttl", "§ 77", "18"], ["ttl", "§ 77", "19"]]
+      },
+      "syn": ["tasuta hambaravi", "elupuhune hambaravi", "elupuhune", "erivajadusega inimese hambaravi", "erivajadus hambaravi", "puudega inimese hambaravi", "suuhügieen", "kõrgendatud hambaravihüvitis", "kõrgendatud hüvitis", "suurenenud hambaravi vajadus", "suurenenud hambaravivajadus", "hrh", "hambaravi õigus", "hambaravi laiendatud õigused", "9071", "9072", "endoproteesimine hambaravi", "sjögren", "hulgimüeloom", "bisfosfonaat", "denosumab", "dementsus hambaravi"],
+      "read": [
+        {"p": "9072: tasuta hambaravi", "koodid": ["9072"], "s": "Kui arst märgib raviarvele koodi 9072, tasub Tervisekassa vähemalt 19-aastase inimese hambaraviteenuste eest (v.a hambaproteesid) kogu elu jooksul. Õiguse määrab perearst või eriarst, mitte hambaarst. Kood on pearahasisene tegevus (0 €).",
+         "allikas": ["tk-lisa2", ["ttl", "§ 77"], "tk-tasuta-hambaravi", "tk-url-lisa3"],
+         "kontroll": [["ttl", "§ 77", "puuduva suuhügieeni võimekusega vaimse ja füüsilise puudega isikult"]]},
+        {"p": "9072: psüühiline seisund", "koodid": ["9072"], "s": "Isiksuse psüühilised iseärasused (sõltumata diagnoosist), mille tõttu inimene ei suuda suuõõne hügieeni tagada, Tervisekassa lehe järgi ka adekvaatse juhendamise korral: sügav intellektipuue, autismispektri häire, dementsus, muu raske psüühikahäire (nt krooniline raske psühhoos).",
+         "allikas": ["tk-lisa2", ["ttl", "§ 77"], "tk-tasuta-hambaravi"]},
+        {"p": "9072: füüsiline seisund", "koodid": ["9072"], "s": "Haigusest tingitud seisund, mille tõttu inimene ei suuda suuhügieeni protseduure teha: mõlemat ülajäset haarav halvatus kesknärvisüsteemi või neuromuskulaarse ühiku haiguse tõttu; liigutushäire (parkinsonistlik sündroom, generaliseerunud düstoonia, raskekujuline tantstõbi); jäseme või selle olulise osa puudumine arenematuse või amputatsiooni tõttu.",
+         "allikas": ["tk-lisa2", ["ttl", "§ 77"], "tk-tasuta-hambaravi"]},
+        {"p": "9072: onkoloogia", "koodid": ["9072"], "s": "Pea- ja kaelapiirkonna pahaloomuline kasvaja (RHK-10 C00–C14, C30–C32), kui inimene saab või on saanud kiiritus- ja/või keemiaravi ning on saanud antiresorptiivset ravi (bisfosfonaadid, denosumab).",
+         "allikas": [["ttl", "§ 77"], "tk-lisa2"],
+         "kontroll": [["ttl", "§ 77", "pea- ja kaelapiirkonna pahaloomuline kasvaja"], ["ttl", "§ 77", "antiresorptiivset ravi (bisfosfonaadid, denosumab)"]]},
+        {"p": "9072: hematoloogia", "koodid": ["9072"], "s": "Hulgimüeloom või lümfoid- ja vereloomekoe pahaloomuline kasvaja (RHK-10 C90–C96), kui ravi osana on vaja koodidega 8101 ja 8102 tähistatud teenuseid või antiresorptiivset ravi (kood 486R).",
+         "allikas": [["ttl", "§ 77"], "tk-lisa2"],
+         "kontroll": [["ttl", "§ 77", "hulgimüeloom või lümfoid- ja vereloomekoe pahaloomuline kasvaja"], ["ttl", "§ 77", "koodidega 8101 ja 8102"]]},
+        {"p": "9072: pärast märkimist", "koodid": ["9072"], "s": "Õigus hakkab kehtima kuni kahe kuu jooksul (infosüsteemide andmevahetus); patsient näeb seda eesti.ee teenuses „Hambaravi- ja proteesiteenuste info“. Ravi saab Tervisekassaga lepingu sõlminud hambaraviasutuses, kus see arveldatakse elupuhuse hambaravina (lepingueriala 71700012). Lamavat haiget tavalises kabinetis reeglina ei ravita; haiglaravitingimustes hambaravi sihtrühma kuuluvad ka 9072-ga inimesed.",
+         "allikas": ["tk-tasuta-hambaravi", "tk-rrl-hambaravi"]},
+        {"p": "9071: kõrgendatud hüvitis", "koodid": ["9071"], "s": "Suurenenud hambaravivajaduse hindamisel märgitakse raviarvele kood 9071. Seejärel on inimesel kahe aasta jooksul õigus kõrgendatud hambaravihüvitisele: kuni 105 € kalendriaastas, omaosalus 12,5% (tavahüvitis 60 €, omaosalus 50%). Kood on pearahasisene tegevus (0 €).",
+         "allikas": ["tk-lisa2", ["ttl", "§ 77"], "tk-url-lisa3"],
+         "kontroll": [["ttl", "§ 77", "kuni 105 euro eest kalendriaasta kohta"], ["ttl", "§ 77", "kindlustatud isiku omaosaluse määr on 12,5%"]]},
+        {"p": "9071: millal", "koodid": ["9071"], "s": "Hambaravivajadus on tekkinud tervishoiuteenuse tagajärjel: pea-kaela kasvajate kirurgiline ja/või kiiritusravi; huule-, alveolaarjätke- ja suulaelõhe kirurgiline ravi; hambakudede või näo- ja lõualuude väärarenguid põhjustavate geneetiliste ja ainevahetushaiguste ravi; näo-lõualuu traumade ja põletike kirurgiline ravi; protseduur (endoskoopia, anesteesia jm), mille käigus tekkis näo-lõualuu trauma; kopsu, maksa, südame, neeru või vereloome tüvirakkude siirdamine või selleks ettevalmistamine; puusa- või põlveliigese endoproteesimiseks ettevalmistamine. Jätkuvat vajadust kinnitab raviarst (v.a hambaarst) üks kord kahe aasta jooksul.",
+         "allikas": [["ttl", "§ 77"], "tk-lisa2"],
+         "kontroll": [["ttl", "§ 77", "puusa- või põlveliigese endoproteesimise operatsiooniks ettevalmistamine"], ["ttl", "§ 77", "kinnitab isiku raviarst (välja arvatud hambaarst) isiku jätkuvat suurenenud vajadust"]]},
+        {"p": "9071: endoproteesimine", "koodid": ["9071"], "s": "Endoproteesimise teekonnal annab õiguse kõrgendatud hüvitisele koodiga 9071 positiivne e-konsultatsiooni vastus (suunamine ortopeedi vastuvõtule e-konsultatsiooni kaudu).",
+         "allikas": ["tk-lisa2"]},
+        {"p": "Diabeet ja Sjögren", "koodid": ["9071"], "s": "Suurenenud hambaravivajadus on ka I tüübi diabeedi ja Sjögreni sündroomi korral. Leping seob koodi 9071 ainult ravist tekkinud vajadusega (§ 77 lg 17); kas nende diagnooside korral märgitakse 9071, ükski allikas ei ütle (vt erinevused).",
+         "allikas": [["ttl", "§ 77"], "tk-lisa2"],
+         "kontroll": [["ttl", "§ 77", "Sjögreni sündroom"]]},
+        {"p": "Kuidas märkida", "koodid": ["9071", "9072"], "s": "Hinda seisundit või õiguse tekke põhjust (arstlik otsus), dokumenteeri hindamise tulemus tervise infosüsteemis, vajadusel küsi patsiendi praegust seisundit hoolekande- või õendustöötajalt ja märgi kood raviarvele.",
+         "allikas": ["tk-infopaev-hambaravi", "tk-lisa2"]}
+      ],
+      "erinevused": [
+        {"s": "Infopäeva esitluse järgi saab endoproteesimise teekonnal olev patsient 2 aasta jooksul kõrgendatud hüvitist „85 eurot, omaosalusega 15%“. See on varasem määr: kehtiva loetelu järgi on kõrgendatud hüvitis kuni 105 € ja omaosalus 12,5% kõigile kõrgendatud määra saajatele.",
+         "allikas": ["tk-infopaev-hambaravi", ["ttl", "§ 77"]]},
+        {"s": "Infopäeva esitlus kirjeldab 9072 sihtrühma laiemalt kui määrus ja leping: erihoolekandel olevad inimesed, kes ei suuda ise adekvaatseid otsuseid vastu võtta, iseseisvalt liikumisvõimetud (lamavad) hoolekande patsiendid, inimesed, keda saab ravida ainult üldanesteesias või haiglas, ja „JNE“. Määruse (§ 77 lg 20) ja lepingu kriteerium on võimetus suuhügieeni tagada. Täiskasvanu plaaniline hambaravi üldanesteesias on hambaravi lepingus eraldi rada (teenuse tüüp 34, eriala 71700009), mis 9072-te ei eelda.",
+         "allikas": ["tk-infopaev-hambaravi", "tk-lisa2", "tk-rrl-hambaravi"]},
+        {"s": "§ 77 lg 19 (I tüübi diabeet, Sjögreni sündroom) annab suurenenud vajaduse diagnoosi alusel, kuid perearstiabi leping seob koodi 9071 ainult lg 17 teenustega ja ka lg 18 kinnitamiskohustus puudutab ainult lg 17 juhte. Infopäeva esitlus loetleb diabeedi ja Sjögreni 9071 all. Kuidas lg 19 õigus tekib (kood 9071 või diagnoosi alusel), tasub Tervisekassalt küsida.",
+         "allikas": [["ttl", "§ 77"], "tk-lisa2", "tk-infopaev-hambaravi"]},
+        {"s": "Toru nimetused erinevad lepingu omadest: 9071 „HRH saamise med tingimuse kinnitamine“ (liik „ambulatoorsed vastuvõtud“), lepingus „Suurenenud hambaravi vajaduse tekkimise hindamine“; 9072 on Torus alates 2022 liigis „uuringud ja protseduurid“ (2019–2021 „perearstiabi“), lepingus „Elupuhune hambaravi määramine“. Lepingu pearahasiseste koodide loend on 2025. aasta lisas 3; 01.07.2026 lisatingimustes sellist loendit ei ole ja uuemat loendit ei leitud.",
+         "allikas": ["tk-url-lisa3", "tk-lisa2"]}
+      ],
+      "lingid": ["tk-tasuta-hambaravi", "tk-hambaravi", "tk-lisa2", "tk-infopaev-hambaravi", "tk-rrl-hambaravi"]
     },
     {
       "k": "kys-meeleolu",

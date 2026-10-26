@@ -116,6 +116,7 @@
   }
   function zeroLabel(it) {
     if (it.p !== 0) return null;
+    if (it.zl) return it.zl;
     const hk = (it.tp && it.tp.hk) || '';
     if (hk === 'PEREARSTIABI') return 'pearahasisene';
     if (/STAT/.test(hk)) return 'statistiline';
@@ -300,8 +301,10 @@
     state.byCode = {};
     state.labsByCode = {};
     state.teemaByKey = {};
+    state.teemaByCode = {};
     for (const it of items) {
       if (it.t === 'j') state.teemaByKey[it.k] = it;
+      if (it.t === 'j') for (const c of it.kd || []) (state.teemaByCode[c] = state.teemaByCode[c] || []).push(it);
       if (it.t === 'q') state.qByKey[it.k] = it;
       if (it.t === 's') state.byCode[it.c] = it;
       if (it.t === 'b') for (const [c] of it.c || []) (state.labsByCode[c] = state.labsByCode[c] || []).push(it);
@@ -809,6 +812,13 @@
     return h;
   }
 
+  // Teemakaardi rea allikate nupud: säte avaneb teatmikus, muu allikas uues aknas.
+  function srcChips(a) {
+    return (a || []).filter(Boolean).map((x) => (x.src && !/^lisa/.test(x.par || '')
+      ? `<button class="badge srcb" data-goto="${esc(x.src)}:${esc(x.par)}" title="Ava säte">${esc(x.n)}</button>`
+      : `<a class="badge srcb" href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.n)} ↗</a>`)).join(' ');
+  }
+
   function detail(it) {
     const d = state.data;
     const re = state.hl;
@@ -852,6 +862,13 @@
       if (it.muud) h += `<div><dt>Esineb ka</dt><dd>${it.muud.map((m) => esc(m.par)).join(', ')}</dd></div>`;
       h += '</dl>';
       if (it.tmis) h += `<p class="note">Toru failis on selle koodi hind ${fmtEur(it.tp.p)}, mis erineb kehtivast loetelust. Õiguslikult kehtib loetelu hind.</p>`;
+      // Teemakaart, mis seda koodi käsitleb: kaardi read selle koodi kohta koos viidetega.
+      for (const tj of state.teemaByCode[it.c] || []) {
+        const rows = (tj.r || []).filter((r) => (r.kd || []).includes(it.c));
+        h += `<div class="rules"><h4>Kriteeriumid ja kasutamine</h4>`
+          + rows.map((r) => `<div class="rule">${r.p ? `<b>${esc(r.p)}.</b> ` : ''}${hl(r.s, re)} ${srcChips(r.a)}</div>`).join('')
+          + `<div class="seotud"><span>Teemakaart</span><button class="badge teema ${tgCls(tj.g)}" data-focus="${tj._id}">${esc(tj.sn)}</button></div></div>`;
+      }
       // Tingimused on igapäevatöös vajalikum info, seepärast enne standardkulu.
       if (it.r && it.r.length) {
         h += '<div class="rules"><h4>Tingimused ja seotud sätted</h4>';
@@ -975,9 +992,7 @@
       return h;
     }
     if (it.t === 'j') {
-      const chips = (a) => (a || []).filter(Boolean).map((x) => (x.src && !/^lisa/.test(x.par || '')
-        ? `<button class="badge srcb" data-goto="${esc(x.src)}:${esc(x.par)}" title="Ava säte">${esc(x.n)}</button>`
-        : `<a class="badge srcb" href="${esc(x.u)}" target="_blank" rel="noopener">${esc(x.n)} ↗</a>`)).join(' ');
+      const chips = srcChips;
       let h = '';
       const rel = (it.seotud || []).map((k) => state.teemaByKey[k]).filter(Boolean);
       if (rel.length) h += `<div class="seotud"><span>Vaata ka</span>${rel.map((x) => `<button class="badge teema ${tgCls(x.g)}" data-focus="${x._id}">${esc(x.sn)}</button>`).join('')}</div>`;
