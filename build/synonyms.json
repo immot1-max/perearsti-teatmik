@@ -106,5 +106,8 @@
   "link:rhk-sm": ["rhk", "rhk-10", "rhk10", "rhk 10", "rhk otsing", "diagnoosikood", "diagnoosi kood", "icd-10"],
   "link:ravijuhend": ["ravijuhendid", "ravijuhend.ee"],
   "link:rj-pj": ["patsiendijuhend", "patsiendijuhendid", "patsiendi juhend", "ravijuhend patsiendile"],
-  "link:abr": ["antimikroobne ravi", "antibiootikum", "antibiootikumid", "antibakteriaalne ravi", "abr", "kliinikumi antibiootikumid"]
+  "link:abr": ["antimikroobne ravi", "antibiootikum", "antibiootikumid", "antibakteriaalne ravi", "abr", "kliinikumi antibiootikumid"],
+  "link:ta-reisimine": ["reisivaktsineerimine", "reisivaktsiin", "reisivaktsiinid", "reisimeditsiin", "reisimine", "reisinõustamine", "reisikabinet", "malaaria", "malaaria profülaktika", "kollapalavik"],
+  "link:ltkh-reisimeditsiin": ["reisivaktsineerimine", "reisivaktsiin", "reisivaktsiinid", "reisimeditsiin", "reisinõustamine", "reisikabinet", "kollapalavik", "kollapalaviku tõend", "keskhaigla"],
+  "link:cdc-reis": ["reisivaktsineerimine", "reisivaktsiin", "reisivaktsiinid", "reisimeditsiin", "reisimine", "malaaria", "cdc", "travel", "sihtriik"]
 }

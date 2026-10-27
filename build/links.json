@@ -106,5 +106,23 @@
     "n": "ravimiinfo.ee",
     "u": "https://ravimiinfo.ee/",
     "d": "Ravimiotsing. Eraleht, mitte ametlik allikas: kontrolli soodustust Tervisekassa loetelust."
+  },
+  {
+    "id": "ta-reisimine",
+    "n": "Reisimine ja nakkushaigused (Terviseamet)",
+    "u": "https://terviseamet.ee/nakkushaigused/info-nakkushaiguste-kohta/reisimine",
+    "d": "Vähemalt 4 nädalat enne reisi perearsti või reisimeditsiini kabineti juurde; reisivaktsineerimine, malaaria ravimprofülaktika, hügieen ja putukahammustuste vältimine. Reisimeditsiini kabinetid Tallinnas, Tartus, Pärnus ja Kohtla-Järvel."
+  },
+  {
+    "id": "ltkh-reisimeditsiin",
+    "n": "Reisimeditsiiniline nõustamine (Lääne-Tallinna Keskhaigla)",
+    "u": "https://www.keskhaigla.ee/kampaaniad/reisimeditsiiniline-noustamine",
+    "d": "Nakkuskliiniku reisinõustajad koostavad sihtriigi põhjal vaktsineerimis- ja ennetusplaani; kollapalaviku vaktsineerimine ja rahvusvaheline tõend. Tasuline. Eelregistreerimine 659 8594, vaktsineerimine@keskhaigla.ee."
+  },
+  {
+    "id": "cdc-reis",
+    "n": "Riigipõhised reisisoovitused (CDC, inglise keeles)",
+    "u": "https://wwwnc.cdc.gov/travel/destinations/list",
+    "d": "USA CDC sihtkohtade loend: iga riigi lehel soovitatavad vaktsiinid ja ravimid (sh malaaria) ning kehtivad terviseteated. Ei ole Eesti allikas."
   }
 ]
