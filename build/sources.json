@@ -46,7 +46,12 @@
       "§ 8¹",
       "§ 7",
       "§ 35",
-      "§ 4³"
+      "§ 4³",
+      "§ 4¹",
+      "§ 4²",
+      "§ 59¹",
+      "§ 59²",
+      "§ 59³"
     ]
   },
   "tvl": {
@@ -153,11 +158,46 @@
     "grupiId": 1046526
   },
   "tis": {
-    "nimi": "Tervise infosüsteemi põhimäärus (andmete esitamise tähtajad)",
+    "nimi": "Tervise infosüsteemi põhimäärus",
     "lyh": "TIS põhimäärus",
     "grupiId": 1036829,
     "par": [
+      "§ 2¹",
+      "§ 3",
       "§ 5"
+    ]
+  },
+  "dokkord": {
+    "nimi": "Tervishoiuteenuse osutamise dokumenteerimise tingimused ja kord",
+    "lyh": "Dokumenteerimise määrus",
+    "grupiId": 325685,
+    "par": [
+      "§ 1",
+      "§ 3",
+      "§ 3¹",
+      "§ 4",
+      "§ 5",
+      "§ 14"
+    ]
+  },
+  "andmekoosseisud": {
+    "nimi": "Tervise infosüsteemi andmekoosseisud ja nende esitamise tingimused",
+    "lyh": "Andmekoosseisude määrus",
+    "grupiId": 325665,
+    "par": [
+      "§ 1",
+      "§ 2",
+      "§ 5"
+    ]
+  },
+  "vos": {
+    "nimi": "Võlaõigusseadus",
+    "lyh": "VÕS",
+    "grupiId": 153569,
+    "par": [
+      "§ 768",
+      "§ 769",
+      "§ 770"
     ]
   },
   "immkava": {

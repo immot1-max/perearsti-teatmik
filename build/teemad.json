@@ -108,7 +108,12 @@
     "ltkh-kolo-et": {"n": "Lääne-Tallinna Keskhaigla: koloskoopia infoleht (PDF)", "u": "https://cdn.prod.website-files.com/66d001b8c1ce9bc0b1e262c7/6853cb2337d1178d402a2f54_Koloskoopia_EST.pdf"},
     "ltkh-kolo-ru": {"n": "Lääne-Tallinna Keskhaigla: колоноскопия, infoleht vene keeles (PDF)", "u": "https://cdn.prod.website-files.com/66d001b8c1ce9bc0b1e262c7/6853cb24e269c38c10eb83d2_Koloskoopia_RUS.pdf"},
     "ltkh-gastro-et": {"n": "Lääne-Tallinna Keskhaigla: gastroskoopia infoleht (PDF)", "u": "https://cdn.prod.website-files.com/66d001b8c1ce9bc0b1e262c7/6853cb2395e8863b3c9bb2c4_Gastroskoopia_EST.pdf"},
-    "ltkh-gastro-ru": {"n": "Lääne-Tallinna Keskhaigla: гастроскопия, infoleht vene keeles (PDF)", "u": "https://cdn.prod.website-files.com/66d001b8c1ce9bc0b1e262c7/6853cb238e8c4b97ac6285f3_Gastroskoopia_RUS.pdf"}
+    "ltkh-gastro-ru": {"n": "Lääne-Tallinna Keskhaigla: гастроскопия, infoleht vene keeles (PDF)", "u": "https://cdn.prod.website-files.com/66d001b8c1ce9bc0b1e262c7/6853cb238e8c4b97ac6285f3_Gastroskoopia_RUS.pdf"},
+    "rk-951": {"n": "Riigikogu: eelnõu 951 SE (TTKS ja teiste seaduste muutmine, andmekogude liitmine TIS-iga)", "u": "https://www.riigikogu.ee/tegevus/eelnoud/84b90d76-9a92-4832-942e-fcd70b1923eb/tervishoiuteenuste-korraldamise-seaduse-ja-teiste-seaduste-muutmise-seadus/"},
+    "eur-gdpr": {"n": "Isikuandmete kaitse üldmäärus (EL) 2016/679 (IKÜM, GDPR)", "u": "https://eur-lex.europa.eu/eli/reg/2016/679/oj/est"},
+    "eur-ehds": {"n": "Euroopa terviseandmeruumi määrus (EL) 2025/327 (EHDS)", "u": "https://eur-lex.europa.eu/eli/reg/2025/327/oj/est"},
+    "ec-ehds": {"n": "Euroopa Komisjon: Euroopa terviseandmeruumi määrus ja rakendamise ajakava", "u": "https://health.ec.europa.eu/ehealth-digital-health-and-care/european-health-data-space-regulation-ehds_et"},
+    "rt-iks": {"n": "Isikuandmete kaitse seadus", "u": "https://www.riigiteataja.ee/akt/104012019011?leiaKehtiv"}
   },
   "teemad": [
     {
@@ -1054,6 +1059,73 @@
          "allikas": ["tk-padi-pdf", ["tookorraldus", "§ 14"]]}
       ],
       "lingid": ["tk-leping", "tk-lisa2", "tk-juhendid", "tk-padi"]
+    },
+    {
+      "k": "dokumenteerimine",
+      "grupp": "Töökorraldus ja nimistu",
+      "n": "Dokumenteerimine ja dokumenteerimiskohustus: õigusruum, TIS-i tähtajad ja säilitamine",
+      "sn": "Dokumenteerimine",
+      "kontrollitud": "2026-10-29",
+      "syn": ["dokumenteerimine", "dokumenteerimiskohustus", "dokumenteerima", "dokumentatsioon", "tervisekaart", "decursus", "decursus morbi", "sissekanne", "kanne", "anamnees", "epikriis", "ambulatoorne epikriis", "säilitamine", "säilitustähtaeg", "säilitamise tähtaeg", "30 aastat", "logid", "logimine", "digitempel", "allkiri", "ravist keeldumine", "keeldumine", "tervise infosüsteem", "tis", "tis-i tähtaeg", "andmekoosseis", "andmekoosseisud", "määrus 56", "määrus nr 56", "määrus 53", "määrus nr 53", "määrus 138", "tis põhimäärus", "ravimiskeem", "ravimiskeemi teatis", "isikuandmed", "eriliiki isikuandmed", "terviseandmed", "andmekaitse", "iküm", "gdpr", "ehds", "terviseandmeruum", "euroopa terviseandmeruum", "951 se", "eelnõu 951", "sündmuspõhine", "tõendamiskoormus", "võlaõigusseadus"],
+      "read": [
+        {"p": "Kohustus ja tähtaeg", "s": "Tervishoiuteenuse osutaja peab patsiendile osutatud teenuse nõuetekohaselt dokumenteerima ja dokumendid säilitama; patsiendil on õigus dokumentidega tutvuda ja saada neist oma kulul ärakirju, kui seadusest ei tulene teisiti. Dokumenteeritakse ka sidevahendi teel osutatud teenus, teenuse osutamise päeval või sellele järgneva tööpäeva jooksul (koduvisiit hiljemalt järgmisel tööpäeval), eesti keeles (vajaduse korral lisaks ladina keeles), loetavalt ja korrektselt. Kirja tuleb panna kõik asjaolud, mis on teenuse eesmärgi seisukohalt olulised.",
+         "allikas": [["vos", "§ 769"], ["dokkord", "§ 3"], ["dokkord", "§ 14"]],
+         "kontroll": [["vos", "§ 769", "peab patsiendile tervishoiuteenuse osutamise nõuetekohaselt dokumenteerima"], ["dokkord", "§ 3", "tervishoiuteenuse osutamise päeval või sellele järgneva tööpäeva jooksul"], ["dokkord", "§ 3", "Dokumenteerida tuleb kõik asjaolud"], ["dokkord", "§ 14", "hiljemalt koduvisiidile järgneva tööpäeva jooksul"]]},
+        {"p": "Tervisekaart", "s": "Ambulatoorse teenuse kohta vormistatakse tervisekaart (neli lehte, lapsel lisalehed). Vastuvõtu kanne: kuupäev, pöördumise põhjus, anamnees, objektiivne leid, diagnoos koos RHK-10 koodiga, määratud uuringud ja konsultatsioonid ning nende tulemused, korraldused, soovitused ja suunamised ning ravimid (nimetus, toimeaine, vorm, ühekordne ja päevane annus). Kirja lähevad ka väljastatud dokumendid: töövõimetuslehe number ja kuupäevad, retsepti ravim ja kogus (soodusretseptil ka number ja soodustuse määr), tõendi nimetus, number, sisu ja kehtivus. Kui ravimid on vormistatud ravimiskeemi teatises, ei ole ravimiandmete kandmine tervisekaardile kohustuslik. Kasutada tuleb riigi infosüsteemi klassifikaatoreid, loendeid ja TIS-i standardeid. Määrus ei ole ammendav: kvaliteedi tagamiseks võib dokumenteerida rohkem.",
+         "allikas": [["dokkord", "§ 5"], ["dokkord", "§ 14"], ["ttks", "§ 4²"], ["dokkord", "§ 1"]],
+         "kontroll": [["dokkord", "§ 5", "koosneb tervisekaart neljast lehest"], ["dokkord", "§ 14", "vastuvõtule pöördumise põhjus"], ["dokkord", "§ 14", "ravimiskeemi teatis"], ["ttks", "§ 4²", "kasutada riigi infosüsteemis ettenähtud klassifikaatoreid"], ["dokkord", "§ 1", "ei ole kõikehõlmav"]]},
+        {"p": "Allkiri, keeldumine, logid", "s": "Määruses nõutud allkiri võib olla elektrooniline või asendatud asutuse digitempliga, kui dokumendi koostaja on tuvastatav (alates 10.07.2026). Teenusest keeldumist tõendab patsiendi allkiri; kui patsient allkirjast keeldub, dokumenteerivad keeldumise vähemalt kaks tervishoiutöötajat (v.a kui teenust osutatakse olemuselt üksi) ja keeldumise andmed säilitatakse teenuse dokumendi juures. Teenuse osutaja infosüsteem peab töötlemise jälgitavaks tegema: logitakse töötlemise sisu, töötleja ning kuupäev ja kellaaeg, logisid säilitatakse viis aastat.",
+         "allikas": [["dokkord", "§ 3"], ["dokkord", "§ 3¹"], ["ttks", "§ 4²"]],
+         "kontroll": [["dokkord", "§ 3", "asendatud asutuse digitaalse templiga"], ["dokkord", "§ 3", "vähemalt kahe tervishoiutöötaja poolt"], ["dokkord", "§ 3¹", "logisid säilitatakse viis aastat"], ["ttks", "§ 4²", "isikuandmete töötlemise jälgitavuse"]]},
+        {"p": "Tõendamiskoormus", "s": "Vastutuse aluseks olevat asjaolu peab üldjuhul tõendama patsient, välja arvatud juhul, kui teenuse osutamine on jäetud nõuetekohaselt dokumenteerimata.",
+         "allikas": [["vos", "§ 770"]],
+         "kontroll": [["vos", "§ 770", "välja arvatud juhul, kui patsiendile tervishoiuteenuse osutamine on jäetud nõuetekohaselt dokumenteerimata"]]},
+        {"p": "TIS-i tähtajad", "s": "Teenuse osutaja on kohustatud edastama TIS-i andmed patsiendile osutatud teenuse kohta määruse nr 53 andmekoosseisus: ambulatoorne dokument ühe tööpäeva jooksul pärast seda, kui tervishoiutöötaja on selle kinnitanud (koduõenduse epikriis kahe tööpäeva jooksul), statsionaarne viie tööpäeva jooksul, saatekiri kohe pärast vormistamist, surmateatis viivitamata, surma põhjuse teatis ühe tööpäeva jooksul ja patsiendi üldandmed viivitamata nende muutumisel. Teenuse osutaja tagab edastatud andmete õigsuse ja järgib TEHIK-u avaldatud standardeid. Patsiendi elu või tervise kaitseks võib edastamisel määrata kuni kuuekuulise tähtaja, mille jooksul patsient näeb andmeid esmakordselt ainult tervishoiutöötaja vahendusel.",
+         "allikas": [["ttks", "§ 59²"], ["tis", "§ 5"], ["ttks", "§ 59³"]],
+         "kontroll": [["ttks", "§ 59²", "Tervishoiuteenuse osutaja on kohustatud edastama tervise infosüsteemi andmed"], ["tis", "§ 5", "ühe tööpäeva ja koduõendusteenuse korral vormistatud epikriisi kahe tööpäeva jooksul"], ["tis", "§ 5", "patsiendi üldandmed viivitamata nende muutumisel"], ["tis", "§ 5", "tagab infosüsteemi edastatavate andmete õigsuse"], ["ttks", "§ 59³", "kuni kuuekuulise tähtaja"]]},
+        {"p": "Andmekoosseisud", "s": "Määrus nr 53 loetleb TIS-i edastatavad dokumendid (nt ambulatoorne epikriis, saatekirjad ja saatekirja vastus, immuniseerimise, läbivaatuse, nõustamise ja kasvamise teatis, tervisetõend, surmateatis, nakkushaiguse teatised, ravimiskeemi teatis) ja annab igaühe andmekoosseisu lisas. Uuringu-, protseduuri- ja analüüsi saatekiri tuleb alates 01.06.2026 esitada uues andmekoosseisus ja ravimiskeemi teatis hiljemalt alates 01.07.2026. Esitamise tähtajad on TIS-i põhimääruses.",
+         "allikas": [["andmekoosseisud", "§ 2"], ["andmekoosseisud", "§ 5"], ["tis", "§ 5"]],
+         "kontroll": [["andmekoosseisud", "§ 2", "ravimiskeemi teatis"], ["andmekoosseisud", "§ 5", "hiljemalt 1. juunist 2026"], ["andmekoosseisud", "§ 5", "hiljemalt 1. juulist 2026"]]},
+        {"p": "Säilitamine", "s": "Ambulatoorse ja statsionaarse teenuse osutamist tõendavaid andmeid säilitatakse 30 aastat andmete kinnitamisest. Erandid: saatekiri, saatekirja vastus ja kiirabikaart 5 aastat kinnitamisest, õpilase tervisekaart 5 aastat kooli lõpetamisest või koolist lahkumisest, surmateatis ja surma põhjuse teatis 10 aastat. Kui andmed kogutakse TIS-i ja teenuse osutaja on need sinna edastanud, ei pea ta neid tähtaegu järgima; TIS-is säilitatakse andmeid üldjuhul tähtajatult. Digiteeritud paberdokumendi võib enne tähtaega hävitada, kui selle terviklikkus ja autentsus on säilitustähtaja jooksul tagatud.",
+         "allikas": [["ttks", "§ 4²"], ["ttks", "§ 59¹"]],
+         "kontroll": [["ttks", "§ 4²", "30 aastat patsiendile osutatud teenuse andmete kinnitamisest"], ["ttks", "§ 4²", "kui andmeid kogutakse tervise infosüsteemi ja tervishoiuteenuse osutaja on need sinna edastanud"], ["ttks", "§ 59¹", "säilitatakse andmeid nende infosüsteemi vastuvõtmisest alates tähtajatult"]]},
+        {"p": "Töötlemise alus ja saladus", "s": "Saladuse hoidmise kohustusega teenuse osutaja võib patsiendi nõusolekuta töödelda tema isikuandmeid, sh terviseandmeid, teenuse osutamiseks ja selle kavandamiseks; kavandamise õigus laieneb perearstiabile ja koolitervishoiule, eriarstiabile ja iseseisvatele teenustele ainult varem sõlmitud teenuse lepingu olemasolul. Kavandamise ning kvaliteedi ja patsiendiohutuse eesmärgil töötlemise põhjus ja eesmärk tuleb dokumenteerida. Andmed patsiendi ja tema tervise kohta tuleb hoida saladuses ja dokumendid kaitsta kõrvaliste isikute eest. Üldised nõuded tulenevad isikuandmete kaitse üldmäärusest (IKÜM) ja isikuandmete kaitse seadusest.",
+         "allikas": [["ttks", "§ 4¹"], ["vos", "§ 768"], "eur-gdpr", "rt-iks"],
+         "kontroll": [["ttks", "§ 4¹", "laieneb perearstiabi ja koolitervishoiu teenuse osutamiseks"], ["ttks", "§ 4¹", "töötlemise põhjus ja eesmärk tuleb dokumenteerida"], ["vos", "§ 768", "ei saaks teatavaks kõrvalistele isikutele"]]},
+        {"p": "Kavandatud suund", "s": "Sotsiaalministeeriumi esitluse „Tervishoidu toetava dokumenteerimissüsteemi õigusruum“ (Ü. Harak, TEHIK, 22.10.2026) järgi on praegune õigusruum dokumendikeskne: määrus nr 56 lähtub dokumentidest, määruse nr 53 dokumendipõhine andmekoosseis ei kattu teenuse osutaja dokumenteeritavaga ja TIS-i esitamise aeg on seotud dokumendi vormistamise või kinnitamisega. Kavas on minna üle sündmuspõhisele andmevahetusele: andmed tekivad tööprotsessi käigus struktureeritult ja edastatakse TIS-i vajaduse korral. Prioriteet on määrus nr 56 (teenuse käigus dokumenteeritavad andmed, andmekoosseisude ühtlustamine määrusega nr 53, dokumendi koostamine ja allkirjastamine); muudetakse ka määrust nr 53 (sündmuspõhist andmevahetust toetav andmekoosseis ja esitamise tingimused) ning TIS-i põhimäärust (andmete esitajad, sündmuspõhine esitamise aeg).",
+         "allikas": [["dokkord", "§ 1"], ["andmekoosseisud", "§ 1"], ["tis", "§ 5"]]},
+        {"p": "Eelnõu 951 SE", "s": "Vabariigi Valitsus algatas eelnõu 15.06.2026; esimene lugemine lõpetati 22.09.2026 ja eelnõu on teise lugemise etapis (juhtivkomisjon sotsiaalkomisjon). Tervisekassa andmekogu (raviarved) ja retseptikeskus liidetakse TIS-iga, kuhu lisanduvad ravikindlustuse, hüvitiste ja retseptide andmed ning alates 2028. aastast viljatusravi ja sugurakudoonorluse andmed; esitluse järgi käsitletakse ka Tervisekassa andmeladu ja täpsustatakse juurdepääse. TIS-i põhimääruse kehtestaks edaspidi valdkonna eest vastutav minister (praegu Vabariigi Valitsus); uus põhimäärus on töös. Jõustumine on esitluse järgi kavas 01.01.2027 (küsimärgiga).",
+         "allikas": ["rk-951", ["ttks", "§ 59¹"]],
+         "kontroll": [["ttks", "§ 59¹", "põhimääruse kehtestab Vabariigi Valitsus määrusega"]]},
+        {"p": "Euroopa terviseandmeruum", "s": "Euroopa terviseandmeruumi määrus (EL) 2025/327 loob ELi ühtse raamistiku elektrooniliste terviseandmete kasutamiseks ja vahetamiseks. Määrus jõustus 26.03.2025 ja seda kohaldatakse üldjuhul alates 26.03.2027. Inimeste õigusi ja andmevahetust käsitlevaid sätteid kohaldatakse patsiendikokkuvõtte, e-retsepti ja e-väljastuse suhtes alates 26.03.2029 ning meditsiiniliste kujutiste, laboritulemuste ja haiglast väljakirjutamise aruannete suhtes alates 26.03.2031.",
+         "allikas": ["eur-ehds", "ec-ehds"]}
+      ],
+      "erinevused": [
+        {"s": "Määruse nr 53 pealkiri ja § 1 lubavad kehtestada andmekoosseisude kõrval ka nende esitamise tingimused ja korra (nagu TTKS § 59² lg 2 volitab), kuid määruses on ainult dokumentide loetelu, andmekoosseisud lisades ja rakendamise tähtpäevad; esitamise tähtajad on TIS-i põhimääruse § 5-s. Ka esitlus märgib, et esitamise tingimused puuduvad.",
+         "allikas": [["andmekoosseisud", "§ 1"], ["ttks", "§ 59²"], ["tis", "§ 5"]]},
+        {"s": "Esitlus nimetab dokumendi koostamist ja allkirjastamist määruse nr 56 muutmise fookuseks. Osa sellest on juba tehtud: alates 10.07.2026 võib määruses nõutud allkiri olla elektrooniline või asutuse digitempel (§ 3 lg 3¹) ja tervisekaardi lehtede vormid määruse lisades kaotati.",
+         "allikas": [["dokkord", "§ 3"]]},
+        {"s": "Määrus nr 56 seab tähtaja andmete dokumenteerimisele (teenuse päev või järgmine tööpäev), TIS-i edastamise tähtaeg algab aga dokumendi kinnitamisest; eraldi tähtaega, mille jooksul ambulatoorne dokument tuleb kinnitada, kumbki määrus ei nimeta. Esitlus seab eesmärgiks sündmuspõhise esitamise aja.",
+         "allikas": [["dokkord", "§ 3"], ["tis", "§ 5"]]},
+        {"s": "Eelnõu 951 SE esimese lugemise tekstis on seaduse jõustumise päev 01.10.2026 (osa sätteid 01.01.2027, 01.01.2028 ja 01.07.2028); see kuupäev on möödas ja esitluse järgi on kavas 01.01.2027.",
+         "allikas": ["rk-951"]}
+      ],
+      "tabelid": [
+        {"n": "Dokumenteerimise õigusruum (esitluse ülesehitus, volitusnormid kehtivast TTKS-ist)", "pais": ["Tase", "Akt", "Mida reguleerib"], "read": [
+          ["EL", ["Isikuandmete kaitse üldmäärus (IKÜM, GDPR) 2016/679", "https://eur-lex.europa.eu/eli/reg/2016/679/oj/est"], "üldised andmekaitsenõuded, sh terviseandmete kui eriliiki isikuandmete töötlemine"],
+          ["EL", ["Euroopa terviseandmeruumi määrus (EHDS) 2025/327", "https://eur-lex.europa.eu/eli/reg/2025/327/oj/est"], "ühtne raamistik elektrooniliste terviseandmete kasutamiseks ja vahetamiseks ELis"],
+          ["Seadus", ["Isikuandmete kaitse seadus", "https://www.riigiteataja.ee/akt/104012019011?leiaKehtiv"], "IKÜM-i täiendavad riigisisesed andmekaitsenõuded"],
+          ["Seadus", "Tervishoiuteenuste korraldamise seadus § 4¹–4², § 59¹–59³", "eriliiki isikuandmete töötlemise alus ja eesmärgid, dokumenteerimise nõuded ja säilitustähtajad, TIS-i asutamine, andmete edastamine, säilitamine ja juurdepääs; volitused allolevateks määrusteks"],
+          ["Seadus", "Võlaõigusseadus § 768–770; nakkushaiguste ennetamise ja tõrje seadus, kunstliku viljastamise ja embrüokaitse seadus, vereseadus jt", "saladuse hoidmine, dokumenteerimiskohustus, patsiendi õigus dokumentidega tutvuda, tõendamiskoormus; valdkondlikud lisanõuded"],
+          ["Määrus", "Sotsiaalministri 18.09.2008 määrus nr 56 „Tervishoiuteenuse osutamise dokumenteerimise tingimused ja kord“ (TTKS § 4² lg 3)", "teenuse osutamist tõendavate andmete loetelu ja dokumenteerimise kord; dokumendikeskne"],
+          ["Määrus", "Sotsiaalministri 17.09.2008 määrus nr 53 „Tervise infosüsteemi andmekoosseisud ja nende esitamise tingimused“ (TTKS § 59² lg 2)", "TIS-i edastatavate dokumentide ja andmestike andmekoosseisud; dokumendipõhine, ei kattu teenuse osutaja dokumenteeritava andmekoosseisuga"],
+          ["Määrus", "Vabariigi Valitsuse 01.12.2016 määrus nr 138 „Tervise infosüsteemi põhimäärus“ (TTKS § 59¹ lg 3)", "ülesehitus, vastutav ja volitatud töötleja, andmeandjad, andmete esitamise aeg (dokumendi vormistamisest või kinnitamisest)"]],
+         "markus": "Ülesehitus ja hinnangud („dokumendikeskne“, „ei kattu“) on Sotsiaalministeeriumi esitlusest 22.10.2026; volitusnormid ja sätete sisu on kontrollitud kehtivast tekstist.",
+         "allikas": ["eur-gdpr", "eur-ehds", "rt-iks", ["ttks", "§ 4²"], ["ttks", "§ 59¹"], ["ttks", "§ 59²"], ["vos", "§ 769"], ["dokkord", "§ 1"], ["andmekoosseisud", "§ 1"], ["tis", "§ 3"]]}
+      ],
+      "tabelid_lopus": true,
+      "lingid": ["rk-951", "eur-ehds", "ec-ehds", "eur-gdpr", "rt-iks"],
+      "seotud": ["teatis", "tookorraldus", "abiarst"]
     },
     {
       "k": "oigused",
