@@ -1404,7 +1404,8 @@ def build(args):
         if not targets:
             missing.append(k)
         for x in targets:
-            x.setdefault("syn", []).extend(words)
+            # Ilma kordusteta: eelmisest andmefailist üle võetud kirjetel (nt SYNLAB, kui hinnakirja ei saanud) on sünonüümid juba olemas.
+            x["syn"] = list(dict.fromkeys((x.get("syn") or []) + list(words)))
 
     meta = {
         "built": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
