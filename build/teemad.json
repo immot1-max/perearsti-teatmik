@@ -32,6 +32,7 @@
     "tk-tookorraldus": {"n": "Tervisekassa: perearsti töökorraldus (patsiendile)", "u": "https://tervisekassa.ee/perearsti-tookorraldus"},
     "tk-perearstiabi": {"n": "Tervisekassa: perearstiabi (patsiendile)", "u": "https://tervisekassa.ee/perearstiabi"},
     "rt-meremeditsiin": {"n": "Tervisekontrolli tegijate meremeditsiinialase koolituse nõuded (Riigi Teataja)", "u": "https://www.riigiteataja.ee/akt/956592"},
+    "pa-vabatahtlik": {"n": "Päästeamet: vabatahtlikuks päästjaks saamine", "u": "https://www.rescue.ee/et/juhend/vabatahtlikud/vabatahtlikuks-paastjaks-saamine"},
     "tk-ekons": {"n": "Tervisekassa: e-konsultatsioon", "u": "https://tervisekassa.ee/tervisekassa/e-tervise-tooted/suunamised/e-konsultatsioon"},
     "tk-ekons-erialad": {"n": "Tervisekassa: e-konsultatsiooni erialapõhised tingimused ja haiglate kontaktid", "u": "https://tervisekassa.ee/tervisekassa/e-tervise-tooted/suunamised/e-konsultatsioon/erialapohised-tingimused-ja-nouded"},
     "tk-ttl-juhendid": {"n": "Tervisekassa: tervishoiuteenuste loetelu juhendid (kodeerimine, suunamine)", "u": "https://tervisekassa.ee/partnerile/raviasutusele/tervishoiuteenuste-loetelu/juhendid"},
@@ -390,6 +391,40 @@
          "allikas": [["meremees", "§ 13"]],
          "kontroll": [["meremees", "§ 13", "75 aastat isiku sünnist arvates"]]}
       ]
+    },
+    {
+      "k": "vabpaastja",
+      "grupp": "Tervisetõendid",
+      "n": "Vabatahtliku päästja ja abidemineerija tervisekontroll",
+      "sn": "Vabatahtlik päästja",
+      "kontrollitud": "2026-10-29",
+      "syn": ["vabatahtlik päästja", "vabatahtliku päästja tõend", "vabatahtliku päästja tervisetõend", "päästja tõend", "päästja", "vpk", "vabatahtlik päästekomando", "päästekomando", "päästeamet", "tuletõrje", "abidemineerija", "demineerija"],
+      "read": [
+        {"p": "Eraldi tõendit ei ole", "s": "Vabatahtliku päästja tervisetõendi vormi ei ole alates 15.07.2020 (määruse lisa tunnistati kehtetuks). Tervist tõendatakse mõne teise kehtiva tõendiga, perearsti juures juhi või relvaloa tervisetõendiga. Kuni 15.07.2020 vanal vormil väljastatud tõend kehtib oma kehtivusaja lõpuni.",
+         "allikas": [["vabpaastja", "§ 17"], ["vabpaastja", "§ 11"]],
+         "kontroll": [["vabpaastja", "§ 17", "vabatahtliku päästja tervisetõendi vormil väljastatud tervisetõend kehtib vastava tõendi kehtivusaja lõpuni"]]},
+        {"p": "Kuidas tõendada", "s": "Ühega neist: kehtiv mootorsõidukijuhi tervisetõendi otsus; kehtiv relvaloa tervisetõend (RelvS § 35¹); päästeteenistujal vastavus I–IV grupi päästeteenistuja tervisenõuetele; tegevväelasel, politseiametnikul, vanglaametnikul, vabatahtlikul merepäästjal või abipolitseinikul vastavus oma ameti tervisenõuetele. Juhi tõendi otsuse edastab inimene tervise infosüsteemi kaudu päästeinfosüsteemi või esitab Päästeametile ise. Kehtib ka abidemineerijale.",
+         "allikas": [["vabpaastja", "§ 11"], ["paasteseadus", "§ 9"]],
+         "kontroll": [["vabpaastja", "§ 11", "esitades kehtiva mootorsõidukijuhi tervisetõendi otsuse"], ["vabpaastja", "§ 11", "vabatahtliku merepäästjana või abipolitseinikuna"], ["paasteseadus", "§ 9", "edastab mootorsõidukijuhi tervisetõendi otsuse andmed tervise infosüsteemi vahendusel"]]},
+        {"p": "Tervisenõuded", "s": "Vabatahtlikul päästjal ei tohi olla sõltuvust alkoholist, narkootilisest või psühhotroopsest ainest, raskekujulist psüühika-, isiksuse- või käitumishäiret ega füüsilist puuet, mis takistab vabatahtliku päästja ülesannete täitmist. Puude nõudest oli kuni 30.09.2026 erand ennetustööl osalejatele, alates 01.10.2026 seda erandit ei ole. Abidemineerijal ei tohi olla sõltuvust, raskekujulist psüühika-, isiksuse- või käitumishäiret ega tervisehäiret, mis takistab abidemineerija ülesannete täitmist.",
+         "allikas": [["vabpaastja", "§ 10"], ["paasteseadus", "§ 34"]],
+         "kontroll": [["vabpaastja", "§ 10", "päästeseaduse § 34 lõike 1 punktides"], ["paasteseadus", "§ 34", "raskekujuline psüühika-, isiksuse- või käitumishäire"], ["paasteseadus", "§ 34", "kellel on tervisehäire, mis takistab tal abidemineerija ülesandeid täita"]]},
+        {"p": "Vanus", "s": "Vabatahtlik päästja vähemalt 18-aastane; abidemineerija vähemalt 21-aastane Eesti kodanik, kellel on vähemalt keskharidus ja eesti keel B2-tasemel.",
+         "allikas": [["paasteseadus", "§ 33"]],
+         "kontroll": [["paasteseadus", "§ 33", "vähemalt 18-aastaseks saanud isiku"], ["paasteseadus", "§ 33", "vähemalt 21-aastase kodaniku"]]},
+        {"p": "Eriväljaõpe", "s": "Kes osaleb päästeametniku korraldusel iseseisvalt eriväljaõpet nõudval päästetööl, peab vastama I grupi päästeteenistuja tervisenõuetele (I grupp: suitsu- või keemiasukeldumine, päästetööd veekogudelt). Seda ei tõendata juhi ega relvaloa tõendiga: tervisekontrolli teeb päästeteenistujate kutsesobivuse määruse järgi töötervishoiuarst, kellega Päästeamet on sõlminud lepingu (nõuded nägemisele, kuulmisele jm).",
+         "allikas": [["vabpaastja", "§ 10"], ["vabpaastja", "§ 11"], ["paasteteenistuja", "§ 13"], ["paasteteenistuja", "§ 14"], ["paasteteenistuja", "§ 18"]],
+         "kontroll": [["vabpaastja", "§ 10", "I grupi päästeteenistujatele kehtestatud tervisenõuetele"], ["vabpaastja", "§ 11", "kontrollitakse päästeteenistuse seaduse § 7 lõike 4 alusel kehtestatud määruse kohaselt"], ["paasteteenistuja", "§ 13", "suitsu- või keemiasukeldumist"], ["paasteteenistuja", "§ 18", "Eelnevat ja perioodilist tervisekontrolli teeb töötervishoiuarst"]]},
+        {"p": "Kulud ja sagedus", "s": "Esmane tervisekontroll on soovija enda kulul. Vabatahtlik päästja ja abidemineerija läbivad tervisekontrolli perioodiliselt (määrus sagedust ei nimeta); perioodilise ja erakorralise kontrolli kulud hüvitab Päästeamet. Erakorralisse kontrolli võib suunata päästeametniku põhjendatud taotlusel.",
+         "allikas": [["vabpaastja", "§ 11"]],
+         "kontroll": [["vabpaastja", "§ 11", "Esmane tervisekontroll tehakse vabatahtlikuks päästjaks või abidemineerijaks saada soovija kulul"], ["vabpaastja", "§ 11", "Perioodilise ja erakorralise tervisekontrolli kulud hüvitab Päästeamet"]]}
+      ],
+      "erinevused": [
+        {"s": "Päästeameti juhendileht vabatahtlikuks päästjaks saamise kohta ei maini tervisekontrolli ega tervisetõendit, kuigi määruse järgi tuleb tervisekontroll läbida enne kandideerimist.",
+         "allikas": ["pa-vabatahtlik", ["vabpaastja", "§ 11"]]}
+      ],
+      "lingid": ["pa-vabatahtlik"],
+      "seotud": ["relv", "abipol"]
     },
     {
       "k": "teatis",

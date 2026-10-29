@@ -198,5 +198,35 @@
       "§ 2",
       "§ 3"
     ]
+  },
+  "paasteseadus": {
+    "nimi": "Päästeseadus (vabatahtlik päästja ja abidemineerija)",
+    "lyh": "PäS",
+    "grupiId": 343642,
+    "par": [
+      "§ 9",
+      "§ 33",
+      "§ 34"
+    ]
+  },
+  "vabpaastja": {
+    "nimi": "Vabatahtliku päästja ja abidemineerija kutsesobivuse nõuded ning nendele vastavuse kontrollimise tingimused ja kord",
+    "lyh": "Vabatahtliku päästja määrus",
+    "grupiId": 1000099,
+    "par": [
+      "§ 10",
+      "§ 11",
+      "§ 17"
+    ]
+  },
+  "paasteteenistuja": {
+    "nimi": "Päästeteenistujate kutsesobivuse nõuded, sealhulgas füüsilise ettevalmistuse, hariduse- ja tervisenõuded",
+    "lyh": "Päästeteenistujate kutsesobivuse määrus",
+    "grupiId": 1000676,
+    "par": [
+      "§ 13",
+      "§ 14",
+      "§ 18"
+    ]
   }
 }

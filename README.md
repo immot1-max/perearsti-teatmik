@@ -20,7 +20,7 @@ Avalehe kohal on vahelehed: „Avaleht“ (kõik), „Rahastus“ (fondid, peara
 | Terviseportaal: vähi sõeluuringud | Rinna-, emakakaela- ja soolevähi sõeluuringu vanus, intervall ja jooksva aasta sünniaastad; koodid ja raviarve info failist `build/soeluuringud.json` |
 | Tervisekassa: kopsuvähi sõeluuring | Tegevusjuhendi link ja lehe uuendamise kuupäev; sihtrühm ja kodeerimine failist `build/soeluuringud.json` |
 | Riigi Teataja: töövõimetus | Ravikindlustuse seadus § 50–62, TTOS § 12², 12⁴, 12⁵, töövõimetuslehe määrus |
-| Riigi Teataja: tervisetõendid | Relvaseadus § 35, 35¹ ja relvaloa tervisekontrolli määrus, abipolitseiniku seadus § 6 ja määrus, Kaitseliidu seadus § 28, kaitseväe tervisehindamise määrus, NETS § 13 |
+| Riigi Teataja: tervisetõendid | Relvaseadus § 35, 35¹ ja relvaloa tervisekontrolli määrus, abipolitseiniku seadus § 6 ja määrus, Kaitseliidu seadus § 28, kaitseväe tervisehindamise määrus, NETS § 13; päästeseadus § 9, 33, 34, vabatahtliku päästja ja abidemineerija kutsesobivuse määrus § 10, 11, 17 ning päästeteenistujate kutsesobivuse määrus § 13, 14, 18 (I grupi tervisenõuded ja tervisekontrolli tegija) |
 | Riigi Teataja: nakkushaigused ja vaktsineerimine | Nakkushaiguste määrus, TIS-i põhimäärus § 5, NETS § 8, 10, 21, immuniseerimiskava koos lisadega, immuniseerimise korraldus |
 | Riigi Teataja: töökorraldus ja nimistu | Perearstiabi töökorralduse määrus (nr 14), nimistu määrus (nr 47), TTKS § 4³, 7, 8, 8¹, 35 |
 | Riigi Teataja: tervishoiuteenuse osutamisel osalejad | Määrus „Tervishoiuteenuse osutamisel osalevad isikud ja tervise infosüsteemile juurdepääsu ulatus“ § 2, 3 (arst-resident, abiarst, juurdepääs TIS-ile) |
