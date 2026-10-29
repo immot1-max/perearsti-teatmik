@@ -51,4 +51,4 @@
 - 47 ravijuhendit, 11 käsitlusjuhendit, 1 muud juhendit (väljaspool ravijuhend.ee), 8 lisa eelvaadet
 
 
-Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 215 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 34 teemakaarti, 59 ravijuhendit, 52 linki.
+Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 217 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 35 teemakaarti, 59 ravijuhendit, 52 linki.

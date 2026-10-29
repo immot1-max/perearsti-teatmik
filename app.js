@@ -560,7 +560,7 @@
     } else if (it.t === 'j') {
       const changed = (it.r || []).some((r) => r.muutus);
       head = `<span class="name">${hl(it.n, re)}</span><span></span>
-        <span class="meta"><span class="badge teema">${esc(it.g || 'teema')}</span><span>${(it.r || []).length} punkti</span>${(it.e || []).length ? `<span class="badge warn">${it.e.length} erinevus${it.e.length > 1 ? 't' : ''} allikates</span>` : ''}${changed ? '<span class="badge warn">allikas muutunud</span>' : ''}${via ? '<span class="via">· vaste sisus</span>' : ''}</span>`;
+        <span class="meta"><span class="badge teema">${esc(it.g || 'teema')}</span>${it.al && it.al > new Date().toISOString().slice(0, 10) ? `<span class="badge warn">jõustub ${fmtDate(it.al)}</span>` : ''}<span>${(it.r || []).length} punkti</span>${(it.e || []).length ? `<span class="badge warn">${it.e.length} erinevus${it.e.length > 1 ? 't' : ''} allikates</span>` : ''}${changed ? '<span class="badge warn">allikas muutunud</span>' : ''}${via ? '<span class="via">· vaste sisus</span>' : ''}</span>`;
     } else if (it.t === 'u') {
       head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${it.tul ? 'jõustub ' : ''}${fmtDate(it.alates)}</small></span>
         <span class="meta">${it.tul ? '<span class="badge warn">tulekul</span>' : '<span class="badge muutus">jõustunud</span>'}<span>${esc(uSummary(it))}</span>${via ? '<span class="via">· vaste sisus</span>' : ''}</span>`;
@@ -996,6 +996,7 @@
       let h = '';
       const rel = (it.seotud || []).map((k) => state.teemaByKey[k]).filter(Boolean);
       if (rel.length) h += `<div class="seotud"><span>Vaata ka</span>${rel.map((x) => `<button class="badge teema ${tgCls(x.g)}" data-focus="${x._id}">${esc(x.sn)}</button>`).join('')}</div>`;
+      if (it.al && it.al > new Date().toISOString().slice(0, 10)) h += `<p class="note"><b>Jõustub ${fmtDate(it.al)}.</b> Viited on avaldatud, veel jõustumata redaktsioonidele; jõustumise päevast viitab teatmik kehtivale tekstile.</p>`;
       for (const f of it.tul || []) {
         if (f.alates <= new Date().toISOString().slice(0, 10)) continue;
         h += `<p class="note"><b>Alates ${fmtDate(f.alates)}:</b> ${hl(f.s, re)} ${chips(f.a)}</p>`;
@@ -1155,7 +1156,7 @@
       return it ? `<button class="qbtn juhi" data-focus="${it._id}"><b>${esc(t)}</b><small>${esc(sub)}</small></button>` : '';
     }).join('');
     const tj = d.items.filter((x) => x.t === 'j');
-    const tCard = (x) => `<button class="qbtn teema" data-focus="${x._id}"><b>${esc(x.sn)}</b><small>${x.n !== x.sn ? esc(x.n) + ' · ' : ''}${(x.r || []).length} punkti${(x.e || []).length ? ' · ⚠ ' + x.e.length : ''}</small></button>`;
+    const tCard = (x) => `<button class="qbtn teema" data-focus="${x._id}"><b>${esc(x.sn)}</b><small>${x.n !== x.sn ? esc(x.n) + ' · ' : ''}${x.al && x.al > new Date().toISOString().slice(0, 10) ? 'jõustub ' + fmtDate(x.al) + ' · ' : ''}${(x.r || []).length} punkti${(x.e || []).length ? ' · ⚠ ' + x.e.length : ''}</small></button>`;
     const tGroups = (gs) => `<div class="tgroups">` + gs.map((g) => `<div class="tgroup ${tgCls(g)}"><h3>${esc(g)}</h3><div class="quick">`
       + (g === 'Tervisetõendid' ? juhiBtns : '')
       + tj.filter((x) => x.g === g).map(tCard).join('') + '</div></div>').join('') + '</div>';

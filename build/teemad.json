@@ -113,7 +113,10 @@
     "eur-gdpr": {"n": "Isikuandmete kaitse üldmäärus (EL) 2016/679 (IKÜM, GDPR)", "u": "https://eur-lex.europa.eu/eli/reg/2016/679/oj/est"},
     "eur-ehds": {"n": "Euroopa terviseandmeruumi määrus (EL) 2025/327 (EHDS)", "u": "https://eur-lex.europa.eu/eli/reg/2025/327/oj/est"},
     "ec-ehds": {"n": "Euroopa Komisjon: Euroopa terviseandmeruumi määrus ja rakendamise ajakava", "u": "https://health.ec.europa.eu/ehealth-digital-health-and-care/european-health-data-space-regulation-ehds_et"},
-    "rt-iks": {"n": "Isikuandmete kaitse seadus", "u": "https://www.riigiteataja.ee/akt/104012019011?leiaKehtiv"}
+    "rt-iks": {"n": "Isikuandmete kaitse seadus", "u": "https://www.riigiteataja.ee/akt/104012019011?leiaKehtiv"},
+    "rk-pet": {"n": "Riigikogu: elulõpu tahteavalduse seadus (TTKS 5². peatükk, RT I, 26.06.2025, 29)", "u": "https://www.riigikogu.ee/tegevus/eelnoud/1b263415-8c5b-47bc-b7f8-2699c47b186f/tervishoiuteenuste-korraldamise-seaduse-tootuskindlustuse-seaduse-muutmise-ja-sellega-seonduvalt-teiste-seaduste-muutmise-seaduse-ning-toovoimetoetuse-seaduse-muutmise-seadus/"},
+    "tehik-pet": {"n": "TEHIK: patsiendi elulõpu tahteavaldus (TIS-i teenus, andmekoosseis, ärireeglid)", "u": "https://teabekeskus.tehik.ee/et/teenused/tis-teenused/patsiendi-elulopu-tahteavaldus"},
+    "sm-pet-kkk": {"n": "Sotsiaalministeerium: patsiendi elulõpu tahteavalduse korduma kippuvad küsimused", "u": "https://sm.ee/patsiendi-elulopu-tahteavalduse-korduma-kippuvad-kusimused"}
   },
   "teemad": [
     {
@@ -1124,9 +1127,67 @@
          "markus": "Ülesehitus ja hinnangud („dokumendikeskne“, „ei kattu“) on Sotsiaalministeeriumi esitlusest 22.10.2026; volitusnormid ja sätete sisu on kontrollitud kehtivast tekstist.",
          "allikas": ["eur-gdpr", "eur-ehds", "rt-iks", ["ttks", "§ 4²"], ["ttks", "§ 59¹"], ["ttks", "§ 59²"], ["vos", "§ 769"], ["dokkord", "§ 1"], ["andmekoosseisud", "§ 1"], ["tis", "§ 3"]]}
       ],
+      "tulevik": [
+        {"alates": "2027-01-01", "s": "Dokumentide hulka lisandub patsiendi elulõpu tahteavaldus (määrus nr 56 § 4 p 22, TIS-i andmekoosseis määruse nr 53 lisas 31): arst kinnitab nõustamise TIS-is ja kannab paberil koostatud tahteavalduse TIS-i. Vt kaarti „Elulõpu tahteavaldus“.",
+         "allikas": [["dokkord", "§ 4"], ["andmekoosseisud", "§ 2"]]}
+      ],
       "tabelid_lopus": true,
       "lingid": ["rk-951", "eur-ehds", "ec-ehds", "eur-gdpr", "rt-iks"],
-      "seotud": ["teatis", "tookorraldus", "abiarst"]
+      "seotud": ["elulopu-tahteavaldus", "teatis", "tookorraldus", "abiarst"]
+    },
+    {
+      "k": "elulopu-tahteavaldus",
+      "grupp": "Töökorraldus ja nimistu",
+      "n": "Patsiendi elulõpu tahteavaldus (alates 01.01.2027): nõustamine, koostamine, rakendamine ja tühistamine",
+      "sn": "Elulõpu tahteavaldus",
+      "kontrollitud": "2026-10-29",
+      "alates": "2027-01-01",
+      "ule": {"alates": "2027-01-01", "s": "Elulõpu tahteavaldus on jõustunud: vaata üle kaardi sõnastus, nõustamise teenus ja kood tervishoiuteenuste loetelus ning TEHIK-u paberivormi link."},
+      "syn": ["elulõpu tahteavaldus", "elulõpu", "tahteavaldus", "patsiendi tahteavaldus", "pet", "elu säilitav ravi", "elu säilitavast ravist keeldumine", "ravist keeldumine", "elustamisest keeldumine", "elustamata jätmine", "elustamiskeeld", "dnr", "dnar", "usaldusisik", "tunnistaja", "otsusevõimetu", "otsusevõimetus", "palliatiivravi", "elu lõpp", "elulõpu nõustamine", "advance directive"],
+      "read": [
+        {"p": "Mis see on", "s": "Dokument, mille isik koostab ise juhuks, kui ta on tulevikus otsusevõimetu: ta kirjeldab olukordi, kus keelab nimetatud tervishoiuteenused või annab nende osutamiseks nõusoleku. Valida saab elu säilitavast ravist keeldumise juhuks, kui tulemus oleks talle vastuvõetamatu, keeldumise sõltumata ravitulemusest või kõigist ravisekkumistest keeldumise; sekkumistena on loetletud elustamine, hingamisaparaat, dialüüs, intensiivravi, kunstlik toitmine ja vedelikud, ravimid, vere ja verekomponentide ülekanne, kirurgiline ravi ning uuringud ja analüüsid, eraldi palliatiivravi elu lõpus. Raviga mitteseotud juhised ja eelistused ei ole tervishoiuteenuse osutajale siduvad, varaga seotud korraldusi anda ei saa. Tahteavaldus on tähtajatu.",
+         "allikas": [["ttks", "§ 59⁵"], ["andmekoosseisud", "lisa 31"]],
+         "kontroll": [["ttks", "§ 59⁵", "Elulõpu tahteavaldus on tähtajatu."], ["ttks", "§ 59⁵", "ei ole need tervishoiuteenuse osutajale siduvad"]]},
+        {"p": "Kes saab koostada", "s": "Täieliku teovõimega otsusevõimeline isik. Piiratud teovõimega vähemalt 18-aastane otsusevõimeline isik võib koostada, kui nõustav arst hindab, et ta suudab koostamise poolt- ja vastuargumente vastutustundlikult kaaluda; tema võib tahteavalduse koostada ja muuta paberil.",
+         "allikas": [["ttks", "§ 59⁷"], ["dokkord", "§ 106²⁰"]],
+         "kontroll": [["ttks", "§ 59⁷", "piiratud teovõimega vähemalt 18-aastane otsusevõimeline isik"]]},
+        {"p": "Arsti nõustamine", "s": "Esmakordse tahteavalduse eeldus on arsti nõustamine; seadus nõustava arsti eriala ei piira. Arst selgitab tahteavalduse olemust, pöördumatuid terviseseisundeid, raviviiside sisu ja tervishoiuteenustest loobumise võimalikke tagajärgi; raviga mitteseotud juhiseid ta ei nõusta. Pärast nõustamist märgib arst TIS-is nõustamise tulemuse ja kinnitab, et isik on otsusevõimeline ja võimeline tahteavaldust koostama. Kinnitatud nõustamine kehtib tähtajatult: muutmine ja pärast tühistamist uue koostamine uut nõustamist ei nõua.",
+         "allikas": [["ttks", "§ 59⁸"], ["dokkord", "§ 106¹⁹"]],
+         "kontroll": [["ttks", "§ 59⁸", "pöördumatuid terviseseisundeid"], ["dokkord", "§ 106¹⁹", "kinnitab, et isik on otsusevõimeline"], ["dokkord", "§ 106¹⁹", "arsti kinnitatud nõustamine kehtib tähtajatult"]]},
+        {"p": "Koostamine TIS-is", "s": "Isik eeltäidab tahteavalduse TIS-is (terviseportaalis), käib arsti nõustamisel ja digiallkirjastab selle 30 päeva jooksul pärast nõustamise kinnitamist; muidu eeltäidetud tahteavaldus kustub. Tahteavaldus jõustub, kui arst on nõustamise kinnitanud ja allkirjastatud tahteavaldus on TIS-is. Muutmine kinnitatakse digiallkirjaga, tühistamiseks allkirja vaja ei ole.",
+         "allikas": [["dokkord", "§ 106¹⁹"], ["ttks", "§ 59⁸"], ["tis", "§ 17"], "tehik-pet"],
+         "kontroll": [["dokkord", "§ 106¹⁹", "30 päeva jooksul"], ["tis", "§ 17", "koostada patsiendi elulõpu tahteavaldust"]]},
+        {"p": "Paberil", "s": "Paberil võivad tahteavalduse koostada ja seda muuta täisealine piiratud teovõimega isik, kes on arsti hinnangul võimeline selle tähendusest ja tagajärgedest aru saama, ning isik, kes ei saa digiallkirja anda. Selleks pöördutakse tervishoiuteenuse osutaja vastuvõtule; arst nõustab enne koostamist ja märgib TIS-is nõustamise tulemuse, isik allkirjastab omakäeliselt. Arst kannab tahteavalduse andmed TIS-i teenuse osutamise käigus, hiljem ainult mõjuval põhjusel ja siis viivitamata pärast selle äralangemist. Allkirjastatud tahteavaldus säilitatakse teenuse osutaja juures tervishoiuteenuse osutamist tõendava dokumendina, isik saab koopia.",
+         "allikas": [["dokkord", "§ 106²⁰"], ["ttks", "§ 59⁸"]],
+         "kontroll": [["dokkord", "§ 106²⁰", "Andmete hilisem sisestamine on lubatud üksnes mõjuval põhjusel"], ["dokkord", "§ 106²⁰", "tervishoiuteenuse osutamist tõendava dokumendina"]]},
+        {"p": "Tunnistaja", "s": "Kui isik ei saa ise allkirja anda, annab allkirja tunnistaja arsti juuresolekul pärast nõustamist ja tahteavalduse koostamist; tunnistaja andmed märgitakse TIS-i. Tunnistaja on koostaja heakskiidetud vähemalt 18-aastane teo- ja otsusevõimeline isik, kuid mitte nõustanud arst; ta võib sisu teada, kuid TIS-is seda talle ei näidata.",
+         "allikas": [["ttks", "§ 59¹⁰"], ["dokkord", "§ 106²¹"]],
+         "kontroll": [["ttks", "§ 59¹⁰", "Tunnistajaks ei tohi olla isikut elulõpu tahteavalduse koostamisel nõustanud arst"]]},
+        {"p": "Usaldusisik", "s": "Isik võib määrata ühe usaldusisiku (vähemalt 18-aastane, teo- ja otsusevõimeline), kes kaitseb tema huve, kui ta on otsusevõimetu. Usaldusisik kinnitab nõusoleku allkirjaga; TIS-is tuleb nõusolek anda 14 päeva jooksul, muidu loetakse, et ta keeldus, mis tahteavalduse kehtivust ei mõjuta. Tahteavaldus ja selle tühistamine on usaldusisikule TIS-is nähtavad. Kui usaldusisiku ja teiste lähedaste arvamused lähevad lahku, lähtub rakendaja usaldusisiku seisukohast; tahteavalduse alusel teenuse osutamata jätmisest teavitab arst usaldusisikut esimesel võimalusel.",
+         "allikas": [["ttks", "§ 59⁹"], ["dokkord", "§ 106²²"]],
+         "kontroll": [["ttks", "§ 59⁹", "lähtub käesoleva seaduse § 59⁶ lõikes 1 nimetatud rakendaja usaldusisiku seisukohast"], ["dokkord", "§ 106²²", "14 päeva jooksul"]]},
+        {"p": "Rakendamine", "s": "Tahteavaldust rakendab arst või kiirabibrigaadi juht. Seda ei rakendata, kui isiku tahe ei ole selge või kirjeldatud olukord ei vasta tekkinud kliinilisele seisundile.",
+         "allikas": [["ttks", "§ 59⁶"]],
+         "kontroll": [["ttks", "§ 59⁶", "ei vasta tekkinud kliinilisele seisundile"]]},
+        {"p": "Tühistamine", "s": "Isik võib tahteavalduse igal ajal ilma nõustamiseta tühistada TIS-is või muul selgelt väljendatud viisil, mis jõuab arstini. Kui tühistamine toimub väljaspool TIS-i, peab arst sellest teada saades tahteavalduse viivitamata ise TIS-is tühistama. Tühistamine jõustub TIS-i kandest, välja arvatud kui teenust osutav tervishoiutöötaja teadis sellest varem. Tühistatud tahteavaldusi säilitatakse TIS-is üks aasta.",
+         "allikas": [["ttks", "§ 59¹¹"], ["ttks", "§ 59¹"]],
+         "kontroll": [["ttks", "§ 59¹¹", "viivitamata tühistama"], ["ttks", "§ 59¹", "mis on tühistatud, üks aasta"]]},
+        {"p": "Dokumenteerimine", "s": "Patsiendi elulõpu tahteavaldus lisandub tervishoiuteenuse osutamist tõendavate dokumentide loetellu (määrus nr 56) ja TIS-i edastatavate dokumentide hulka. Andmekoosseis (määruse nr 53 lisa 31): staatus, keel, koostaja, tunnistaja, usaldusisiku ning nõustava arsti ja asutuse andmed, sisu, koostaja kinnitused, allkirjad ning nõustamise kuupäev ja tulemus.",
+         "allikas": [["dokkord", "§ 4"], ["dokkord", "§ 106¹⁷"], ["andmekoosseisud", "§ 2"], ["andmekoosseisud", "lisa 31"]],
+         "kontroll": [["dokkord", "§ 4", "patsiendi elulõpu tahteavaldus"], ["andmekoosseisud", "§ 2", "patsiendi elulõpu tahteavaldus"]]}
+      ],
+      "erinevused": [
+        {"s": "Nõustamist rahastatakse tervishoiuteenuste loetelu kaudu (RaKS § 30 lg 1), kuid kehtivas loetelus ega 01.01.2027 jõustuvas metoodikas nõustamise teenust ega koodi ei ole ja 2027. aasta loetelu ei ole veel avaldatud (kontrollitud 29.10.2026). Kes nõustab ja millise koodiga, on seega lahtine.",
+         "allikas": [["ttks", "§ 59¹²"]]},
+        {"s": "TIS-i põhimääruse § 17 lg 4 järgi teostab piiratud teovõimega isiku õigusi TIS-is seaduslik esindaja, kui seaduses või määruses ei ole sätestatud teisiti. TTKS-i järgi koostab tahteavalduse isik ise ja piiratud teovõimega isik võib seda teha paberil; põhimäärus elulõpu tahteavaldust erandina eraldi ei nimeta.",
+         "allikas": [["tis", "§ 17"], ["ttks", "§ 59⁵"], ["dokkord", "§ 106²⁰"]]},
+        {"s": "Sotsiaalministeeriumi korduma kippuvate küsimuste leht (uuendatud 06.01.2026) kirjeldab tahteavaldust endiselt eelnõuna, mis on saadetud Riigikokku; seadus on vastu võetud ja avaldatud (RT I, 26.06.2025, 29) ning jõustub 01.01.2027.",
+         "allikas": ["sm-pet-kkk", "rk-pet"]},
+        {"s": "TEHIK-u teabekeskuse lehel (uuendatud 05.10.2026) olev link paberivormile (PET vorm, seis 11.06.2026) suunas 29.10.2026 TEHIK-u avalehele; lehe järgi on teenus alles loomisel.",
+         "allikas": ["tehik-pet"]}
+      ],
+      "lingid": ["tehik-pet", "sm-pet-kkk", "rk-pet"],
+      "seotud": ["dokumenteerimine"]
     },
     {
       "k": "oigused",

@@ -18,8 +18,8 @@ import re
 
 VERSION = 2
 # Allika põhine versioon: kui mõne akti võrdlusloogika või jälgitavate sätete loetelu muutub, arvutatakse ainult selle kirjed uuesti.
-# ttks ja tis: 29.10.2026 lisandusid jälgitavad sätted (dokumenteerimise kaart).
-SRC_VERSION = {"metoodika": 3, "ttks": 3, "tis": 3}
+# ttks, tis ja dokkord: 29.10.2026 lisandusid jälgitavad sätted (dokumenteerimise ja elulõpu tahteavalduse kaart).
+SRC_VERSION = {"metoodika": 3, "ttks": 4, "tis": 4, "dokkord": 3}
 
 
 def version(src):

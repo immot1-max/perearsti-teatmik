@@ -783,12 +783,17 @@ def watch_sources(allikad, prev):
     return out
 
 
-def build_teemad(cfg, sources, par_text, dyn, lisad):
-    """Teemakaardid: read koos viidetega, tekstikontroll ja dünaamilised tabelid."""
+def build_teemad(cfg, sources, par_text, dyn, lisad, text_at=None):
+    """Teemakaardid: read koos viidetega, tekstikontroll ja dünaamilised tabelid.
+    Kaardi või rea väli „alates“ (tulevane kuupäev): viited ja tekstikontroll kasutavad sel päeval
+    kehtima hakkavat, juba avaldatud redaktsiooni (text_at); kuupäeva saabudes kehtivat redaktsiooni."""
     items, warn = [], []
     allikad = cfg.get("allikad", {})
 
-    def ref(a):
+    def fut_text(src, at):
+        return text_at(src, at) if (at and text_at) else None
+
+    def ref(a, at=None):
         if isinstance(a, str):
             x = allikad.get(a)
             if not x:
@@ -800,6 +805,19 @@ def build_teemad(cfg, sources, par_text, dyn, lisad):
         if not s:
             warn.append(f"Tundmatu akt „{src}“")
             return None
+        fx = fut_text(src, at)
+        if fx:
+            lyh = s.get("lyh") or s["nimi"]
+            n = f'{lyh} {par} (alates {fmt_date(fx["alates"])})'
+            if par.startswith("lisa"):
+                li = next((x for x in fx["lisad"] if par.replace(" ", "") in x["n"].lower()), None)
+                if not li:
+                    warn.append(f"Viidatud lisa puudub tulevases redaktsioonis: {lyh} {par}")
+                return {"src": src, "par": par, "n": n, "u": li["u"] if li else RT + fx["id"]}
+            pid = fx["pt"].get(par, {}).get("id")
+            if not pid:
+                warn.append(f"Viidatud säte puudub tulevases redaktsioonis: {lyh} {par}")
+            return {"src": src, "par": par, "n": n, "u": RT + fx["id"] + ("#" + pid if pid else "")}
         if par.startswith("lisa"):
             li = next((x for x in lisad.get(src, []) if par.replace(" ", "") in x["n"].lower()), None)
             return {"src": src, "par": par, "n": f'{s.get("lyh") or s["nimi"]} {par}', "u": li["u"] if li else s["url"]}
@@ -808,13 +826,14 @@ def build_teemad(cfg, sources, par_text, dyn, lisad):
             warn.append(f"Viidatud säte puudub: {s.get('lyh')} {par}")
         return {"src": src, "par": par, "n": f'{s.get("lyh") or s["nimi"]} {par}', "u": s["url"] + ("#" + pid if pid else "")}
 
-    def check(row, where):
+    def check(row, where, at=None):
         bad = []
         for src, par, needle in row.get("kontroll", []):
+            fx = fut_text(src, at)
             if par.startswith("lisa"):
                 hay = (dyn.get("imm1" if "1" in par else "imm2") or {}).get("text", "") if src == "immkava" else ""
             else:
-                hay = (par_text.get(src) or {}).get(par, {}).get("t", "")
+                hay = ((fx["pt"] if fx else par_text.get(src)) or {}).get(par, {}).get("t", "")
             if norm_ws(needle) not in norm_ws(hay):
                 bad.append(f'{(sources.get(src) or {}).get("lyh", src)} {par}: „{needle}“')
         if bad:
@@ -832,6 +851,10 @@ def build_teemad(cfg, sources, par_text, dyn, lisad):
         # Kaardipõhine kontrollikuupäev (hiljem lisatud kaardid); muidu kehtib _meta.kontrollitud.
         if t.get("kontrollitud"):
             it["kk"] = t["kontrollitud"]
+        # Kaart, mis kirjeldab tulevikus jõustuvat korda (viited avaldatud, veel jõustumata redaktsioonile).
+        at = t.get("alates")
+        if at and at > TODAY.isoformat():
+            it["al"] = at
         # Ülevaatuse meeldetuletus (nt tähtajaline kollektiivleping): alates kuupäevast läheb hoiatus aruandesse.
         if t.get("ule") and TODAY.isoformat() >= t["ule"]["alates"]:
             warn.append(f'{t.get("sn") or t["n"]}: {t["ule"]["s"]}')
@@ -841,20 +864,21 @@ def build_teemad(cfg, sources, par_text, dyn, lisad):
                 s = r["s"]
                 if "{ylempiir}" in s:
                     s = s.replace("{ylempiir}", f'{yl["aasta"]}. aastal on {yl["eur"]} eurot' if yl else "(vt Tervisekassa lehte)")
-                row = {"s": s, "a": [x for x in (ref(a) for a in r.get("allikas", [])) if x]}
+                rat = r.get("alates") or at
+                row = {"s": s, "a": [x for x in (ref(a, rat) for a in r.get("allikas", [])) if x]}
                 if r.get("p"):
                     row["p"] = r["p"]
                 if r.get("koodid"):
                     row["kd"] = r["koodid"]
-                if check(r, f'{t["sn"]} ({s[:50]}…)'):
+                if check(r, f'{t["sn"]} ({s[:50]}…)', rat):
                     row["muutus"] = True
                 out.append(row)
             if out:
                 it["r" if key == "read" else "e"] = out
-        fut = [dict(f, a=[x for x in (ref(a) for a in f.get("allikas", [])) if x]) for f in t.get("tulevik", []) if f["alates"] > TODAY.isoformat()]
+        fut = [dict(f, a=[x for x in (ref(a, f["alates"]) for a in f.get("allikas", [])) if x]) for f in t.get("tulevik", []) if f["alates"] > TODAY.isoformat()]
         if fut:
             it["tul"] = [{"alates": f["alates"], "s": f["s"], "a": f["a"]} for f in fut]
-        tabs = [dict(tb, a=[x for x in (ref(a) for a in tb.get("allikas", [])) if x]) for tb in t.get("tabelid", [])]
+        tabs = [dict(tb, a=[x for x in (ref(a, at) for a in tb.get("allikas", [])) if x]) for tb in t.get("tabelid", [])]
         for d in t.get("dyn", []):
             if d == "huvitised" and hu.get("rows"):
                 tabs.insert(0, {"n": "Tervisekassa hüvitiste võrdlustabel: kõik põhjuse koodid, kes maksab ja kui kaua", "dyn": "huvitised", "rows": hu["rows"],
@@ -888,7 +912,7 @@ def build_teemad(cfg, sources, par_text, dyn, lisad):
         if t.get("lisad"):
             it["lisad"] = lisad.get(t["lisad"], [])
         if t.get("lingid"):
-            it["l"] = [x for x in (ref(a) for a in t["lingid"]) if x]
+            it["l"] = [x for x in (ref(a, at) for a in t["lingid"]) if x]
         if t.get("tabelid_lopus"):
             it["tl"] = True
         if t.get("seotud"):
@@ -1361,7 +1385,28 @@ def build(args):
     # metoodika lisad: teenuste standardkulu komponendid ja e-konsultatsiooni nõuded erialade kaupa
     ml = met_lisad.lisad_info(xmls["metoodika"], met["id"], cache, aktilisa_url)
     dyn["ekons"] = ml.get("ekons")
-    teema_items, teema_warn = build_teemad(teemad_cfg, sources, par_text, dyn, lisad)
+    fut_cache = {}
+
+    def text_at(src, date):
+        """Teemakaardi välja „alates“ jaoks: sel kuupäeval kehtima hakkava, juba avaldatud
+        redaktsiooni sätete tekst ja lisad. Kui kuupäev on käes või tulevast redaktsiooni pole, None."""
+        if not date or date <= TODAY.isoformat():
+            return None
+        cand = [f for f in (sources.get(src) or {}).get("tulevased") or [] if f["alates"] <= date]
+        if not cand:
+            return None
+        rid = cand[-1]["id"]
+        if rid not in fut_cache:
+            fxml = fetch_xml(rid, cache)
+            fpars, _ = walk_act(fxml)
+            pt = {}
+            for p in fpars:
+                sate = make_sate(src, sources[src], p)
+                pt[p["nr"]] = {"id": p["id"], "t": " ".join(b.get("s", "") or " ".join(" ".join(r) for r in b.get("rows", [])) for b in sate["b"])}
+            fut_cache[rid] = {"id": rid, "alates": cand[-1]["alates"], "pt": pt, "lisad": act_lisad(fxml, rid)}
+        return fut_cache[rid]
+
+    teema_items, teema_warn = build_teemad(teemad_cfg, sources, par_text, dyn, lisad, text_at)
     teema_warn = hu_warn + imm_warn + ml.get("warn", []) + fund_warn + teema_warn
     items.extend(teema_items)
     teema_warn += link_teema_codes(teemad_cfg, by_code, text_rules, rules, sources)
