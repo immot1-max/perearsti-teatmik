@@ -20,7 +20,10 @@
 - Kaitseväekohustuslase terviseseisundi hindamine: [120022026026](https://www.riigiteataja.ee/akt/120022026026) kehtib alates 01.04.2026
 - Nakkushaiguste ennetamise ja tõrje seadus: [130062026134](https://www.riigiteataja.ee/akt/130062026134) kehtib alates 01.10.2026; tulevikus jõustub: [111072026114](https://www.riigiteataja.ee/akt/111072026114) alates 01.07.2027, [111072026115](https://www.riigiteataja.ee/akt/111072026115) alates 01.01.2028
 - Nakkushaiguste loetelu ja neisse haigestumise andmete edastamine: [115072026003](https://www.riigiteataja.ee/akt/115072026003) kehtib alates 18.07.2026; tulevikus jõustub: [111072026177](https://www.riigiteataja.ee/akt/111072026177) alates 01.01.2028
-- Tervise infosüsteemi põhimäärus (andmete esitamise tähtajad): [128032026002](https://www.riigiteataja.ee/akt/128032026002) kehtib alates 01.04.2026; tulevikus jõustub: [123102026010](https://www.riigiteataja.ee/akt/123102026010) alates 01.01.2027
+- Tervise infosüsteemi põhimäärus: [128032026002](https://www.riigiteataja.ee/akt/128032026002) kehtib alates 01.04.2026; tulevikus jõustub: [123102026010](https://www.riigiteataja.ee/akt/123102026010) alates 01.01.2027
+- Tervishoiuteenuse osutamise dokumenteerimise tingimused ja kord: [107072026008](https://www.riigiteataja.ee/akt/107072026008) kehtib alates 10.07.2026; tulevikus jõustub: [129102026002](https://www.riigiteataja.ee/akt/129102026002) alates 01.01.2027
+- Tervise infosüsteemi andmekoosseisud ja nende esitamise tingimused: [120032026003](https://www.riigiteataja.ee/akt/120032026003) kehtib alates 01.04.2026; tulevikus jõustub: [129102026003](https://www.riigiteataja.ee/akt/129102026003) alates 01.01.2027
+- Võlaõigusseadus: [120062026018](https://www.riigiteataja.ee/akt/120062026018) kehtib alates 01.09.2026; tulevikus jõustub: [111072026158](https://www.riigiteataja.ee/akt/111072026158) alates 01.01.2027, [111072026159](https://www.riigiteataja.ee/akt/111072026159) alates 01.03.2029
 - Immuniseerimiskava: [115072026005](https://www.riigiteataja.ee/akt/115072026005) kehtib alates 18.07.2026; tulevikus jõustub: [111072026171](https://www.riigiteataja.ee/akt/111072026171) alates 01.01.2028
 - Immuniseerimise korraldamise nõuded: [123052023016](https://www.riigiteataja.ee/akt/123052023016) kehtib alates 26.05.2023; tulevikus jõustub: [111072026170](https://www.riigiteataja.ee/akt/111072026170) alates 01.01.2028
 - Ravimite väljakirjutamine ja apteekidest väljastamine: [107072026011](https://www.riigiteataja.ee/akt/107072026011) kehtib alates 10.07.2026
@@ -29,7 +32,7 @@
 - Päästeseadus (vabatahtlik päästja ja abidemineerija): [130062026023](https://www.riigiteataja.ee/akt/130062026023) kehtib alates 01.10.2026
 - Vabatahtliku päästja ja abidemineerija kutsesobivuse nõuded ning nendele vastavuse kontrollimise tingimused ja kord: [126092026002](https://www.riigiteataja.ee/akt/126092026002) kehtib alates 01.10.2026
 - Päästeteenistujate kutsesobivuse nõuded, sealhulgas füüsilise ettevalmistuse, hariduse- ja tervisenõuded: [110042025009](https://www.riigiteataja.ee/akt/110042025009) kehtib alates 13.04.2025
-- SYNLABi hinnakiri: 948 analüüsi, SYNLAB Eesti OÜ analüüside hinnakiri ja koondtabel tervishoiuteenuse pakkujale (al 01.04.2026) - SYNLAB Eesti
+- SYNLABi hinnakiri: 949 analüüsi, SYNLAB Eesti OÜ analüüside hinnakiri ja koondtabel tervishoiuteenuse pakkujale (al 01.04.2026) - SYNLAB Eesti
 - Toru: toru_2026jul.xlsx (viimane muudatus 01.07.2026), hinnaerinevusi loeteluga: 3
 
 ## Teenused: 0 hinnamuutust, 0 uut, 0 eemaldatud, 0 fondimuutust
@@ -48,4 +51,4 @@
 - 47 ravijuhendit, 11 käsitlusjuhendit, 1 muud juhendit (väljaspool ravijuhend.ee), 8 lisa eelvaadet
 
 
-Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 948 SYNLABi analüüsi, 326 abivahendit, 196 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 33 teemakaarti, 59 ravijuhendit, 49 linki.
+Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 215 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 34 teemakaarti, 59 ravijuhendit, 52 linki.

@@ -1111,15 +1111,16 @@
          "allikas": ["rk-951"]}
       ],
       "tabelid": [
-        {"n": "Dokumenteerimise õigusruum (esitluse ülesehitus, volitusnormid kehtivast TTKS-ist)", "pais": ["Tase", "Akt", "Mida reguleerib"], "read": [
-          ["EL", ["Isikuandmete kaitse üldmäärus (IKÜM, GDPR) 2016/679", "https://eur-lex.europa.eu/eli/reg/2016/679/oj/est"], "üldised andmekaitsenõuded, sh terviseandmete kui eriliiki isikuandmete töötlemine"],
-          ["EL", ["Euroopa terviseandmeruumi määrus (EHDS) 2025/327", "https://eur-lex.europa.eu/eli/reg/2025/327/oj/est"], "ühtne raamistik elektrooniliste terviseandmete kasutamiseks ja vahetamiseks ELis"],
-          ["Seadus", ["Isikuandmete kaitse seadus", "https://www.riigiteataja.ee/akt/104012019011?leiaKehtiv"], "IKÜM-i täiendavad riigisisesed andmekaitsenõuded"],
-          ["Seadus", "Tervishoiuteenuste korraldamise seadus § 4¹–4², § 59¹–59³", "eriliiki isikuandmete töötlemise alus ja eesmärgid, dokumenteerimise nõuded ja säilitustähtajad, TIS-i asutamine, andmete edastamine, säilitamine ja juurdepääs; volitused allolevateks määrusteks"],
-          ["Seadus", "Võlaõigusseadus § 768–770; nakkushaiguste ennetamise ja tõrje seadus, kunstliku viljastamise ja embrüokaitse seadus, vereseadus jt", "saladuse hoidmine, dokumenteerimiskohustus, patsiendi õigus dokumentidega tutvuda, tõendamiskoormus; valdkondlikud lisanõuded"],
-          ["Määrus", "Sotsiaalministri 18.09.2008 määrus nr 56 „Tervishoiuteenuse osutamise dokumenteerimise tingimused ja kord“ (TTKS § 4² lg 3)", "teenuse osutamist tõendavate andmete loetelu ja dokumenteerimise kord; dokumendikeskne"],
-          ["Määrus", "Sotsiaalministri 17.09.2008 määrus nr 53 „Tervise infosüsteemi andmekoosseisud ja nende esitamise tingimused“ (TTKS § 59² lg 2)", "TIS-i edastatavate dokumentide ja andmestike andmekoosseisud; dokumendipõhine, ei kattu teenuse osutaja dokumenteeritava andmekoosseisuga"],
-          ["Määrus", "Vabariigi Valitsuse 01.12.2016 määrus nr 138 „Tervise infosüsteemi põhimäärus“ (TTKS § 59¹ lg 3)", "ülesehitus, vastutav ja volitatud töötleja, andmeandjad, andmete esitamise aeg (dokumendi vormistamisest või kinnitamisest)"]],
+        {"n": "Dokumenteerimise õigusruum (esitluse ülesehitus, volitusnormid kehtivast TTKS-ist)", "pais": ["Akt", "Mida reguleerib"], "read": [
+          [["IKÜM (GDPR), EL 2016/679", "https://eur-lex.europa.eu/eli/reg/2016/679/oj/est"], "EL: üldised andmekaitsenõuded, sh terviseandmete kui eriliiki isikuandmete töötlemine"],
+          [["EHDS, EL 2025/327", "https://eur-lex.europa.eu/eli/reg/2025/327/oj/est"], "EL: ühtne raamistik elektrooniliste terviseandmete kasutamiseks ja vahetamiseks"],
+          [["Isikuandmete kaitse seadus", "https://www.riigiteataja.ee/akt/104012019011?leiaKehtiv"], "IKÜM-i täiendavad riigisisesed nõuded"],
+          ["TTKS § 4¹–4², 59¹–59³", "eriliiki isikuandmete töötlemise alus ja eesmärgid, dokumenteerimise nõuded ja säilitustähtajad; TIS-i asutamine, andmete edastamine, säilitamine ja juurdepääs; volitused kolmeks allolevaks määruseks"],
+          ["VÕS § 768–770", "saladuse hoidmine, dokumenteerimiskohustus, patsiendi õigus dokumentidega tutvuda, tõendamiskoormus"],
+          ["Muud seadused", "nakkushaiguste ennetamise ja tõrje seadus, kunstliku viljastamise ja embrüokaitse seadus, vereseadus jt: valdkondlikud lisanõuded"],
+          ["Määrus nr 56 (sotsiaalminister, 18.09.2008)", "„Tervishoiuteenuse osutamise dokumenteerimise tingimused ja kord“ (TTKS § 4² lg 3): teenuse osutamist tõendavate andmete loetelu ja dokumenteerimise kord; dokumendikeskne"],
+          ["Määrus nr 53 (sotsiaalminister, 17.09.2008)", "„Tervise infosüsteemi andmekoosseisud ja nende esitamise tingimused“ (TTKS § 59² lg 2): TIS-i edastatavate dokumentide ja andmestike andmekoosseisud; dokumendipõhine, ei kattu teenuse osutaja dokumenteeritava andmekoosseisuga"],
+          ["Määrus nr 138 (Vabariigi Valitsus, 01.12.2016)", "„Tervise infosüsteemi põhimäärus“ (TTKS § 59¹ lg 3): ülesehitus, vastutav ja volitatud töötleja, andmeandjad, andmete esitamise aeg (dokumendi vormistamisest või kinnitamisest)"]],
          "markus": "Ülesehitus ja hinnangud („dokumendikeskne“, „ei kattu“) on Sotsiaalministeeriumi esitlusest 22.10.2026; volitusnormid ja sätete sisu on kontrollitud kehtivast tekstist.",
          "allikas": ["eur-gdpr", "eur-ehds", "rt-iks", ["ttks", "§ 4²"], ["ttks", "§ 59¹"], ["ttks", "§ 59²"], ["vos", "§ 769"], ["dokkord", "§ 1"], ["andmekoosseisud", "§ 1"], ["tis", "§ 3"]]}
       ],
