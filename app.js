@@ -1215,7 +1215,7 @@
         + sec('Igapäevatöö reeglid', tGroups(allGroups.filter((g) => !KYS_GROUPS.includes(g))))
         + sec('Abivahendid, meditsiiniseadmed ja juhi tõend', `<div class="quick">${QB_NOUD.map(qb).join('')}${msBtn}</div>`)
         + muutHtml((x) => !RAHASTUS_SRC.has(x.src), 'Mis muutus (seadused ja määrused)', 'Jälgitavate seaduste ja määruste viimase aasta jooksul jõustunud ning juba avaldatud tulevased muudatused (v.a tervishoiuteenuste loetelu ja metoodika).')
-        + examples(['haigusleht', 'P21', 'relvaluba', 'meremees', 'juhiload', 'nakkushaiguse teatis', 'õe retsept', 'e-konsultatsioon', 'ratastool', 'jalaortoos', 'abiarst', 'koolivaheaeg']);
+        + examples(['haigusleht', 'P21', 'relvaluba', 'meremees', 'juhiload', 'nakkushaiguse teatis', 'õe retsept', 'e-konsultatsioon', 'radioloogia', 'ratastool', 'jalaortoos', 'abiarst', 'koolivaheaeg']);
       return;
     }
     if (tab === 'kys') {

@@ -116,7 +116,16 @@
     "rt-iks": {"n": "Isikuandmete kaitse seadus", "u": "https://www.riigiteataja.ee/akt/104012019011?leiaKehtiv"},
     "rk-pet": {"n": "Riigikogu: elulõpu tahteavalduse seadus (TTKS 5². peatükk, RT I, 26.06.2025, 29)", "u": "https://www.riigikogu.ee/tegevus/eelnoud/1b263415-8c5b-47bc-b7f8-2699c47b186f/tervishoiuteenuste-korraldamise-seaduse-tootuskindlustuse-seaduse-muutmise-ja-sellega-seonduvalt-teiste-seaduste-muutmise-seaduse-ning-toovoimetoetuse-seaduse-muutmise-seadus/"},
     "tehik-pet": {"n": "TEHIK: patsiendi elulõpu tahteavaldus (TIS-i teenus, andmekoosseis, ärireeglid)", "u": "https://teabekeskus.tehik.ee/et/teenused/tis-teenused/patsiendi-elulopu-tahteavaldus"},
-    "sm-pet-kkk": {"n": "Sotsiaalministeerium: patsiendi elulõpu tahteavalduse korduma kippuvad küsimused", "u": "https://sm.ee/patsiendi-elulopu-tahteavalduse-korduma-kippuvad-kusimused"}
+    "sm-pet-kkk": {"n": "Sotsiaalministeerium: patsiendi elulõpu tahteavalduse korduma kippuvad küsimused", "u": "https://sm.ee/patsiendi-elulopu-tahteavalduse-korduma-kippuvad-kusimused"},
+    "tehik-rad-tellitav": {"n": "TEHIK Teabekeskus: Tellitavad radioloogilised protseduurid", "u": "https://teabekeskus.tehik.ee/et/loendid/tellitavad-radioloogilised-protseduurid"},
+    "akk-rad-tellitav": {"n": "AKK: Tellitavad radioloogilised protseduurid (detailvaade)", "u": "https://akk.tehik.ee/classifier/resources/value-sets/tellitavad-radioloogilised-protseduurid/summary"},
+    "tehik-kehapool": {"n": "TEHIK Teabekeskus: Kehapool", "u": "https://teabekeskus.tehik.ee/et/loendid/kehapool"},
+    "tehik-rad-liik": {"n": "TEHIK Teabekeskus: Radioloogilise protseduuri liik", "u": "https://teabekeskus.tehik.ee/et/loendid/radioloogilise-uuringu-liik"},
+    "tehik-kehapiirkond": {"n": "TEHIK Teabekeskus: Kehapiirkond", "u": "https://teabekeskus.tehik.ee/et/loendid/kehapiirkond"},
+    "at-rad-valdkonnad": {"n": "Airtable (J. Juurmaa): Valdkonnad", "u": "https://airtable.com/appFEgmpScTyr2Rro/shr0sECkpZLEDxz8K"},
+    "at-rad-piirkonnad": {"n": "Airtable (J. Juurmaa): Piirkonnad ja allpiirkonnad", "u": "https://airtable.com/appFEgmpScTyr2Rro/shrvfHCjZvzB48Wv4"},
+    "at-rad-kehaosad": {"n": "Airtable (J. Juurmaa): Kehaosad", "u": "https://airtable.com/appFEgmpScTyr2Rro/shrLMW5o5U9fC81kR"},
+    "at-rad-kataloog": {"n": "Airtable (J. Juurmaa): Protseduuride kataloog", "u": "https://airtable.com/appFEgmpScTyr2Rro/shreSEmp5DSQCYluu"}
   },
   "teemad": [
     {
@@ -600,6 +609,46 @@
          "kontroll": [["raks", "§ 72", "ambulatoorse eriarstiabi visiiditasu piirmäär on 20 eurot"], ["raks", "§ 70", "sellesama tervishoiuteenuse osutaja teise tervishoiutöötaja"]]}
       ],
       "lingid": ["tk-ekons", "tk-ekons-erialad", "tk-ttl-juhendid"]
+    },
+    {
+      "k": "radioloogia-tellimine",
+      "kontrollitud": "2026-10-30",
+      "grupp": "Ravimid, suunamine ja hüvitised",
+      "n": "Radioloogiliste protseduuride tellimine: uus tellimise loend saatekirjal",
+      "sn": "Radioloogia tellimise loend",
+      "seotud": ["ekons", "dokumenteerimine"],
+      "syn": ["radioloogia", "radioloogiline", "radioloogiline uuring", "radioloogiline protseduur", "radioloogia saatekiri", "saatekiri radioloogiale", "pildidiagnostika", "tellimine", "tellimise loend", "protseduuride tellimise loend", "tellitavad protseduurid", "tellitavad radioloogilised protseduurid", "protseduuride kataloog", "tellimuse kataloog", "röntgen", "rö", "röntgenuuring", "KT", "kompuutertomograafia", "MRT", "magnetresonantstomograafia", "ultraheli", "UH", "UHU", "mammograafia", "kehapool", "kehapiirkond", "allpiirkond", "kehaosa", "modaliteet", "valdkond", "protseduuri valdkond", "protseduuri liik", "radioloogilise protseduuri liik", "radioloogilise uuringu liik", "SNOMED", "AKK", "Teabekeskus", "airtable", "Juurmaa", "TTL kood saatekirjal", "uuringu saatekiri", "protseduuri saatekiri"],
+      "tabelid_lopus": true,
+      "tabelid": [
+        {"n": "Tellimise loend ja sellega seotud loendid (TEHIK Teabekeskus)", "pais": ["Loend", "Mida määrab", "Kehtiv versioon"], "read": [[["Tellitavad radioloogilised protseduurid", "https://teabekeskus.tehik.ee/et/loendid/tellitavad-radioloogilised-protseduurid"], "milliseid protseduure saab tellida; igaüks seotud kehapiirkonna, kehapoole ja liigiga", "2.0.0 alates 13.10.2026"], [["Kehapool", "https://teabekeskus.tehik.ee/et/loendid/kehapool"], "millist kehapoolt protseduur puudutab", "1.0.0 alates 25.09.2025"], [["Radioloogilise protseduuri liik", "https://teabekeskus.tehik.ee/et/loendid/radioloogilise-uuringu-liik"], "millise seadme või modaliteediga („millises kabinetis“)", "4.0.0 alates 13.10.2026"], [["Kehapiirkond", "https://teabekeskus.tehik.ee/et/loendid/kehapiirkond"], "millist anatoomilist piirkonda või struktuuri protseduur puudutab", "5.0.0 alates 03.10.2025"]], "markus": "Koodid ja täisloend on AKK detailvaates (link Teabekeskuse lehel). Teostatud protseduuri dokumenteerimiseks kasutatakse endiselt loendit „Radioloogiline uuring“.",
+         "allikas": ["tehik-rad-tellitav", "tehik-kehapool", "tehik-rad-liik", "tehik-kehapiirkond"]}
+      ],
+      "read": [
+        {"p": "Mis muutub", "s": "Radioloogilise uuringu või protseduuri saatekirjal valitakse tellitav protseduur TEHIK-u loendist „Tellitavad radioloogilised protseduurid“. Koolituse teate järgi vahetab see välja saatekirjal seni kasutatud tervishoiuteenuste loetelu (TTL) koodid. Teabekeskuse lehed üleminekut ega selle tähtaega ei nimeta (vt erinevused).",
+         "allikas": ["tehik-rad-tellitav"]},
+        {"p": "Tellimise loend", "s": "Loend on mõeldud tervishoiuteenuse osutajate infosüsteemidele tellimuse edastamiseks. Iga protseduur on seotud kehapiirkonna, kehapoole ja modaliteediga. Versioon 2.0.0 kehtib alates 13.10.2026: koodisüsteem vahetati uue koodiformaadiga ja lisandusid rasedusaegsed ultraheliuuringud. Esimene versioon 1.0.0 kehtis 03.10.2025–12.10.2026. Tehtud protseduuri dokumenteeritakse endiselt loendi „Radioloogiline uuring“ järgi, sest selle mõistetel on tunnuseid, mis tellimisel ei ole olulised.",
+         "allikas": ["tehik-rad-tellitav", "akk-rad-tellitav"]},
+        {"p": "Kehapool", "s": "Määrab, millist kehapoolt protseduur puudutab. SNOMED CT põhine loend, versioon 1.0.0 alates 25.09.2025; sellest on ehitatud tellitavate protseduuride kataloog.",
+         "allikas": ["tehik-kehapool"]},
+        {"p": "Protseduuri liik (valdkond)", "s": "Vastab küsimusele, millise seadmega või millises kabinetis protseduur tehakse. Teabekeskuses on loendi nimi „Radioloogilise protseduuri liik“ (kuni 3. versioonini „radioloogilise uuringu liik“, aadress ja OID on vana nimega). Versioon 4.0.0 alates 13.10.2026 lisas rasedusaegse ultraheli eraldi valdkonnana; see on praegu ingliskeelne ja saab eestikeelse vaste pärast SNOMED-i laienduse avaldamist 30.11.2026.",
+         "allikas": ["tehik-rad-liik"]},
+        {"p": "Kehapiirkond", "s": "Määrab, millist anatoomilist struktuuri või struktuuride kombinatsiooni protseduur puudutab. Versioon 5.0.0 (alates 03.10.2025) on SNOMED-põhine ja kahetasandiline: esimesel tasandil eelmise versiooni piirkonnad (nt peapiirkond), teisel täpsem paige (nt kõrv). Loend on kasutusel ka saatekirja vastusel.",
+         "allikas": ["tehik-kehapiirkond"]},
+        {"p": "Airtable'i vaated", "s": "Dr Julius Juurmaa koolitusel näidatud vaated (valdkonnad, piirkonnad ja allpiirkonnad, kehaosad, protseduuride kataloog) on Teabekeskuse omadest paremini hoomatavad ja sisaldavad ka teiste erialade valdkondi, mis on alles välja töötamisel. Kehtiva loendi avaldab TEHIK Teabekeskuses ja AKK-s; Airtable'i sisu võib sellest erineda.",
+         "allikas": ["at-rad-valdkonnad", "at-rad-piirkonnad", "at-rad-kehaosad", "at-rad-kataloog"]},
+        {"p": "Õiguslik alus", "s": "Dokumenteerimisel tuleb kasutada riigi infosüsteemis ettenähtud klassifikaatoreid, loendeid ja tervise infosüsteemi standardeid (TTKS § 4² lg 1). Uuringu, protseduuri ja analüüsi saatekirja andmekoosseisus (määruse nr 53 lisa 3, 01.12.2025 määruse nr 65 sõnastuses) on väli „uuring, protseduur, analüüs, millele suunatud“, kuid loendit määrus ei nimeta. Uues andmekoosseisus tuli saatekiri TIS-i esitada hiljemalt 01.06.2026 (§ 5 lg 14).",
+         "allikas": [["ttks", "§ 4²"], ["andmekoosseisud", "lisa 3"], ["andmekoosseisud", "§ 5"]],
+         "kontroll": [["ttks", "§ 4²", "kasutada riigi infosüsteemis ettenähtud klassifikaatoreid, loendeid"], ["andmekoosseisud", "§ 5", "uuringu, protseduuri ja analüüsi saatekirja esitavad tervishoiuteenuse osutajad tervise infosüsteemi hiljemalt 1. juunist 2026"]]}
+      ],
+      "erinevused": [
+        {"s": "Koolituse materjalis on loendi nimi „Protseduuri valdkond“ ja Airtable'is „Valdkonnad“; Teabekeskuses on sama loend nimega „Radioloogilise protseduuri liik“ ja aadressis on endine nimi „radioloogilise-uuringu-liik“.",
+         "allikas": ["tehik-rad-liik", "at-rad-valdkonnad"]},
+        {"s": "Teabekeskuse lehed ei ütle, et tellimise loend asendab saatekirjal tervishoiuteenuste loetelu, ega nimeta kohustusliku ülemineku kuupäeva; ka saatekirja andmekoosseis (määruse nr 53 lisa 3) loendit ei nimeta. Ülemineku aeg ja see, millal uus valik perearsti infosüsteemi jõuab, tuleb koolitusel üle küsida.",
+         "allikas": ["tehik-rad-tellitav", ["andmekoosseisud", "lisa 3"]]},
+        {"s": "Tellimise loendi versioon 2.0.0 (13.10.2026) vahetas koodisüsteemi ja koodiformaadi. Versiooni 1.0.0 (03.10.2025–12.10.2026) koodid ei pruugi uuega klappida, kui mõni süsteem või väljavõte neid veel kasutab.",
+         "allikas": ["tehik-rad-tellitav"]}
+      ],
+      "lingid": ["tehik-rad-tellitav", "akk-rad-tellitav", "tehik-kehapool", "tehik-rad-liik", "tehik-kehapiirkond", "at-rad-valdkonnad", "at-rad-piirkonnad", "at-rad-kehaosad", "at-rad-kataloog"]
     },
     {
       "k": "patsiendihuvitised",
