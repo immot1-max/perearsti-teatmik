@@ -2,7 +2,7 @@ name: Andmete kontroll
 
 on:
   schedule:
-    - cron: "17 4 3 * *"   # iga kuu 3. kuupäeval kell 04:17 UTC (07:17 Eesti suveajal)
+    - cron: "17 4 3 * *"   # iga kuu 3. kuupäeval kell 04:17 UTC (Eesti aja järgi 07:17 suvel, 06:17 talvel)
   workflow_dispatch:
   push:
     branches: [main]
@@ -34,14 +34,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
-      - name: Riigi Teataja vahemälu
-        uses: actions/cache@v4
+      # Vahemälu taastatakse ja salvestatakse eraldi sammudes, et ka katkenud ehituse
+      # järel jääks alla laaditud Riigi Teataja tekst järgmiseks korraks alles.
+      - name: Riigi Teataja vahemälu (taastamine)
+        id: cache
+        uses: actions/cache/restore@v6
         with:
           path: build/cache
           key: rt-${{ hashFiles('build/sources.json') }}-${{ github.run_id }}
@@ -50,11 +53,20 @@ jobs:
       - name: Sõltuvused
         run: pip install openpyxl pdfplumber lxml
 
+      # Sammu ajapiir on väiksem kui töö oma, et vahemälu salvestamine ja veateade jõuaksid ka siis toimuda.
       - name: Kontrolli ja ehita
         id: b
+        timeout-minutes: 32
         env:
           PYTHONUNBUFFERED: "1"
         run: python build/build.py
+
+      - name: Riigi Teataja vahemälu (salvestamine)
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: build/cache
+          key: ${{ steps.cache.outputs.cache-primary-key }}
 
       - name: Salvesta uued andmed
         if: steps.b.outputs.changed == 'true'
@@ -71,6 +83,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh issue create --title "Teatmiku andmed uuenesid $(date +%d.%m.%Y)" --body-file build/report.md
+
+      # Andmed muutusteta, kuid osa akte jäi Riigi Teataja tõrke tõttu kontrollimata.
+      - name: Teavita Riigi Teataja tõrkest
+        if: steps.b.outputs.rt == 'true' && steps.b.outputs.changed != 'true' && github.event_name != 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "" >> build/rt_viga.md
+          echo "Logi: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> build/rt_viga.md
+          gh issue create --title "Teatmiku kontroll: Riigi Teataja ei vastanud $(date +%d.%m.%Y)" --body-file build/rt_viga.md
 
       - name: Teavita veast
         if: failure()

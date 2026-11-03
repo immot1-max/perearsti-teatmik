@@ -3,3 +3,4 @@ build/toru/*.xlsx
 __pycache__/
 *.pyc
 .DS_Store
+build/rt_viga.md

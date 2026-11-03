@@ -79,8 +79,36 @@ def http_get(url, timeout=300, tries=6, headers=None):
     raise RuntimeError(f"Päring ebaõnnestus: {url}: {last}")
 
 
+# Riigi Teataja päringute kaitse. Kui RT mitu päringut järjest ei vasta või ajaline eelarve
+# saab otsa, edasisi RT päringuid ei tehta: aktid võetakse eelmisest andmefailist (build, fallback_source)
+# ja vahemälust, et ehitus ei veniks töövoo ajapiirini ega katkeks ühe akti pärast.
+RT_TRIES = 4
+RT_BUDGET = 20 * 60  # sekundit esimesest RT päringust
+RT_FAIL_STOP = 3
+_rt = {"start": None, "fails": 0, "stop": None}
+
+
+def rt_get(url, timeout):
+    if not _rt["stop"]:
+        if _rt["start"] is None:
+            _rt["start"] = time.time()
+        elif time.time() - _rt["start"] > RT_BUDGET:
+            _rt["stop"] = f"ajaline eelarve {RT_BUDGET // 60} min täis"
+    if _rt["stop"]:
+        raise RuntimeError(f"Riigi Teataja päringud peatatud: {_rt['stop']}")
+    try:
+        data = http_get(url, timeout=timeout, tries=RT_TRIES)
+    except Exception:
+        _rt["fails"] += 1
+        if _rt["fails"] >= RT_FAIL_STOP:
+            _rt["stop"] = f"{RT_FAIL_STOP} päringut järjest ebaõnnestus"
+        raise
+    _rt["fails"] = 0
+    return data
+
+
 def api_json(path):
-    return json.loads(http_get(API + path, timeout=60))
+    return json.loads(rt_get(API + path, timeout=60))
 
 
 def api_meta(akt_id, cache_dir):
@@ -104,7 +132,7 @@ def fetch_xml(akt_id, cache_dir):
     if p and os.path.exists(p):
         with open(p, encoding="utf-8") as f:
             return f.read()
-    data = http_get(f"{API}/akt/{akt_id}/xml").decode("utf-8")
+    data = rt_get(f"{API}/akt/{akt_id}/xml", timeout=180).decode("utf-8")
     if p:
         os.makedirs(cache_dir, exist_ok=True)
         with open(p, "w", encoding="utf-8") as f:
@@ -162,6 +190,21 @@ def resolve_current(grupi_id, cache_dir, depth=0, pre=None):
         "url": RT + str(kid),
         "_chain": chain,
     }, xml
+
+
+def fallback_source(ps, cache_dir):
+    """Riigi Teataja tõrke korral akti eelmise ehituse andmed (meta.sources) ja tekst vahemälust.
+    Kui eelmise ehituse tulevane redaktsioon on vahepeal jõustunud, võetakse see kehtivaks.
+    Kui teksti ei ole vahemälus ega saa ka kätte, tõstab vea."""
+    info = {k: ps.get(k) for k in ("grupiId", "id", "pealkiri", "alates", "kuni", "tulevased", "url")}
+    today = TODAY.isoformat()
+    fut = info.get("tulevased") or []
+    due = [f for f in fut if f.get("alates") and f["alates"] <= today]
+    if due:
+        rest = [f for f in fut if f not in due]
+        info.update(id=due[-1]["id"], alates=due[-1]["alates"], url=RT + due[-1]["id"], tulevased=rest,
+                    kuni=(dt.date.fromisoformat(rest[0]["alates"]) - dt.timedelta(days=1)).isoformat() if rest else None)
+    return info, fetch_xml(info["id"], cache_dir)
 
 
 # ----------------------------------------------------------------- XML tekst
@@ -1050,18 +1093,23 @@ def build(args):
     with open(os.path.join(HERE, "sources.json"), encoding="utf-8") as f:
         sources_cfg = json.load(f)
 
+    out_path = os.path.join(ROOT, "data", "data.json")
+    prev = None
+    if os.path.exists(out_path):
+        with open(out_path, encoding="utf-8") as f:
+            prev = json.load(f)
+
     # 1. kehtivad redaktsioonid
     sources, xmls, chains = {}, {}, {}
-    for key, cfg in sources_cfg.items():
-        print(f"[RT] {key}", flush=True)
+    incomplete = set()  # aktid, mille redaktsioonide ahel jäi poolikuks: „Mis muutus“ kirjed võetakse eelmisest andmefailist
+
+    def take(key, cfg):
         old_gid = cfg["grupiId"]
         info, xml = resolve_current(cfg["grupiId"], cache)
         chain = info.pop("_chain")
         info["nimi"] = cfg["nimi"]
         if cfg.get("lyh"):
             info["lyh"] = cfg["lyh"]
-        sources[key] = info
-        xmls[key] = xml
         if str(info["grupiId"]) != str(old_gid):
             cfg["grupiId"] = info["grupiId"]
             # asendatud akti grupp jääb muudatuste vaate jaoks meelde
@@ -1074,10 +1122,62 @@ def build(args):
                 try:
                     pre += content_chain(api_json(f"/akt/{g}/redaktsioonid"))
                 except Exception as e:  # noqa: BLE001
+                    incomplete.add(key)
                     print(f"[hoiatus] {key}: eelmise grupi {g} redaktsioone ei saanud: {e}")
             known = {x["id"] for x in chain}
             chain = sorted([x for x in pre if x["id"] not in known], key=lambda x: x["alates"] or "") + chain
-        chains[key] = chain
+        sources[key], xmls[key], chains[key] = info, xml, chain
+
+    rt_fail = {}
+    for key, cfg in sources_cfg.items():
+        print(f"[RT] {key}", flush=True)
+        try:
+            take(key, cfg)
+        except Exception as e:  # noqa: BLE001
+            rt_fail[key] = str(e)
+            print(f"[hoiatus] {key}: Riigi Teataja päring ebaõnnestus: {e}", flush=True)
+    if rt_fail and not _rt["stop"]:
+        time.sleep(60)
+        for key in list(rt_fail):
+            print(f"[RT] {key} (uus katse)", flush=True)
+            try:
+                take(key, sources_cfg[key])
+                del rt_fail[key]
+            except Exception as e:  # noqa: BLE001
+                rt_fail[key] = str(e)
+    # Ebaõnnestunud aktid eelmisest andmefailist ja vahemälust; kui ka see ei õnnestu, ehitust ei tehta.
+    rt_warn = []
+    for key, err in rt_fail.items():
+        cfg = sources_cfg[key]
+        ps = ((prev or {}).get("meta") or {}).get("sources", {}).get(key)
+        try:
+            if not ps:
+                raise RuntimeError("eelmist seisu ei ole")
+            info, xml = fallback_source(ps, cache)
+        except Exception as e:  # noqa: BLE001
+            raise RuntimeError(f"Riigi Teataja ei vastanud ({key}: {err}) ja eelmist seisu ei saanud kasutada ({e}). "
+                               "Andmeid ei uuendatud.") from None
+        info["nimi"] = cfg["nimi"]
+        if cfg.get("lyh"):
+            info["lyh"] = cfg["lyh"]
+        sources[key], xmls[key], chains[key] = info, xml, []
+        incomplete.add(key)
+        msg = f"{info.get('lyh') or info['nimi']}: Riigi Teataja ei vastanud, kasutati eelmist seisu ({info['id']}). Viga: {err[:200]}"
+        rt_warn.append(msg)
+        print(f"[hoiatus] {msg}", flush=True)
+    sources = {k: sources[k] for k in sources_cfg}
+    # Avaldatud tulevaste redaktsioonide tekst vahemällu (üks kord ID kohta), et pärast nende jõustumist
+    # saaks Riigi Teataja tõrke korral kasutada juba kehtima hakanud redaktsiooni (fallback_source).
+    for key, info in sources.items():
+        for f in info.get("tulevased") or []:
+            if _rt["stop"]:
+                break
+            try:
+                fetch_xml(f["id"], cache)
+            except Exception as e:  # noqa: BLE001
+                print(f"[hoiatus] {key}: tulevase redaktsiooni {f['id']} teksti ei saanud vahemällu: {e}", flush=True)
+    if _rt["stop"]:
+        print(f"[hoiatus] Riigi Teataja päringud peatati: {_rt['stop']}", flush=True)
 
     toru_dir = os.path.join(HERE, "toru")
     aux_hash = hashlib.sha256()
@@ -1091,11 +1191,6 @@ def build(args):
         with open(ex_path, "rb") as f:
             aux_hash.update(f.read())
 
-    out_path = os.path.join(ROOT, "data", "data.json")
-    prev = None
-    if os.path.exists(out_path):
-        with open(out_path, encoding="utf-8") as f:
-            prev = json.load(f)
     tk = tk_ks_docs(prev["meta"] if prev else None)
     if tk:
         aux_hash.update(json.dumps(tk["docs"], sort_keys=True).encode())
@@ -1125,9 +1220,10 @@ def build(args):
     aux_hash.update(json.dumps({k: [v.get("uuendatud"), v.get("sha"), (v.get("vigu") or 0) >= 2] for k, v in sorted(jalgimine.items())},
                                ensure_ascii=False).encode())
     fingerprint = "|".join([BUILD_VERSION] + [f"{k}:{v['id']}:{','.join(x['id'] for x in v['tulevased'])}" for k, v in sorted(sources.items())] + [aux_hash.hexdigest()[:16]])
+    write_rt_note(rt_warn)
     if prev and prev["meta"].get("fingerprint") == fingerprint and not args.force:
-        print("Muudatusi ei ole.")
-        write_output(args, changed=False)
+        print("Muudatusi ei ole." + (" Riigi Teataja tõrke tõttu jäi osa akte kontrollimata (build/rt_viga.md)." if rt_warn else ""))
+        write_output(args, changed=False, rt=bool(rt_warn))
         return
 
     with open(os.path.join(HERE, "sources.json"), "w", encoding="utf-8") as f:
@@ -1385,11 +1481,12 @@ def build(args):
     # metoodika lisad: teenuste standardkulu komponendid ja e-konsultatsiooni nõuded erialade kaupa
     ml = met_lisad.lisad_info(xmls["metoodika"], met["id"], cache, aktilisa_url)
     dyn["ekons"] = ml.get("ekons")
-    fut_cache = {}
+    fut_cache, fut_warn = {}, []
 
     def text_at(src, date):
         """Teemakaardi välja „alates“ jaoks: sel kuupäeval kehtima hakkava, juba avaldatud
-        redaktsiooni sätete tekst ja lisad. Kui kuupäev on käes või tulevast redaktsiooni pole, None."""
+        redaktsiooni sätete tekst ja lisad. Kui kuupäev on käes, tulevast redaktsiooni pole
+        või selle teksti ei saanud (Riigi Teataja tõrge), None."""
         if not date or date <= TODAY.isoformat():
             return None
         cand = [f for f in (sources.get(src) or {}).get("tulevased") or [] if f["alates"] <= date]
@@ -1397,7 +1494,13 @@ def build(args):
             return None
         rid = cand[-1]["id"]
         if rid not in fut_cache:
-            fxml = fetch_xml(rid, cache)
+            try:
+                fxml = fetch_xml(rid, cache)
+            except Exception as e:  # noqa: BLE001
+                fut_cache[rid] = None
+                fut_warn.append(f"{sources[src].get('lyh') or src}: tulevase redaktsiooni {rid} teksti ei saanud ({str(e)[:120]}); "
+                                "kaardi kontroll tehti kehtiva teksti järgi")
+                return None
             fpars, _ = walk_act(fxml)
             pt = {}
             for p in fpars:
@@ -1407,13 +1510,13 @@ def build(args):
         return fut_cache[rid]
 
     teema_items, teema_warn = build_teemad(teemad_cfg, sources, par_text, dyn, lisad, text_at)
-    teema_warn = hu_warn + imm_warn + ml.get("warn", []) + fund_warn + teema_warn
+    teema_warn = hu_warn + imm_warn + ml.get("warn", []) + fund_warn + fut_warn + teema_warn
     items.extend(teema_items)
     teema_warn += link_teema_codes(teemad_cfg, by_code, text_rules, rules, sources)
 
     # 7d. mis muutus: jõustunud (viimase aasta) ja avaldatud tulevaste redaktsioonide vahe
     muut, muut_warn = muutused.compute(sys.modules[__name__], sources_cfg, sources, chains, cache,
-                                       (prev or {}).get("muutused"), TODAY)
+                                       (prev or {}).get("muutused"), TODAY, incomplete=incomplete)
     teema_warn += muut_warn
 
     # 8. fondid, ravijuhendid, lingid, sünonüümid
@@ -1472,6 +1575,7 @@ def build(args):
         "tk": tk,
         "ksNotes": ks_notes.get("_meta"),
         "rj": rj_meta,
+        "rtWarn": rt_warn,
     }
     kulu = ml.get("kulu")
     if kulu:
@@ -1488,14 +1592,31 @@ def build(args):
     with open(os.path.join(HERE, "report.md"), "w", encoding="utf-8") as f:
         f.write(report)
     print(report)
-    write_output(args, changed=True)
+    write_output(args, changed=True, rt=bool(rt_warn))
 
 
-def write_output(args, changed):
+def write_output(args, changed, rt=False):
     gh = os.environ.get("GITHUB_OUTPUT")
     if gh:
         with open(gh, "a") as f:
             f.write(f"changed={'true' if changed else 'false'}\n")
+            f.write(f"rt={'true' if rt else 'false'}\n")
+
+
+def write_rt_note(rt_warn):
+    """build/rt_viga.md: töövoo teavitus, kui Riigi Teataja tõrke tõttu kasutati eelmist seisu (failil pole muud rolli)."""
+    p = os.path.join(HERE, "rt_viga.md")
+    if not rt_warn:
+        if os.path.exists(p):
+            os.remove(p)
+        return
+    lines = ["Riigi Teataja ei vastanud osale päringutest. Nende aktide puhul kasutati eelmise ehituse seisu; "
+             "andmed on kehtivad eelmise kontrolli seisuga. Järgmine kontroll proovib uuesti.", ""]
+    if _rt["stop"]:
+        lines += [f"Päringud peatati: {_rt['stop']}.", ""]
+    lines += [f"- {w}" for w in rt_warn]
+    with open(p, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
 
 
 def fmt_date(iso):
@@ -1677,6 +1798,11 @@ def parse_abivahendid(xml):
 def make_report(prev, data, missing):
     lines = [f"# Andmete uuendus {fmt_date(data['meta']['date'])}", ""]
     ns = data["meta"]["sources"]
+    rtw = data["meta"].get("rtWarn") or []
+    if rtw:
+        lines.append("## Riigi Teataja ei vastanud: kasutati eelmist seisu")
+        lines += [f"- {w}" for w in rtw]
+        lines.append("")
     lines.append("## Allikad")
     for k, s in ns.items():
         old = prev["meta"]["sources"].get(k, {}).get("id") if prev else None

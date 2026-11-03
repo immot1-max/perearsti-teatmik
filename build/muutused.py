@@ -266,8 +266,9 @@ def diff_pair(B, key, cfg, a, b, xa, xb):
     return e
 
 
-def compute(B, sources_cfg, sources, chains, cache, prev_list, today, days=365):
-    """Arvutab kõik kirjed. chains[key] = sisuga redaktsioonid kuupäeva järgi (ka tulevased)."""
+def compute(B, sources_cfg, sources, chains, cache, prev_list, today, days=365, incomplete=()):
+    """Arvutab kõik kirjed. chains[key] = sisuga redaktsioonid kuupäeva järgi (ka tulevased).
+    incomplete: aktid, mille ahel jäi Riigi Teataja tõrke tõttu poolikuks; nende eelmised kirjed võetakse üle."""
     import datetime as dt
     cutoff = (today - dt.timedelta(days=days)).isoformat()
     prev = {x["k"]: x for x in (prev_list or []) if x.get("v") == version(x.get("src"))}
@@ -293,6 +294,14 @@ def compute(B, sources_cfg, sources, chains, cache, prev_list, today, days=365):
                      "u": B.RT + b["id"], "eu": B.RT + a["id"], "tyhi": True}
             out.append(e)
             print(f"[muutus] {key} {a['alates']} → {b['alates']}", flush=True)
+    have = {e["k"] for e in out}
+    for x in prev_list or []:
+        if x.get("src") in incomplete and x["k"] not in have and (x.get("alates") or "") >= cutoff:
+            out.append(x)
+            have.add(x["k"])
+    # sama kuupäeva kirjed allikate järjekorras (üle võetud kirjed lisati lõppu)
+    order = {k: i for i, k in enumerate(sources_cfg)}
+    out.sort(key=lambda x: order.get(x["src"], len(order)))
     for e in out:
         s = sources.get(e["src"]) or {}
         e["n"] = s.get("nimi") or e["src"]
