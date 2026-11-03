@@ -52,13 +52,18 @@ FUND_SUB = {"f13": "keskuse enda füsioterapeut, psühholoog, logopeed"}
 _last_call = {}
 
 
+# Riigi Teataja päringute vahe sekundites. GitHubi serveritele vastab RT juba paarikümne kiire päringu
+# järel 429-ga (03.11.2026), seepärast seab töövoog selle suuremaks (keskkonnamuutuja RT_VAHE).
+RT_SPACING = float(os.environ.get("RT_VAHE") or 1.5)
+
+
 def http_get(url, timeout=300, tries=6, headers=None):
-    """GET koos ettevaatliku tempoga: sama hosti päringute vahel vähemalt 0,6 s;
+    """GET koos ettevaatliku tempoga: sama hosti päringute vahel vähemalt 0,6 s (Riigi Teatajal RT_SPACING);
     vastuse 429 (liiga palju päringuid) korral oodatakse Retry-After või kasvava pausi võrra."""
     host = urllib.parse.urlsplit(url).netloc
-    last = None
+    last, ra = None, None
     for i in range(tries):
-        wait = (1.5 if "riigiteataja" in host else 0.6) - (time.time() - _last_call.get(host, 0))
+        wait = (RT_SPACING if "riigiteataja" in host else 0.6) - (time.time() - _last_call.get(host, 0))
         if wait > 0:
             time.sleep(wait)
         _last_call[host] = time.time()
@@ -76,7 +81,7 @@ def http_get(url, timeout=300, tries=6, headers=None):
         except Exception as e:  # noqa: BLE001
             last = e
             time.sleep(3 * (i + 1))
-    raise RuntimeError(f"Päring ebaõnnestus: {url}: {last}")
+    raise RuntimeError(f"Päring ebaõnnestus: {url}: {last}" + (f" (Retry-After: {ra})" if ra else ""))
 
 
 # Riigi Teataja päringute kaitse. Kui RT mitu päringut järjest ei vasta või ajaline eelarve
@@ -154,16 +159,36 @@ def content_chain(red):
     return sorted(out, key=lambda x: x["alates"] or "")
 
 
-def resolve_current(grupi_id, cache_dir, depth=0, pre=None):
+def resolve_current(grupi_id, cache_dir, depth=0, pre=None, prev_src=None):
     """Leiab grupi kehtiva redaktsiooni. Kui akt on kehtetuks tunnistatud ja
     asendatud uue aktiga (nagu tervishoiuteenuste loeteluga juhtub), järgib
     kehtetuks tunnistamise märget uue aktini. info["_chain"] on sisuga redaktsioonide
-    ahel koos asendatud akti(de) redaktsioonidega (muudatuste vaate jaoks)."""
+    ahel koos asendatud akti(de) redaktsioonidega (muudatuste vaate jaoks).
+    prev_src: eelmise ehituse meta.sources kirje; kui kehtiv redaktsioon on sama, võetakse
+    pealkiri ja kehtivus sealt (üks RT päring vähem)."""
     if depth > 4:
         raise RuntimeError("Liiga pikk asendusaktide ahel")
     red = api_json(f"/akt/{grupi_id}/redaktsioonid")
     chain = (pre or []) + content_chain(red)
     kid = red["kehtivRedaktsioon"]
+    future = sorted(({"id": str(r["id"]), "alates": utc_to_local_date(r["kehtivuseAlgus"])} for r in red["redaktsioonid"]
+                     if utc_to_local_date(r["kehtivuseAlgus"]) and utc_to_local_date(r["kehtivuseAlgus"]) > TODAY.isoformat()),
+                    key=lambda x: x["alates"])
+    if (prev_src and depth == 0 and str(prev_src.get("id")) == str(kid) and str(prev_src.get("grupiId")) == str(grupi_id)
+            and prev_src.get("pealkiri")):
+        # Sama redaktsioon kui eelmisel ehitusel: kehtetuks tunnistamine looks uue redaktsiooni, seega akt kehtib.
+        # Kehtivuse lõpp: järgmise avaldatud redaktsiooni jõustumisele eelnev päev, muidu eelmine väärtus.
+        kuni = (dt.date.fromisoformat(future[0]["alates"]) - dt.timedelta(days=1)).isoformat() if future else prev_src.get("kuni")
+        return {
+            "grupiId": grupi_id,
+            "id": str(kid),
+            "pealkiri": prev_src["pealkiri"],
+            "alates": prev_src.get("alates"),
+            "kuni": kuni,
+            "tulevased": future,
+            "url": RT + str(kid),
+            "_chain": chain,
+        }, fetch_xml(kid, cache_dir)
     meta = api_meta(kid, cache_dir)
     xml = fetch_xml(kid, cache_dir)
     body = re.sub(r"<metaandmed>.*?</metaandmed>", "", xml, flags=re.S)
@@ -174,11 +199,6 @@ def resolve_current(grupi_id, cache_dir, depth=0, pre=None):
         new_id = re.search(r"<aktViide[^>]*>(\d+)</aktViide>", m.group(1)).group(1)
         new_meta = api_meta(new_id, cache_dir)
         return resolve_current(new_meta["grupiId"], cache_dir, depth + 1, pre=chain)
-    future = []
-    for r in red["redaktsioonid"]:
-        alg = utc_to_local_date(r["kehtivuseAlgus"])
-        if alg and alg > TODAY.isoformat():
-            future.append({"id": str(r["id"]), "alates": alg})
     ap = meta["aktiParameetrid"]
     return {
         "grupiId": grupi_id,
@@ -186,7 +206,7 @@ def resolve_current(grupi_id, cache_dir, depth=0, pre=None):
         "pealkiri": ap["pealkiri"],
         "alates": utc_to_local_date(ap.get("kehtivuseAlgus")),
         "kuni": utc_to_local_date(ap.get("kehtivuseLopp")),
-        "tulevased": sorted(future, key=lambda x: x["alates"]),
+        "tulevased": future,
         "url": RT + str(kid),
         "_chain": chain,
     }, xml
@@ -1103,9 +1123,11 @@ def build(args):
     sources, xmls, chains = {}, {}, {}
     incomplete = set()  # aktid, mille redaktsioonide ahel jäi poolikuks: „Mis muutus“ kirjed võetakse eelmisest andmefailist
 
+    prev_sources = ((prev or {}).get("meta") or {}).get("sources") or {}
+
     def take(key, cfg):
         old_gid = cfg["grupiId"]
-        info, xml = resolve_current(cfg["grupiId"], cache)
+        info, xml = resolve_current(cfg["grupiId"], cache, prev_src=prev_sources.get(key))
         chain = info.pop("_chain")
         info["nimi"] = cfg["nimi"]
         if cfg.get("lyh"):
@@ -1155,8 +1177,10 @@ def build(args):
                 raise RuntimeError("eelmist seisu ei ole")
             info, xml = fallback_source(ps, cache)
         except Exception as e:  # noqa: BLE001
-            raise RuntimeError(f"Riigi Teataja ei vastanud ({key}: {err}) ja eelmist seisu ei saanud kasutada ({e}). "
-                               "Andmeid ei uuendatud.") from None
+            fatal = (f"{cfg.get('lyh') or cfg['nimi']}: Riigi Teataja ei vastanud ja eelmist seisu ei saanud kasutada, "
+                     f"sest redaktsiooni teksti ei ole vahemälus ({str(e)[:160]}). Viga: {err[:200]}")
+            write_rt_note(rt_warn + [fatal], fatal=True)
+            raise RuntimeError(f"{fatal} Andmeid ei uuendatud.") from None
         info["nimi"] = cfg["nimi"]
         if cfg.get("lyh"):
             info["lyh"] = cfg["lyh"]
@@ -1603,15 +1627,20 @@ def write_output(args, changed, rt=False):
             f.write(f"rt={'true' if rt else 'false'}\n")
 
 
-def write_rt_note(rt_warn):
-    """build/rt_viga.md: töövoo teavitus, kui Riigi Teataja tõrke tõttu kasutati eelmist seisu (failil pole muud rolli)."""
+def write_rt_note(rt_warn, fatal=False):
+    """build/rt_viga.md: töövoo teavitus Riigi Teataja tõrkest (failil pole muud rolli)."""
     p = os.path.join(HERE, "rt_viga.md")
     if not rt_warn:
         if os.path.exists(p):
             os.remove(p)
         return
-    lines = ["Riigi Teataja ei vastanud osale päringutest. Nende aktide puhul kasutati eelmise ehituse seisu; "
-             "andmed on kehtivad eelmise kontrolli seisuga. Järgmine kontroll proovib uuesti.", ""]
+    if fatal:
+        lines = ["Riigi Teataja ei vastanud ja vähemalt ühe akti puhul ei saanud eelmist seisu kasutada, "
+                 "seega andmeid ei uuendatud (avaldatud andmed jäävad eelmise kontrolli seisu). "
+                 "Selle käivituse jooksul alla laaditud tekst salvestatakse vahemällu ja järgmine käivitus saab seda kasutada.", ""]
+    else:
+        lines = ["Riigi Teataja ei vastanud osale päringutest. Nende aktide puhul kasutati eelmise ehituse seisu; "
+                 "andmed on kehtivad eelmise kontrolli seisuga. Järgmine kontroll proovib uuesti.", ""]
     if _rt["stop"]:
         lines += [f"Päringud peatati: {_rt['stop']}.", ""]
     lines += [f"- {w}" for w in rt_warn]

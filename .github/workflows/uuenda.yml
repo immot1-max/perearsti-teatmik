@@ -59,6 +59,8 @@ jobs:
         timeout-minutes: 32
         env:
           PYTHONUNBUFFERED: "1"
+          # Riigi Teataja vastab GitHubi serveritele kiirete päringute järel 429-ga; päringute vahe sekundites.
+          RT_VAHE: "6"
         run: python build/build.py
 
       - name: Riigi Teataja vahemälu (salvestamine)
@@ -99,5 +101,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh issue create --title "Teatmiku andmete kontroll ebaõnnestus $(date +%d.%m.%Y)" \
-            --body "Automaatne kontroll ebaõnnestus. Logi: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          {
+            echo "Automaatne kontroll ebaõnnestus. Logi: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            if [ -f build/rt_viga.md ]; then echo ""; cat build/rt_viga.md; fi
+          } > "$RUNNER_TEMP/viga.md"
+          gh issue create --title "Teatmiku andmete kontroll ebaõnnestus $(date +%d.%m.%Y)" --body-file "$RUNNER_TEMP/viga.md"
