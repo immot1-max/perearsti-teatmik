@@ -11,6 +11,7 @@ Kasutus:
 """
 import argparse
 import base64
+import concurrent.futures
 import datetime as dt
 import glob
 import hashlib
@@ -57,9 +58,29 @@ _last_call = {}
 RT_SPACING = float(os.environ.get("RT_VAHE") or 1.5)
 
 
+_t0 = {"start": time.time(), "last": time.time()}
+
+
+def phase(name):
+    """Ehituse etapi algus logisse koos eelmise etapi kestuse ja kogu ajaga (aeglase koha leidmiseks)."""
+    now = time.time()
+    print(f"[aeg] {name} (eelmine etapp {now - _t0['last']:.0f} s, kokku {now - _t0['start']:.0f} s)", flush=True)
+    _t0["last"] = now
+
+
 def http_get(url, timeout=300, tries=6, headers=None):
     """GET koos ettevaatliku tempoga: sama hosti päringute vahel vähemalt 0,6 s (Riigi Teatajal RT_SPACING);
-    vastuse 429 (liiga palju päringuid) korral oodatakse Retry-After või kasvava pausi võrra."""
+    vastuse 429 (liiga palju päringuid) korral oodatakse Retry-After või kasvava pausi võrra.
+    Üle 20 s kestnud päring märgitakse logisse."""
+    t = time.time()
+    try:
+        return _http_get(url, timeout, tries, headers)
+    finally:
+        if time.time() - t > 20:
+            print(f"[aeglane] {time.time() - t:.0f} s: {url[:150]}", flush=True)
+
+
+def _http_get(url, timeout, tries, headers):
     host = urllib.parse.urlsplit(url).netloc
     last, ra = None, None
     for i in range(tries):
@@ -828,22 +849,31 @@ def imm_lisad(xml):
 def watch_sources(allikad, prev):
     """Jälgib teemakaartide allikaid: veebilehe „Viimati uuendatud“ kuupäev, PDF-i räsi ja kättesaadavus."""
     pw = ((prev or {}).get("meta") or {}).get("jalgimine") or {}
-    out = {}
-    for key, a in allikad.items():
+
+    def one(key, a):
         url = a["u"]
         old = pw.get(key) or {}
         try:
             raw = http_get(url, timeout=45, tries=2)
             if url.lower().endswith(".pdf") or raw[:4] == b"%PDF":
-                out[key] = {"ok": True, "sha": hashlib.sha256(raw).hexdigest()[:16]}
-            else:
-                t = raw.decode("utf-8", "replace")
-                d = re.findall(r"(?:Viimati uuendatud|Uuendatud)[^0-9]{0,40}(\d\d)\.(\d\d)\.(\d{2,4})", re.sub(r"<[^>]+>", " ", t))
-                dates = sorted({(y if len(y) == 4 else "20" + y) + f"-{mo}-{dd}" for dd, mo, y in d})
-                out[key] = {"ok": True, "uuendatud": dates[-1] if dates else None}
+                return {"ok": True, "sha": hashlib.sha256(raw).hexdigest()[:16]}
+            t = raw.decode("utf-8", "replace")
+            d = re.findall(r"(?:Viimati uuendatud|Uuendatud)[^0-9]{0,40}(\d\d)\.(\d\d)\.(\d{2,4})", re.sub(r"<[^>]+>", " ", t))
+            dates = sorted({(y if len(y) == 4 else "20" + y) + f"-{mo}-{dd}" for dd, mo, y in d})
+            return {"ok": True, "uuendatud": dates[-1] if dates else None}
         except Exception as e:  # noqa: BLE001
-            out[key] = dict(old, ok=False, viga=str(e)[:120], vigu=(old.get("vigu") or 0) + 1)
-    return out
+            return dict(old, ok=False, viga=str(e)[:120], vigu=(old.get("vigu") or 0) + 1)
+
+    # Hostid paralleelselt, sama hosti lehed järjest (http_get hoiab hosti kaupa päringute vahet),
+    # et üks aeglane või mittevastav sait ei venitaks kogu ehitust.
+    by_host = {}
+    for key, a in allikad.items():
+        by_host.setdefault(urllib.parse.urlsplit(a["u"]).netloc, []).append((key, a))
+    res = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as ex:
+        for part in ex.map(lambda items: [(k, one(k, a)) for k, a in items], by_host.values()):
+            res.update(part)
+    return {k: res[k] for k in allikad}
 
 
 def build_teemad(cfg, sources, par_text, dyn, lisad, text_at=None):
@@ -1119,6 +1149,7 @@ def build(args):
         with open(out_path, encoding="utf-8") as f:
             prev = json.load(f)
 
+    phase("Riigi Teataja")
     # 1. kehtivad redaktsioonid
     sources, xmls, chains = {}, {}, {}
     incomplete = set()  # aktid, mille redaktsioonide ahel jäi poolikuks: „Mis muutus“ kirjed võetakse eelmisest andmefailist
@@ -1190,6 +1221,7 @@ def build(args):
         rt_warn.append(msg)
         print(f"[hoiatus] {msg}", flush=True)
     sources = {k: sources[k] for k in sources_cfg}
+    phase("tulevased redaktsioonid vahemällu")
     # Avaldatud tulevaste redaktsioonide tekst vahemällu (üks kord ID kohta), et pärast nende jõustumist
     # saaks Riigi Teataja tõrke korral kasutada juba kehtima hakanud redaktsiooni (fallback_source).
     for key, info in sources.items():
@@ -1209,31 +1241,38 @@ def build(args):
                "ravijuhendid.json", "ravijuhendid.py"]:
         with open(os.path.join(HERE, fn), "rb") as f:
             aux_hash.update(f.read())
+    phase("Toru")
     toru_loaded = load_toru_rows(toru_dir)  # xlsx olemasolul uuendab väljavõtet
     ex_path = os.path.join(toru_dir, "toru_valjavote.json")
     if os.path.exists(ex_path):
         with open(ex_path, "rb") as f:
             aux_hash.update(f.read())
 
+    phase("Tervisekassa kvaliteedisüsteem")
     tk = tk_ks_docs(prev["meta"] if prev else None)
     if tk:
         aux_hash.update(json.dumps(tk["docs"], sort_keys=True).encode())
+    phase("SYNLAB")
     labs, synlab_meta = synlab_labs(prev)
     aux_hash.update(json.dumps([[x["n"], x["ab"], x["tk"], x["p"]] for x in labs], ensure_ascii=False).encode())
     with open(os.path.join(HERE, "soeluuringud.json"), encoding="utf-8") as f:
         soel_cfg = json.load(f)
+    phase("sõeluuringud")
     soel_items, soel_meta = soeluuringud(prev, soel_cfg)
     aux_hash.update(json.dumps([[x["k"], x.get("aasta"), x.get("sy"), x.get("vanus"), x.get("int"), x.get("kes"), x.get("osale"), x.get("juhend")]
                                 for x in soel_items] + [soel_meta["warn"]], ensure_ascii=False).encode())
     with open(os.path.join(HERE, "teemad.json"), encoding="utf-8") as f:
         teemad_cfg = json.load(f)
+    phase("Tervisekassa hüvitised")
     huvitised, hu_warn = tk_huvitised(prev)
     if huvitised:
         aux_hash.update(json.dumps([huvitised["rows"], huvitised.get("ylempiir")], ensure_ascii=False, sort_keys=True).encode())
+    phase(f"teemakaartide allikad ({len(teemad_cfg.get('allikad', {}))})")
     jalgimine = watch_sources(teemad_cfg.get("allikad", {}), prev)
     # Ravijuhendid (ravijuhend.ee): loend, juhendite lehed ja valitud lisade eelvaated (pildid kaustas lisad/).
     with open(os.path.join(HERE, "ravijuhendid.json"), encoding="utf-8") as f:
         rj_cfg = json.load(f)
+    phase("ravijuhend.ee")
     print("[ravijuhend.ee] loend ja juhendid", flush=True)
     rj_items, rj_meta = ravijuhendid.collect(http_get, rj_cfg, [x for x in (prev or {}).get("items", []) if x["t"] == "g"],
                                              ROOT, TODAY.isoformat())
@@ -1244,6 +1283,7 @@ def build(args):
     aux_hash.update(json.dumps({k: [v.get("uuendatud"), v.get("sha"), (v.get("vigu") or 0) >= 2] for k, v in sorted(jalgimine.items())},
                                ensure_ascii=False).encode())
     fingerprint = "|".join([BUILD_VERSION] + [f"{k}:{v['id']}:{','.join(x['id'] for x in v['tulevased'])}" for k, v in sorted(sources.items())] + [aux_hash.hexdigest()[:16]])
+    phase("võrdlus eelmise ehitusega")
     write_rt_note(rt_warn)
     if prev and prev["meta"].get("fingerprint") == fingerprint and not args.force:
         print("Muudatusi ei ole." + (" Riigi Teataja tõrke tõttu jäi osa akte kontrollimata (build/rt_viga.md)." if rt_warn else ""))
@@ -1257,6 +1297,7 @@ def build(args):
     items, rules = [], []
     by_code = {}
 
+    phase("andmete koostamine")
     # 2. tervishoiuteenuste loetelu
     ttl = sources["ttl"]
     ttl_pars, _ = walk_act(xmls["ttl"])
@@ -1538,6 +1579,7 @@ def build(args):
     items.extend(teema_items)
     teema_warn += link_teema_codes(teemad_cfg, by_code, text_rules, rules, sources)
 
+    phase("Mis muutus")
     # 7d. mis muutus: jõustunud (viimase aasta) ja avaldatud tulevaste redaktsioonide vahe
     muut, muut_warn = muutused.compute(sys.modules[__name__], sources_cfg, sources, chains, cache,
                                        (prev or {}).get("muutused"), TODAY, incomplete=incomplete)
@@ -1616,6 +1658,7 @@ def build(args):
     with open(os.path.join(HERE, "report.md"), "w", encoding="utf-8") as f:
         f.write(report)
     print(report)
+    phase("valmis")
     write_output(args, changed=True, rt=bool(rt_warn))
 
 
