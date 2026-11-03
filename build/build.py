@@ -68,19 +68,19 @@ def phase(name):
     _t0["last"] = now
 
 
-def http_get(url, timeout=300, tries=6, headers=None):
+def http_get(url, timeout=300, tries=6, headers=None, fail_429=False):
     """GET koos ettevaatliku tempoga: sama hosti päringute vahel vähemalt 0,6 s (Riigi Teatajal RT_SPACING);
-    vastuse 429 (liiga palju päringuid) korral oodatakse Retry-After või kasvava pausi võrra.
-    Üle 20 s kestnud päring märgitakse logisse."""
+    vastuse 429 (liiga palju päringuid) korral oodatakse Retry-After või kasvava pausi võrra,
+    fail_429=True korral loobutakse kohe. Üle 20 s kestnud päring märgitakse logisse."""
     t = time.time()
     try:
-        return _http_get(url, timeout, tries, headers)
+        return _http_get(url, timeout, tries, headers, fail_429)
     finally:
         if time.time() - t > 20:
             print(f"[aeglane] {time.time() - t:.0f} s: {url[:150]}", flush=True)
 
 
-def _http_get(url, timeout, tries, headers):
+def _http_get(url, timeout, tries, headers, fail_429=False):
     host = urllib.parse.urlsplit(url).netloc
     last, ra = None, None
     for i in range(tries):
@@ -97,6 +97,8 @@ def _http_get(url, timeout, tries, headers):
             if e.code == 404:
                 break
             ra = e.headers.get("Retry-After") if e.headers else None
+            if e.code == 429 and fail_429:
+                break
             pause = int(ra) if ra and ra.isdigit() else (20 * (i + 1) if e.code == 429 else 3 * (i + 1))
             time.sleep(min(pause, 120))
         except Exception as e:  # noqa: BLE001
@@ -846,33 +848,70 @@ def imm_lisad(xml):
     return res, warn
 
 
-def watch_sources(allikad, prev):
-    """Jälgib teemakaartide allikaid: veebilehe „Viimati uuendatud“ kuupäev, PDF-i räsi ja kättesaadavus."""
-    pw = ((prev or {}).get("meta") or {}).get("jalgimine") or {}
+def watch_sources(allikad, prev, state_path=None):
+    """Jälgib teemakaartide allikaid: veebilehe „Viimati uuendatud“ kuupäev, PDF-i räsi ja kättesaadavus.
 
-    def one(key, a):
-        url = a["u"]
-        old = pw.get(key) or {}
+    Mitu riigi- ja ülikooli saiti vastab GitHubi serveritele paari päringu järel 429-ga (03.11.2026).
+    Siis selle hosti ülejäänud allikaid sel korral ei kontrollita: need jäävad eelmise seisuga ja
+    märgitakse „kontrollimata“ (see ei ole kättesaamatus). Viimase katse kuupäev hoitakse vahemälus
+    (state_path) ja järgmisel korral proovitakse kõige kauem proovimata allikaid esimesena."""
+    pw = ((prev or {}).get("meta") or {}).get("jalgimine") or {}
+    seen = {}
+    if state_path and os.path.exists(state_path):
         try:
-            raw = http_get(url, timeout=45, tries=2)
+            with open(state_path, encoding="utf-8") as f:
+                seen = json.load(f)
+        except Exception:  # noqa: BLE001
+            seen = {}
+
+    def skipped(old):
+        # Varasem päris viga (mitte 429) jääb alles, kuid kontrollide arv ei kasva.
+        if old.get("ok") is False and "429" not in (old.get("viga") or ""):
+            return dict(old, kontrollimata=True)
+        base = {k: v for k, v in old.items() if k not in ("ok", "viga", "vigu", "kontrollimata")}
+        return dict(base, ok=True, kontrollimata=True)
+
+    def host_run(items):
+        out, blocked = [], False
+        for key, a in items:
+            url, old = a["u"], pw.get(key) or {}
+            if blocked:
+                out.append((key, skipped(old)))
+                continue
+            try:
+                raw = http_get(url, timeout=45, tries=2, fail_429=True)
+            except Exception as e:  # noqa: BLE001
+                if "HTTP Error 429" in str(e):
+                    blocked = True
+                    seen[key] = TODAY.isoformat()  # proovitud: järgmisel korral pole see enam järjekorras esimene
+                    out.append((key, skipped(old)))
+                else:
+                    out.append((key, dict(old, ok=False, viga=str(e)[:120], vigu=(old.get("vigu") or 0) + 1)))
+                continue
+            seen[key] = TODAY.isoformat()
             if url.lower().endswith(".pdf") or raw[:4] == b"%PDF":
-                return {"ok": True, "sha": hashlib.sha256(raw).hexdigest()[:16]}
+                out.append((key, {"ok": True, "sha": hashlib.sha256(raw).hexdigest()[:16]}))
+                continue
             t = raw.decode("utf-8", "replace")
             d = re.findall(r"(?:Viimati uuendatud|Uuendatud)[^0-9]{0,40}(\d\d)\.(\d\d)\.(\d{2,4})", re.sub(r"<[^>]+>", " ", t))
             dates = sorted({(y if len(y) == 4 else "20" + y) + f"-{mo}-{dd}" for dd, mo, y in d})
-            return {"ok": True, "uuendatud": dates[-1] if dates else None}
-        except Exception as e:  # noqa: BLE001
-            return dict(old, ok=False, viga=str(e)[:120], vigu=(old.get("vigu") or 0) + 1)
+            out.append((key, {"ok": True, "uuendatud": dates[-1] if dates else None}))
+        return out
 
-    # Hostid paralleelselt, sama hosti lehed järjest (http_get hoiab hosti kaupa päringute vahet),
+    # Hostid paralleelselt, sama hosti lehed järjest (kõige kauem proovimata esimesena),
     # et üks aeglane või mittevastav sait ei venitaks kogu ehitust.
     by_host = {}
     for key, a in allikad.items():
         by_host.setdefault(urllib.parse.urlsplit(a["u"]).netloc, []).append((key, a))
+    groups = [sorted(v, key=lambda x: seen.get(x[0], "")) for v in by_host.values()]
     res = {}
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as ex:
-        for part in ex.map(lambda items: [(k, one(k, a)) for k, a in items], by_host.values()):
+        for part in ex.map(host_run, groups):
             res.update(part)
+    if state_path:
+        os.makedirs(os.path.dirname(state_path), exist_ok=True)
+        with open(state_path, "w", encoding="utf-8") as f:
+            json.dump({k: v for k, v in seen.items() if k in allikad}, f, ensure_ascii=False, indent=0)
     return {k: res[k] for k in allikad}
 
 
@@ -1268,7 +1307,7 @@ def build(args):
     if huvitised:
         aux_hash.update(json.dumps([huvitised["rows"], huvitised.get("ylempiir")], ensure_ascii=False, sort_keys=True).encode())
     phase(f"teemakaartide allikad ({len(teemad_cfg.get('allikad', {}))})")
-    jalgimine = watch_sources(teemad_cfg.get("allikad", {}), prev)
+    jalgimine = watch_sources(teemad_cfg.get("allikad", {}), prev, os.path.join(cache, "jalgimine_kontrollitud.json"))
     # Ravijuhendid (ravijuhend.ee): loend, juhendite lehed ja valitud lisade eelvaated (pildid kaustas lisad/).
     with open(os.path.join(HERE, "ravijuhendid.json"), encoding="utf-8") as f:
         rj_cfg = json.load(f)
@@ -1973,6 +2012,10 @@ def make_report(prev, data, missing):
             tlines.append(f"- Allikas pole juba mitu kontrolli kättesaadav: {name} ({v.get('viga', '')})")
         elif o and v.get("ok") and o.get("ok") and (o.get("uuendatud"), o.get("sha")) != (v.get("uuendatud"), v.get("sha")):
             tlines.append(f"- Allikas muutus: {name} (uuendatud {v.get('uuendatud') or 'PDF sisu'}); vaata teemakaart üle (build/teemad.json)")
+    kk = [tm.get("allikad", {}).get(k, k) for k, v in jw.items() if v.get("kontrollimata")]
+    if kk:
+        tlines.append(f"- Kontrollimata {len(kk)} allikat (sait vastas „liiga palju päringuid“; järgmisel korral kontrollitakse need esimesena): "
+                      + "; ".join(kk))
     po = ((prev or {}).get("meta") or {}).get("huvitised") or {}
     if po and po.get("rows") != hu.get("rows"):
         tlines.append("- Tervisekassa hüvitiste võrdlustabel muutus")
