@@ -46,7 +46,6 @@
 
 ## Igapäevatöö teemakaardid
 - NB: Standardkulu lisa: 1 rida ei õnnestunud lugeda (koodid 52625).
-- Allikas muutus: Tervisekassa: ravimite erandkorras kompenseerimine (uuendatud 2026-10-30); vaata teemakaart üle (build/teemad.json)
 
 ## Ravijuhendid (ravijuhend.ee)
 - 47 ravijuhendit, 11 käsitlusjuhendit, 1 muud juhendit (väljaspool ravijuhend.ee), 8 lisa eelvaadet
