@@ -864,9 +864,13 @@ def watch_sources(allikad, prev, state_path=None):
         except Exception:  # noqa: BLE001
             seen = {}
 
+    def was_429(viga):
+        # Ka 03.11.2026 kirjed, kus viga oli pika aadressi tõttu kärbitud ilma veakoodita (kõik olid 429).
+        return "429" in viga or "Too Many" in viga or bool(re.fullmatch(r"Päring ebaõnnestus: \S+", viga))
+
     def skipped(old):
         # Varasem päris viga (mitte 429) jääb alles, kuid kontrollide arv ei kasva.
-        if old.get("ok") is False and "429" not in (old.get("viga") or ""):
+        if old.get("ok") is False and not was_429(old.get("viga") or ""):
             return dict(old, kontrollimata=True)
         base = {k: v for k, v in old.items() if k not in ("ok", "viga", "vigu", "kontrollimata")}
         return dict(base, ok=True, kontrollimata=True)
@@ -886,7 +890,7 @@ def watch_sources(allikad, prev, state_path=None):
                     seen[key] = TODAY.isoformat()  # proovitud: järgmisel korral pole see enam järjekorras esimene
                     out.append((key, skipped(old)))
                 else:
-                    out.append((key, dict(old, ok=False, viga=str(e)[:120], vigu=(old.get("vigu") or 0) + 1)))
+                    out.append((key, dict(old, ok=False, viga=re.sub(r"^Päring ebaõnnestus: \S+: ", "", str(e))[:120], vigu=(old.get("vigu") or 0) + 1)))
                 continue
             seen[key] = TODAY.isoformat()
             if url.lower().endswith(".pdf") or raw[:4] == b"%PDF":
@@ -2014,7 +2018,7 @@ def make_report(prev, data, missing):
             tlines.append(f"- Allikas muutus: {name} (uuendatud {v.get('uuendatud') or 'PDF sisu'}); vaata teemakaart üle (build/teemad.json)")
     kk = [tm.get("allikad", {}).get(k, k) for k, v in jw.items() if v.get("kontrollimata")]
     if kk:
-        tlines.append(f"- Kontrollimata {len(kk)} allikat (sait vastas „liiga palju päringuid“; järgmisel korral kontrollitakse need esimesena): "
+        tlines.append(f"- Kontrollimata {len(kk)} allikat (sait vastas „liiga palju päringuid“; järgmisel korral proovitakse kauem proovimata allikaid esimesena): "
                       + "; ".join(kk))
     po = ((prev or {}).get("meta") or {}).get("huvitised") or {}
     if po and po.get("rows") != hu.get("rows"):
