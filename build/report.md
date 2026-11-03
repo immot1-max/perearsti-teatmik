@@ -1,4 +1,4 @@
-# Andmete uuendus 30.10.2026
+# Andmete uuendus 03.11.2026
 
 ## Allikad
 - Tervisekassa tervishoiuteenuste loetelu: [116062026020](https://www.riigiteataja.ee/akt/116062026020) kehtib alates 01.07.2026
@@ -46,7 +46,7 @@
 
 ## Igapäevatöö teemakaardid
 - NB: Standardkulu lisa: 1 rida ei õnnestunud lugeda (koodid 52625).
-- Allikas muutus: Tervisekassa: soodusravimid (kehtiv ravimite loetelu, piirhinnad, kokkuvõtlik tabel) (uuendatud 2026-10-30); vaata teemakaart üle (build/teemad.json)
+- Allikas muutus: Tervisekassa: ravimite erandkorras kompenseerimine (uuendatud 2026-10-30); vaata teemakaart üle (build/teemad.json)
 
 ## Ravijuhendid (ravijuhend.ee)
 - 47 ravijuhendit, 11 käsitlusjuhendit, 1 muud juhendit (väljaspool ravijuhend.ee), 8 lisa eelvaadet
