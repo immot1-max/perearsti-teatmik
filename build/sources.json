@@ -283,5 +283,29 @@
       "§ 14",
       "§ 18"
     ]
+  },
+  "pists": {
+    "nimi": "Puuetega inimeste sotsiaaltoetuste seadus (puude raskusastme tuvastamine)",
+    "lyh": "PISTS",
+    "grupiId": 159387,
+    "par": [
+      "§ 2",
+      "§ 2²",
+      "§ 2³",
+      "§ 2⁴",
+      "§ 2⁵"
+    ]
+  },
+  "puudekord": {
+    "nimi": "Puude raskusastme tuvastamise tingimused ja kord ning puudega tööealise inimese toetuse tingimused",
+    "lyh": "Puude tuvastamise määrus",
+    "grupiId": 1033407,
+    "par": [
+      "§ 3",
+      "§ 5",
+      "§ 6",
+      "§ 7",
+      "§ 8"
+    ]
   }
 }

@@ -1,4 +1,4 @@
-# Andmete uuendus 03.11.2026
+# Andmete uuendus 10.11.2026
 
 ## Allikad
 - Tervisekassa tervishoiuteenuste loetelu: [116062026020](https://www.riigiteataja.ee/akt/116062026020) kehtib alates 01.07.2026
@@ -32,8 +32,17 @@
 - Päästeseadus (vabatahtlik päästja ja abidemineerija): [130062026023](https://www.riigiteataja.ee/akt/130062026023) kehtib alates 01.10.2026
 - Vabatahtliku päästja ja abidemineerija kutsesobivuse nõuded ning nendele vastavuse kontrollimise tingimused ja kord: [126092026002](https://www.riigiteataja.ee/akt/126092026002) kehtib alates 01.10.2026
 - Päästeteenistujate kutsesobivuse nõuded, sealhulgas füüsilise ettevalmistuse, hariduse- ja tervisenõuded: [110042025009](https://www.riigiteataja.ee/akt/110042025009) kehtib alates 13.04.2025
+- Puuetega inimeste sotsiaaltoetuste seadus (puude raskusastme tuvastamine): [130062026020](https://www.riigiteataja.ee/akt/130062026020) kehtib alates 01.10.2026; tulevikus jõustub: [130062026021](https://www.riigiteataja.ee/akt/130062026021) alates 01.02.2027
+- Puude raskusastme tuvastamise tingimused ja kord ning puudega tööealise inimese toetuse tingimused: [129052025004](https://www.riigiteataja.ee/akt/129052025004) kehtib alates 01.06.2025
 - SYNLABi hinnakiri: 949 analüüsi, SYNLAB Eesti OÜ analüüside hinnakiri ja koondtabel tervishoiuteenuse pakkujale (al 01.04.2026) - SYNLAB Eesti
 - Toru: toru_2026jul.xlsx (viimane muudatus 01.07.2026), hinnaerinevusi loeteluga: 3
+
+## Mis muutus: uued kirjed
+- PISTS jõustub 01.02.2027: 2 sätet
+- PISTS jõustus 01.10.2026: sisulist muutust ei leitud
+- PISTS jõustus 12.06.2026: sisulist muutust ei leitud
+- PISTS jõustus 22.05.2026: sisulist muutust ei leitud
+- PISTS jõustus 01.01.2026: sisulist muutust ei leitud
 
 ## Teenused: 0 hinnamuutust, 0 uut, 0 eemaldatud, 0 fondimuutust
 ## Abivahendid: 0 muudetud, 0 uut, 0 eemaldatud
@@ -46,12 +55,14 @@
 
 ## Igapäevatöö teemakaardid
 - NB: Standardkulu lisa: 1 rida ei õnnestunud lugeda (koodid 52625).
-- Allikas pole juba mitu kontrolli kättesaadav: ravimiinfo.ee: ravimiotsing (eraleht, mitte ametlik allikas) (Päring ebaõnnestus: https://ravimiinfo.ee/: <urlopen error _ssl.c:993: The handshake operation timed out>)
-- Kontrollimata 37 allikat (sait vastas „liiga palju päringuid“; järgmisel korral kontrollitakse need esimesena): Terviseamet: vaktsineerimise juhendid ja vormid; Vaktsineerimise käsiraamat 18.09.2026 (PDF); Juhis gripivastase vaktsineerimise läbiviimiseks 2026 (PDF); COVID-19 vaktsineerimise juhend sügis 2026 (PDF); HPV vaktsineerimise juhend (PDF); Riskirühmade pneumokokknakkuse vastane vaktsineerimine esmatasandil 01.01.2026 (PDF); Terviseameti lehel lingitud vana laste immuniseerimiskava 01.02.2024 (PDF); Tervisekontrolli tegijate meremeditsiinialase koolituse nõuded (Riigi Teataja); Tervisekassa ravimite loetelu (Riigi Teataja, kehtiv redaktsioon); Tartu Ülikool: peremeditsiini eriala residentuur; TÜ peremeditsiini residentuuri programm 2022/2023 (PDF); TÜ peremeditsiini residentuuri tsüklite tabel, märts 2026 (PDF); Tartu Ülikooli residentuuri eeskiri (PDF); Tartu Ülikool: korduma kippuvad küsimused residentuuri kohta; Ministri määrus 16.03.2026 nr 9 (RT I, 25.03.2026, 1): arst-residendi tööjõukulu alates 01.04.2026; Tartu Ülikool: arstiteaduse kliiniline praktika (6. kursus); Kliinilise praktika päevik 2025/26: sissejuhatus ja kontaktid (PDF); Praktikapäevik: peremeditsiin 2023/24 (PDF); Praktikapäevik: peremeditsiini vestluse kulg 2022/23 (PDF); Praktikapäevik: praktilised oskused 2023/24 (PDF); TÜ: praktika juhendamine meditsiiniteaduste valdkonnas, juhendmaterjal (PDF); Haridus- ja teadusministri määrus nr 45 „2024/2025., 2025/2026. ja 2026/2027. õppeaasta koolivaheajad“ (Riigi Teataja); Haridus- ja teadusministri määrus nr 36 „2027/2028., 2028/2029. ja 2029/2030. õppeaasta koolivaheajad“ (RT I, 04.08.2026, 22); Haridus- ja Teadusministeerium: järgmise kolme õppeaasta koolivaheajad on kinnitatud; ERR 28.05.2026: ülejärgmisel õppeaastal lõpeb talvine koolivaheaeg juba 2. jaanuaril (plaan); Tallinna Lastehaigla: Laste Vaimse Tervise Keskus (küsimustikud); Regionaalhaigla: kolonoskoopia (patsiendiinfo); Regionaalhaigla: gastroskoopia (patsiendiinfo); Riigikogu: eelnõu 951 SE (TTKS ja teiste seaduste muutmine, andmekogude liitmine TIS-iga); Isikuandmete kaitse seadus; Riigikogu: elulõpu tahteavalduse seadus (TTKS 5². peatükk, RT I, 26.06.2025, 29); TEHIK: patsiendi elulõpu tahteavaldus (TIS-i teenus, andmekoosseis, ärireeglid); Sotsiaalministeerium: patsiendi elulõpu tahteavalduse korduma kippuvad küsimused; TEHIK Teabekeskus: Tellitavad radioloogilised protseduurid; TEHIK Teabekeskus: Kehapool; TEHIK Teabekeskus: Radioloogilise protseduuri liik; TEHIK Teabekeskus: Kehapiirkond
+- Allikas muutus: Tervisekassa: ravimite erandkorras kompenseerimine (uuendatud 2026-11-06); vaata teemakaart üle (build/teemad.json)
+- Allikas pole juba mitu kontrolli kättesaadav: ravimiinfo.ee: ravimiotsing (eraleht, mitte ametlik allikas) (<urlopen error [Errno 104] Connection reset by peer>)
 
 ## Ravijuhendid (ravijuhend.ee)
 - 47 ravijuhendit, 11 käsitlusjuhendit, 1 muud juhendit (väljaspool ravijuhend.ee), 8 lisa eelvaadet
-- NB: Lähisuhtevägivalla käsitlus perearstiabis: juhendi PDF-i ei saanud (Päring ebaõnnestus: https://www.justdigi.ee/sites/default/files/documents/2026-1); jääb eelmine seis. Kontrolli, kas juhend on viidud uuele aadressile (build/ravijuhendid.json, valised).
+- Uus versioon: Epilepsia fertiilses eas naistel ja rasedatel (RJ-G/58.1-2022 → RJ-G/58.1-2022, kinnitatud 2022-04-20)
+- Uus versioon: Infektsioonikontrolli standardnõuded (RJ-Z/63.1-2022 → RJ-Z/63.1-2022, kinnitatud 2022-06-08)
+- Uus versioon: Transfusioonravi juhend (I osa). Äge verejooks ja transfusioonravi; Operatsioonile eelnev patsiendi ambulatoorne ja perioperatiivne käsitlus (RJ-D/59.1-2022 → RJ-D/59.1-2022, kinnitatud 2022-05-24)
 
 
-Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 217 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 36 teemakaarti, 59 ravijuhendit, 52 linki.
+Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 227 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 37 teemakaarti, 59 ravijuhendit, 54 linki.
