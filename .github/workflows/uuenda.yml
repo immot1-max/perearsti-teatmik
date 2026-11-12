@@ -20,6 +20,7 @@ on:
       - "build/met_lisad.py"
       - "build/ravijuhendid.json"
       - "build/ravijuhendid.py"
+      - "build/ehas_register.json"
       - "build/rta_reeglid.json"
       - "build/rta_reeglid.py"
 

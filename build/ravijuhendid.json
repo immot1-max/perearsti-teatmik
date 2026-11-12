@@ -80,8 +80,29 @@
         ["Sotsiaalkindlustusamet: lähisuhtevägivald", "https://www.sotsiaalkindlustusamet.ee/abivajav-laps-ja-taiskasvanu/abi-vagivalla-ohvrile/lahisuhtevagivald"],
         ["Ohvri andmete edastamine SKA-le (vorm, docx)", "https://www.sotsiaalkindlustusamet.ee/sites/default/files/documents/2026-02/ohvri_andmete_edastamine_sotsiaalkindlustusametile%20%283%29.docx"]
       ]
+    },
+    "x-ehas-sond": {
+      "n": "Ravimite manustamine neelamisraskustega patsientidele ja sondi kaudu",
+      "liik": "juhend",
+      "pdf": "https://ehas.ee/component/edocman/291-ravimite-manustamine-neelamishaeiretega-patsientidele/download",
+      "leht": "https://ehas.ee/juhendid",
+      "allikas": "ehas.ee",
+      "versioon": "02 (kinnitatud EHAS juhatuse otsusega veebruaris 2022)",
+      "valjaandja": "Eesti Haiglaapteekrite Selts (EHAS); koostanud Ida-Tallinna Keskhaigla, Põhja-Eesti Regionaalhaigla ja TÜ Kliinikumi haiglaapteekide proviisorid",
+      "er": ["Tervishoiutöötajad, kes ravivad neelamishäirega patsienti, sh toitmissondi või -stoomiga"],
+      "markus": "Ei ole RJNK kinnitatud ega ravijuhend.ee-s. Juhend on 2022. aastast: preparaatide loetelu ei pruugi vastata praegusele turule, kontrolli ravimvormi ravimiregistrist. Kirjes on juhendi põhimõtete kokkuvõte ja toimeainete register (ATC, preparaadid, ravimvormid, ohtlikkuse märge ja juhendi lehekülg); iga ravimvormi ettevalmistuse juhis (suu ja sondi kaudu), imendumise koht ja toidu mõju on juhendi PDF-is registris näidatud leheküljel.",
+      "sn": "Ravimid neelamisraskuse ja sondi korral",
+      "kasitsi": "ehas-sond",
+      "kasitsi_sha": "f75aa159455d509a",
+      "kontroll": ["Kinnitatud EHAS juhatuse otsusega VEEBRUAR 2022 (versioon 02)", "ÄRA PURUSTA"],
+      "syn": ["neelamisraskus", "neelamisraskused", "neelamishäire", "neelamishäired", "düsfaagia", "sond", "sondi kaudu", "toitmissond", "nasogastraalsond", "NG-sond", "nasogastriline sond", "PEG", "gastrostoom", "jejunostoom", "toitmisstoom", "stoom", "tableti purustamine", "purustamine", "purustada", "dispergeerimine", "dispergeerida", "kapsli avamine", "ära purusta", "tabletipurustaja", "uhmer", "ENFit", "ravimite manustamine", "ravimite manustamine sondi kaudu", "ravimvormi muutmine", "haiglaapteek", "EHAS", "dysphagia", "feeding tube", "crushing tablets"],
+      "lingid": [
+        ["EHAS juhendid (ehas.ee)", "https://ehas.ee/juhendid"],
+        ["Ravimiregister (ravimvorm, ravimi omaduste kokkuvõte)", "https://www.ravimiregister.ee/"]
+      ]
     }
   },
+  "kasitsi_failid": ["ehas_register.json"],
   "kasitsi": {
     "knh-lisa3": {
       "n": "Lisa 3. Kroonilise neeruhaiguse progresseerumine eGFR-i ja albuminuuria alusel",

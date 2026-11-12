@@ -763,9 +763,19 @@
       else if (b.t === 'small') h += `<p class="small">${hl(b.s, state.hl)}</p>`;
       else if (b.t === 'def') h += `<p class="mkdef"><b>${esc(b.p)}:</b> ${hl(b.s, state.hl)}</p>`;
       else if (b.t === 'tbl') {
-        h += `<h5>${esc(b.n)}</h5><div class="mkt"><table>`
+        // filtr: otsingu korral näidatakse kõigepealt otsingule vastavad read, kogu tabel jääb kokku volditult alla
+        const tbl = (rows) => `<div class="mkt"><table${b.vasak ? ' class="vl"' : ''}>`
           + (b.pais || []).map((r) => `<tr>${r.map((c) => mkCell(c, 'th')).join('')}</tr>`).join('')
-          + (b.read || []).map((r) => `<tr>${r.map((c) => mkCell(c, 'td')).join('')}</tr>`).join('') + '</table></div>';
+          + rows.map((r) => `<tr>${r.map((c) => mkCell(c, 'td')).join('')}</tr>`).join('') + '</table></div>';
+        const rows = b.read || [];
+        const re = b.filtr && state.hl ? new RegExp(state.hl.source, 'i') : null;
+        const hit = re ? rows.filter((r) => r.length > 1 && r.some((c) => re.test(typeof c === 'string' ? c : c.s))) : [];
+        if (hit.length && hit.length < rows.length) {
+          h += `<h5>${esc(b.n)}: otsingule vastavad read (${hit.length})</h5>${tbl(hit)}`
+            + `<details class="mkall"><summary>Kogu tabel (${rows.filter((r) => r.length > 1).length} rida)</summary>${tbl(rows)}</details>`;
+        } else if (b.filtr) {
+          h += `<details class="mkall"><summary>${esc(b.n)} (${rows.filter((r) => r.length > 1).length} rida)</summary>${tbl(rows)}</details>`;
+        } else h += `<h5>${esc(b.n)}</h5>${tbl(rows)}`;
       }
     }
     return h + `<p class="small mksrc">${esc(mk.allikas || '')}</p></div></details>`;

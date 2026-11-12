@@ -1282,7 +1282,7 @@ def build(args):
     toru_dir = os.path.join(HERE, "toru")
     aux_hash = hashlib.sha256()
     for fn in ["synonyms.json", "links.json", "build.py", "muutused.py", "met_lisad.py", "ks_notes.json", "ms_ryhmakoodid.json", "soeluuringud.json", "teemad.json",
-               "ravijuhendid.json", "ravijuhendid.py"]:
+               "ravijuhendid.json", "ravijuhendid.py", "ehas_register.json"]:
         with open(os.path.join(HERE, fn), "rb") as f:
             aux_hash.update(f.read())
     phase("Toru")
@@ -1316,6 +1316,9 @@ def build(args):
     # Ravijuhendid (ravijuhend.ee): loend, juhendite lehed ja valitud lisade eelvaated (pildid kaustas lisad/).
     with open(os.path.join(HERE, "ravijuhendid.json"), encoding="utf-8") as f:
         rj_cfg = json.load(f)
+    for fn in rj_cfg.get("kasitsi_failid", []):  # suured käsitsi plokid eraldi failis (nt EHAS-i toimeainete register)
+        with open(os.path.join(HERE, fn), encoding="utf-8") as f:
+            rj_cfg.setdefault("kasitsi", {}).update(json.load(f))
     phase("ravijuhend.ee")
     print("[ravijuhend.ee] loend ja juhendid", flush=True)
     rj_items, rj_meta = ravijuhendid.collect(http_get, rj_cfg, [x for x in (prev or {}).get("items", []) if x["t"] == "g"],

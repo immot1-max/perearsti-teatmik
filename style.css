@@ -486,5 +486,12 @@ details.rjpv > summary, details.mk > summary { cursor: pointer; font-size: 0.88r
 .mkt td.ko { background: #ef8a1a; color: #2a1400; }
 .mkt td.kr { background: #e2231f; color: #ffffff; }
 .mkt td.kd { background: #b80d14; color: #ffffff; }
+.mkt table.vl td { text-align: left; vertical-align: top; }
+.mkt table.vl td:last-child { text-align: center; white-space: nowrap; }
+.mkt td.eg { background: var(--surface-2); font-weight: 600; text-align: left; }
+.mkt td.eoy { background: #ffff00; color: #2a2300; }
+.mkt td.eol { background: #ffffd1; color: #2a2300; }
+details.mkall { margin: 6px 0; }
+details.mkall > summary { cursor: pointer; font-weight: 600; font-size: 0.9rem; padding: 4px 0; }
 .mksrc { font-style: italic; }
 @media (max-width: 480px) { .mkt table { font-size: 0.74rem; } .mkt th, .mkt td { padding: 3px 4px; } .mkt td.rk { min-width: 4.2em; } }
