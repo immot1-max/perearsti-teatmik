@@ -1,4 +1,4 @@
-# Andmete uuendus 10.11.2026
+# Andmete uuendus 12.11.2026
 
 ## Allikad
 - Tervisekassa tervishoiuteenuste loetelu: [116062026020](https://www.riigiteataja.ee/akt/116062026020) kehtib alates 01.07.2026
@@ -37,13 +37,6 @@
 - SYNLABi hinnakiri: 949 analüüsi, SYNLAB Eesti OÜ analüüside hinnakiri ja koondtabel tervishoiuteenuse pakkujale (al 01.04.2026) - SYNLAB Eesti
 - Toru: toru_2026jul.xlsx (viimane muudatus 01.07.2026), hinnaerinevusi loeteluga: 3
 
-## Mis muutus: uued kirjed
-- PISTS jõustub 01.02.2027: 2 sätet
-- PISTS jõustus 01.10.2026: sisulist muutust ei leitud
-- PISTS jõustus 12.06.2026: sisulist muutust ei leitud
-- PISTS jõustus 22.05.2026: sisulist muutust ei leitud
-- PISTS jõustus 01.01.2026: sisulist muutust ei leitud
-
 ## Teenused: 0 hinnamuutust, 0 uut, 0 eemaldatud, 0 fondimuutust
 ## Abivahendid: 0 muudetud, 0 uut, 0 eemaldatud
 
@@ -55,14 +48,14 @@
 
 ## Igapäevatöö teemakaardid
 - NB: Standardkulu lisa: 1 rida ei õnnestunud lugeda (koodid 52625).
-- Allikas muutus: Tervisekassa: ravimite erandkorras kompenseerimine (uuendatud 2026-11-06); vaata teemakaart üle (build/teemad.json)
+- Allikas muutus: Tervisekassa: ravimite erandkorras kompenseerimine (uuendatud 2026-11-12); vaata teemakaart üle (build/teemad.json)
 - Allikas pole juba mitu kontrolli kättesaadav: ravimiinfo.ee: ravimiotsing (eraleht, mitte ametlik allikas) (<urlopen error [Errno 104] Connection reset by peer>)
 
 ## Ravijuhendid (ravijuhend.ee)
 - 47 ravijuhendit, 11 käsitlusjuhendit, 1 muud juhendit (väljaspool ravijuhend.ee), 8 lisa eelvaadet
-- Uus versioon: Epilepsia fertiilses eas naistel ja rasedatel (RJ-G/58.1-2022 → RJ-G/58.1-2022, kinnitatud 2022-04-20)
-- Uus versioon: Infektsioonikontrolli standardnõuded (RJ-Z/63.1-2022 → RJ-Z/63.1-2022, kinnitatud 2022-06-08)
-- Uus versioon: Transfusioonravi juhend (I osa). Äge verejooks ja transfusioonravi; Operatsioonile eelnev patsiendi ambulatoorne ja perioperatiivne käsitlus (RJ-D/59.1-2022 → RJ-D/59.1-2022, kinnitatud 2022-05-24)
+
+## Raviarvete reeglid (Tervisekassa)
+- [raviarve_reeglid_20260904_kodulehele.xlsx](https://tervisekassa.ee/sites/default/files/raviarve_reeglid_20260904_kodulehele.xlsx): 461 reeglit, teatmikus 20 reeglit 51 koodi juures.
 
 
-Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 227 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 37 teemakaarti, 59 ravijuhendit, 54 linki.
+Kokku: 2644 teenust, 64 meditsiiniseadmete rühma, 949 SYNLABi analüüsi, 326 abivahendit, 227 sätet, 3 fondi, 11 kvaliteedisüsteemi jaotist, 4 sõeluuringut, 38 teemakaarti, 59 ravijuhendit, 54 linki.

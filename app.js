@@ -878,6 +878,15 @@
         }
         h += '</div>';
       }
+      // Tervisekassa raviarvete automaatkontrollid (IT-juhendite lehe fail „Raviarvete reeglid“), teatmiku sõnastuses.
+      if (it.ra && it.ra.length && d.rta) {
+        const rm = d.meta.rta || {};
+        h += '<div class="rules"><h4>Raviarve kontrollid (Tervisekassa)</h4>'
+          + it.ra.map((i) => d.rta[i]).filter(Boolean).map((rr) => `<div class="rule"><span class="ref">reegel ${esc(rr.id)}</span>${hl(rr.s, re)}</div>`).join('')
+          + `<p class="note">Tervisekassa automaatkontroll raviarve vastuvõtmisel, mitte õigusakt${rm.seisuga ? `; faili seis ${fmtDate(rm.seisuga)}` : ''}. `
+          + `<a href="${esc(rm.u || rm.page || '')}" target="_blank" rel="noopener">Raviarvete reeglid (xlsx) ↗</a>`
+          + `${rm.page ? ` · <a href="${esc(rm.page)}" target="_blank" rel="noopener">IT-juhendid ↗</a>` : ''}</p></div>`;
+      }
       const ku = d.kulu && d.kulu.c && d.kulu.c[it.c];
       if (ku) h += kuluHtml(it, ku);
       const labs = state.labsByCode[it.c] || [];

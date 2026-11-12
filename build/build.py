@@ -33,6 +33,7 @@ from lxml import html as lhtml
 import met_lisad
 import muutused
 import ravijuhendid
+import rta_reeglid
 
 BUILD_VERSION = "2"
 API = "https://www.riigiteataja.ee/public-api/api/v1"
@@ -1320,6 +1321,12 @@ def build(args):
     rj_items, rj_meta = ravijuhendid.collect(http_get, rj_cfg, [x for x in (prev or {}).get("items", []) if x["t"] == "g"],
                                              ROOT, TODAY.isoformat())
     aux_hash.update(ravijuhendid.fingerprint(rj_items).encode())
+    # Tervisekassa raviarvete automaatkontrolli reeglid (IT-juhendite lehe xlsx) perearstiabi koodide juurde.
+    with open(os.path.join(HERE, "rta_reeglid.json"), encoding="utf-8") as f:
+        rta_cfg = json.load(f)
+    phase("raviarvete reeglid")
+    rta_meta = rta_reeglid.check(http_get, rta_cfg, ((prev or {}).get("meta") or {}).get("rta"), TODAY.isoformat())
+    aux_hash.update(rta_reeglid.fingerprint(rta_cfg, rta_meta).encode())
     # Ülevaatuse kuupäeva saabumine (teemakaardi väli „ule“) käivitab ehituse, et hoiatus jõuaks aruandesse.
     aux_hash.update(json.dumps(sorted(t["k"] for t in teemad_cfg["teemad"] if t.get("ule") and TODAY.isoformat() >= t["ule"]["alates"])).encode())
     # Sõrmejälge mõjutab sisu muutus ja püsiv (vähemalt kaks järjestikust) kättesaamatus, mitte ühekordne võrgutõrge.
@@ -1621,6 +1628,8 @@ def build(args):
     teema_warn = hu_warn + imm_warn + ml.get("warn", []) + fund_warn + fut_warn + teema_warn
     items.extend(teema_items)
     teema_warn += link_teema_codes(teemad_cfg, by_code, text_rules, rules, sources)
+    rta_rules, rta_missing = rta_reeglid.attach(rta_cfg, by_code)
+    rta_meta["notes"] = list(rta_meta.get("notes") or []) + rta_missing
 
     phase("Mis muutus")
     # 7d. mis muutus: jõustunud (viimase aasta) ja avaldatud tulevaste redaktsioonide vahe
@@ -1684,12 +1693,13 @@ def build(args):
         "tk": tk,
         "ksNotes": ks_notes.get("_meta"),
         "rj": rj_meta,
+        "rta": rta_meta,
         "rtWarn": rt_warn,
     }
     kulu = ml.get("kulu")
     if kulu:
         meta["kulu"] = {"lisa": kulu["lisa"], "u": kulu["u"], "son": kulu["son"], "vigased": kulu["vigased"]}
-    data = {"meta": meta, "items": items, "rules": rules, "muutused": muut,
+    data = {"meta": meta, "items": items, "rules": rules, "rta": rta_rules, "muutused": muut,
             "kulu": {"res": kulu["res"], "c": kulu["c"]} if kulu else None}
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
@@ -2037,6 +2047,19 @@ def make_report(prev, data, missing):
                      f'{sum(len(x.get("pv", [])) for x in gi)} lisa eelvaadet')
         lines.extend(f"- {n}" for n in rj.get("notes", []))
         lines.extend(f"- NB: {w}" for w in rj.get("warn", []))
+        lines.append("")
+    rta = data["meta"].get("rta") or {}
+    if rta:
+        lines.append("## Raviarvete reeglid (Tervisekassa)")
+        n_codes = sum(1 for x in data["items"] if x["t"] == "s" and x.get("ra"))
+        if rta.get("kontrollimata"):
+            lines.append(f'- Faili ei saanud kätte, kasutati eelmist seisu ({rta.get("fail") or "fail teadmata"}); reeglid on seadistusest.')
+        else:
+            pf = ((prev or {}).get("meta") or {}).get("rta") or {}
+            mark = " **(uus fail)**" if pf.get("fail") and pf.get("fail") != rta.get("fail") else ""
+            lines.append(f'- [{rta.get("fail")}]({rta.get("u")}){mark}: {rta.get("count")} reeglit, teatmikus {rta.get("pa")} reeglit {n_codes} koodi juures.')
+        lines.extend(f"- {n}" for n in rta.get("notes", []))
+        lines.extend(f"- NB: {w}" for w in rta.get("warn", []))
         lines.append("")
     if data["meta"].get("msUnmapped"):
         lines.append("## Meditsiiniseadme rühmad, millel puudub 9MS kood")
