@@ -2,7 +2,7 @@
    Kest: võrgust (uusim versioon), võrguta või aeglase võrgu korral vahemälust.
    Andmed: vahemälust; app.js kontrollib version.json kaudu uut versiooni.
    Uue versiooni aktiveerimisel laaditakse avatud aknad automaatselt uuesti. */
-const SHELL = 'teatmik-shell-v37';
+const SHELL = 'teatmik-shell-v38';
 const NET_TIMEOUT = 3500;
 const DATA = 'teatmik-data-v1';
 const ASSETS = ['./', 'index.html', 'app.js', 'style.css', 'fonts.css', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
@@ -89,16 +89,5 @@ async function networkFirst(name, req) {
   const hit = await c.match(req, { ignoreSearch: true });
   if (hit) return hit;
   if (req.mode === 'navigate') return (await c.match('index.html')) || (await c.match('./')) || Response.error();
-  return Response.error();
-}
-
-async function staleWhileRevalidate(name, req) {
-  const c = await caches.open(name);
-  const hit = await c.match(req, { ignoreSearch: true });
-  const net = fetch(req).then((r) => { if (r.ok) c.put(req, r.clone()); return r; }).catch(() => null);
-  if (hit) { net.catch(() => {}); return hit; }
-  const r = await net;
-  if (r) return r;
-  if (req.mode === 'navigate') return (await c.match('index.html')) || Response.error();
   return Response.error();
 }

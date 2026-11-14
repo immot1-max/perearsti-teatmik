@@ -81,6 +81,10 @@ jobs:
           git add -A lisad
           git add data build/sources.json build/report.md build/toru/toru_valjavote.json
           git commit -m "Andmete uuendus $(date +%Y-%m-%d)" || exit 0
+          # Ehitus kestab kaua; kui harule lükati vahepeal teine commit, tõstetakse andmete commit selle peale,
+          # muidu lükkaks GitHub pushi tagasi ja ehituse tulemus läheks kaotsi. Kui ka teine commit muutis
+          # andmefaili, jääb samm konflikti tõttu pooleli ja töövoog avab veateate.
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
           git push
 
       - name: Teavita muudatustest

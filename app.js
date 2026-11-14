@@ -180,8 +180,23 @@
       $('#results').innerHTML = '<p class="empty">Andmeid ei õnnestunud laadida. Ava leht korra võrgu olemasolul, siis töötab see edaspidi ka võrguta.</p>';
       return;
     }
-    setData(data);
+    // Ka siis, kui kuvamine ebaõnnestus (nt uus kest ja vahemälus vanem andmefail), kontrollitakse uuemaid andmeid:
+    // muidu jääks rakendus katki, kuni kasutaja vahemälu tühjendab.
+    tryRender(data);
     checkUpdate();
+  }
+
+  // Andmete kuvamine; vea korral teade ja uuesti laadimise nupp, mitte lõputu „Laadin andmeid…“.
+  function tryRender(data) {
+    try {
+      setData(data);
+      return true;
+    } catch (e) {
+      try { console.error(e); } catch (e2) { /* ignoreeri */ }
+      $('#results').innerHTML = '<p class="empty">Andmete kuvamisel tekkis viga. Kui saadaval on uuemad andmed, laaditakse need kohe; kui see teade ei kao, laadi leht uuesti.</p>'
+        + '<button class="btn solid" data-act="reload">Laadi uuesti</button>';
+      return false;
+    }
   }
 
   async function checkUpdate() {
@@ -190,8 +205,7 @@
       const v = await (await fetch('data/version.json', { cache: 'no-store' })).json();
       if (v.fingerprint && v.fingerprint !== state.data.meta.fingerprint) {
         const fresh = await (await fetch('data/data.json?v=' + encodeURIComponent(v.built), { cache: 'no-store' })).json();
-        setData(fresh);
-        toast('Andmed uuendati (seis ' + fmtDate(fresh.meta.date) + ')');
+        if (tryRender(fresh)) toast('Andmed uuendati (seis ' + fmtDate(fresh.meta.date) + ')');
       }
     } catch (e) { /* võrguta: kasutame olemasolevat */ }
   }
@@ -408,7 +422,23 @@
     const parts = toks.filter((t) => t.length >= 2).map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/[aousezic]/g, (c) => FOLD[c] || c));
     return parts.length ? new RegExp('(' + parts.join('|') + ')', 'gi') : null;
   }
-  const hl = (s, re) => (re ? esc(s).replace(re, '<mark>$1</mark>') : esc(s));
+  // Vasted otsitakse toortekstist ja iga tükk läbib esc() eraldi. Kui enne teha esc() ja siis otsida,
+  // sobivad otsisõnad „39“, „amp“, „lt“, „gt“ ja „quot“ HTML-olemite (&#39; &amp; &lt; &gt; &quot;) sisse ja rikuvad need.
+  function hl(s, re) {
+    const str = String(s ?? '');
+    if (!re) return esc(str);
+    let out = '';
+    let last = 0;
+    str.replace(re, (m, _g, off) => {
+      out += esc(str.slice(last, off)) + '<mark>' + esc(m) + '</mark>';
+      last = off + m.length;
+      return m;
+    });
+    return out + esc(str.slice(last));
+  }
+  // Globaalse lipuga regulaaravaldise test() jätab lastIndex-i meelde ja järgmine test() võib vaste vahele jätta;
+  // seepärast testitakse alati lipu g-ta koopiaga (state.hl ise jääb esiletõstu jaoks globaalseks).
+  const hlTest = (re) => (re ? new RegExp(re.source, 'i') : null);
 
   // ------------------------------------------------------------ vaated
   // Muudatused: tulevased jõustumise järjekorras, siis jõustunud uuemad eespool.
@@ -646,6 +676,7 @@
   }
   function uDetail(it) {
     const re = state.hl;
+    const reT = hlTest(re);
     const codeBtn = (c) => `<button class="code" data-q="${esc(c)}" title="Ava kood">${esc(c)}</button>`;
     const nameOf = (c, fb) => esc((state.byCode[c] || {}).n || fb || '');
     let h = `<p class="small">${esc(it.n)}: <a href="${esc(it.eu)}" target="_blank" rel="noopener">eelmine redaktsioon (${fmtDate(it.ealates)})</a> → <a href="${esc(it.u)}" target="_blank" rel="noopener">${it.tul ? 'uus redaktsioon, jõustub' : 'redaktsioon'} ${fmtDate(it.alates)}</a>.</p>`;
@@ -683,7 +714,7 @@
           const [da, db] = wordDiff(a, b);
           return `<div class="ud">${nr ? `<div class="ud-h">${esc(nr)}</div>` : ''}${a ? `<div class="ud-old"><span>Varem</span>${da}</div>` : ''}<div class="ud-new"><span>Nüüd</span>${b ? db : '<i>kehtetu</i>'}</div></div>`;
         }).join('');
-        return `<details class="udiff"${openAll || (re && re.test(p.n)) ? ' open' : ''}><summary><b>${esc(p.par)}</b> ${hl(p.n, re)}${p.uus ? ' <span class="badge muutus">uus</span>' : ''}${p.kehtetu ? ' <span class="badge warn">kehtetu</span>' : ''}</summary>${los}${p.veel ? `<p class="small">… ja veel ${p.veel} lõiget</p>` : ''}<p class="small"><a href="${esc(p.u)}" target="_blank" rel="noopener">Ava säte Riigi Teatajas ↗</a></p></details>`;
+        return `<details class="udiff"${openAll || (reT && reT.test(p.n)) ? ' open' : ''}><summary><b>${esc(p.par)}</b> ${hl(p.n, re)}${p.uus ? ' <span class="badge muutus">uus</span>' : ''}${p.kehtetu ? ' <span class="badge warn">kehtetu</span>' : ''}</summary>${los}${p.veel ? `<p class="small">… ja veel ${p.veel} lõiget</p>` : ''}<p class="small"><a href="${esc(p.u)}" target="_blank" rel="noopener">Ava säte Riigi Teatajas ↗</a></p></details>`;
       }).join('') + (it.parsVeel ? `<p class="small">… ja veel ${it.parsVeel} paragrahvi (vaata Riigi Teatajast).</p>` : '');
     }
     if ((it.lisad || []).length) {
@@ -768,7 +799,7 @@
           + (b.pais || []).map((r) => `<tr>${r.map((c) => mkCell(c, 'th')).join('')}</tr>`).join('')
           + rows.map((r) => `<tr>${r.map((c) => mkCell(c, 'td')).join('')}</tr>`).join('') + '</table></div>';
         const rows = b.read || [];
-        const re = b.filtr && state.hl ? new RegExp(state.hl.source, 'i') : null;
+        const re = b.filtr ? hlTest(state.hl) : null;
         const hit = re ? rows.filter((r) => r.length > 1 && r.some((c) => re.test(typeof c === 'string' ? c : c.s))) : [];
         if (hit.length && hit.length < rows.length) {
           h += `<h5>${esc(b.n)}: otsingule vastavad read (${hit.length})</h5>${tbl(hit)}`
@@ -940,7 +971,7 @@
       h += '<h4>Alarühmad</h4><div class="tbl"><table><tr><td>Alarühm</td><td>Tooteid</td><td>TK piirhind</td><td>%</td></tr>'
         + (it.subs || []).map(([n, cnt, mn, mx, pc]) => `<tr><td>${hl(n, re)}</td><td class="num">${cnt}</td><td class="num">${mn == null ? '' : mn === mx ? fmtEur(mn) : fmtNum(mn) + '–' + fmtEur(mx)}</td><td class="num">${(pc || []).join('/')}</td></tr>`).join('') + '</table></div>';
       const all = state.msAll.has(it._id);
-      const reNG = state.hl ? new RegExp(state.hl.source, 'i') : null;
+      const reNG = hlTest(state.hl);
       const tokens = reNG ? (it.pr || []).filter((x) => reNG.test(x[1]) || reNG.test(x[0])) : [];
       const prs = all ? it.pr : tokens.slice(0, 40);
       if (prs.length) {
@@ -1031,14 +1062,14 @@
           t1 += `<div class="tbl"><table><tr>${(tb.pais || []).map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`
             + tb.read.map((r) => `<tr>${r.map((c) => `<td>${Array.isArray(c) ? `<a href="${esc(c[1])}" target="_blank" rel="noopener">${esc(c[0])} ↗</a>` : hl(c, re)}</td>`).join('')}</tr>`).join('') + '</table></div>';
         } else if (tb.tekst) {
-          const open = re && new RegExp(re.source, 'i').test(tb.tekst);
+          const open = re && hlTest(re).test(tb.tekst);
           t1 += `<details class="lisa"${open ? ' open' : ''}><summary>Näita loetelu (PDF-i tekst)</summary><div class="pre">${hl(tb.tekst, re)}</div></details>`;
         }
         if (tb.markus) t1 += `<p class="small">${hl(tb.markus, re).replace(/\n/g, '<br>')}</p>`;
         if (tb.legend && tb.legend.length) t1 += `<p class="small">${tb.legend.map((x) => hl(x, re)).join('; ')}</p>`;
         if (tb.a && tb.a.length) t1 += `<div class="srcs">${chips(tb.a)}</div>`;
         if (tb.kinni) {
-          const open = re && new RegExp(re.source, 'i').test(t1.replace(/<[^>]+>/g, ' '));
+          const open = re && hlTest(re).test(t1.replace(/<[^>]+>/g, ' '));
           th += `<details class="tblbox"${open ? ' open' : ''}><summary>${esc(tb.n)}</summary>${t1}</details>`;
         } else {
           th += `<h4>${esc(tb.n)}</h4>${t1}`;
@@ -1554,6 +1585,7 @@
       if (t.dataset.act === 'clear') { clearSearch(); return; }
       if (t.dataset.act === 'pa-off') { setPa(false); return; }
       if (t.dataset.act === 'home') { goHome(); return; }
+      if (t.dataset.act === 'reload') { location.reload(); return; }
       if (t.dataset.act === 'all') { state.fund = null; state.filter = 'all'; state.limit = 60; renderChips(); route(); return; }
       if (t.dataset.act === 'more') { state.limit += 60; route(); return; }
       if (t.dataset.act === 'install') { doInstall(); return; }

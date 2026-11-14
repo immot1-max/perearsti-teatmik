@@ -12,7 +12,6 @@ Võrreldakse:
 - muud aktid: jälgitavate paragrahvide tekst;
 - kõigil aktidel: lisad (uus, kehtetu, sisu muutunud).
 """
-import base64
 import hashlib
 import re
 
@@ -31,7 +30,7 @@ UNSUP = str.maketrans("⁰¹²³⁴⁵⁶⁷⁸⁹", "0123456789")
 
 
 def norm(s):
-    return re.sub(r"\s+", " ", (s or "").replace(" ", " ")).strip()
+    return re.sub(r"\s+", " ", (s or "").replace("\u00a0", " ")).strip()
 
 
 def cut(s):
