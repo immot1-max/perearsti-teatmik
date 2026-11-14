@@ -396,7 +396,7 @@ CODE_RE = re.compile(r"^(?=[0-9A-Z]*\d)[0-9A-Z]{3,8}$")
 
 
 def parse_price(s):
-    s = (s or "").replace(" ", " ").strip()
+    s = (s or "").replace("\u00a0", " ").strip()
     m = re.fullmatch(r"(\d{1,3}(?: \d{3})*|\d+)(?:,(\d+))?", s)
     if not m:
         return None
@@ -451,8 +451,6 @@ KS_KEYS = [
     (r"^indikaator", "jalgimine"), (r"erialane pädevus", "padevus"), (r"günekol", "gunekoloogia"),
     (r"kirurg", "kirurgia"), (r"e-konsult", "ekons"), (r"jämesoole", "jvs"),
 ]
-KS_CAT = {"ennetus": "Ennetus", "krooniline": "Kroonilised haiged", "jalgimine": "Jälgimisindikaatorid",
-          "lisapadevus": "Erialane lisapädevus", "soeluuring": "Sõeluuringud", "ylevaade": "Ülevaade"}
 
 
 def html_grid(s):
@@ -548,7 +546,6 @@ def parse_ks(met_pars, met, ks_notes):
     for sec in sections:
         key = next((k for pat, k in KS_KEYS if re.search(pat, sec["title"], re.I)), None) or re.sub(r"[^a-z0-9]+", "-", norm_ascii(sec["title"])).strip("-")
         note = ks_notes.get(key, {})
-        tot = next((r["v"] for r in sec["rows"] if r["v"] and r["v"] != "0"), None)
         out.append({
             "t": "q", "k": key, "cat": sec["kind"], "n": note.get("n", sec["title"]), "sn": note.get("sn", sec["title"]),
             "title": sec["title"], "vl": sec["vl"], "par": f'{par["nr"]} {sec["lg"]}', "url": met["url"] + "#" + sec["a"],
@@ -649,7 +646,7 @@ def page_text(url):
     doc = lhtml.fromstring(raw)
     for s in doc.xpath("//script|//style|//noscript"):
         s.drop_tree()
-    return doc, re.sub(r"\s+", " ", doc.text_content().replace(" ", " "))
+    return doc, re.sub(r"\s+", " ", doc.text_content().replace("\u00a0", " "))
 
 
 def years_of(s):
@@ -741,7 +738,7 @@ TK_HUVITIS = "https://tervisekassa.ee/inimesele/huvitised/haigushuvitis"
 
 
 def norm_ws(s):
-    return re.sub(r"\s+", " ", (s or "").replace(" ", " ")).strip().lower()
+    return re.sub(r"\s+", " ", (s or "").replace("\u00a0", " ")).strip().lower()
 
 
 def act_lisad(xml, akt_id):
@@ -785,7 +782,7 @@ def tk_huvitised(prev):
 
 
 def norm_space(s):
-    return re.sub(r"\s+", " ", (s or "").replace(" ", " ")).strip()
+    return re.sub(r"\s+", " ", (s or "").replace("\u00a0", " ")).strip()
 
 
 def tvl_pohjused(par_text):
@@ -1340,7 +1337,7 @@ def build(args):
     write_rt_note(rt_warn)
     if prev and prev["meta"].get("fingerprint") == fingerprint and not args.force:
         print("Muudatusi ei ole." + (" Riigi Teataja tõrke tõttu jäi osa akte kontrollimata (build/rt_viga.md)." if rt_warn else ""))
-        write_output(args, changed=False, rt=bool(rt_warn))
+        write_output(changed=False, rt=bool(rt_warn))
         return
 
     with open(os.path.join(HERE, "sources.json"), "w", encoding="utf-8") as f:
@@ -1715,10 +1712,10 @@ def build(args):
         f.write(report)
     print(report)
     phase("valmis")
-    write_output(args, changed=True, rt=bool(rt_warn))
+    write_output(changed=True, rt=bool(rt_warn))
 
 
-def write_output(args, changed, rt=False):
+def write_output(changed, rt=False):
     gh = os.environ.get("GITHUB_OUTPUT")
     if gh:
         with open(gh, "a") as f:
@@ -1848,7 +1845,7 @@ def merge_toru(loaded, by_code, items):
 # ----------------------------------------------------------------- abivahendid
 
 def clean_cell(s):
-    s = (s or "").replace(" ", " ")
+    s = (s or "").replace("\u00a0", " ")
     s = re.sub(r"([a-zõäöü])-\n([a-zõäöü])", r"\1\2", s)
     s = re.sub(r"\n\s*•", "\n•", s)
     s = re.sub(r"(?<!\n)\n(?!•)", " ", s)
