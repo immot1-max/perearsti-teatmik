@@ -8,6 +8,8 @@
   const fmtEur = (v) => (v == null ? '' : eur.format(v));
   const fmtNum = (v) => (v == null ? '' : v.toLocaleString('et-EE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
   const fmtDate = (iso) => (iso ? iso.split('-').reverse().join('.') : '');
+  // Tänane kuupäev seadme kohaliku aja järgi (toISOString annaks UTC kuupäeva, mis Eestis vahetub 2–3 tundi hiljem).
+  const todayIso = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
   const norm = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9%.]+/g, ' ').replace(/(^|\s)\.+|\.+(\s|$)/g, ' ').trim();
 
@@ -167,7 +169,7 @@
   // tühjendab (siis naaseb sinna, kus kirje oli: täisvaatesse või samasse nimekirja). pinFrom = nimekirja olek (q, filter, fund).
   // Kui pin on olemas, näidatakse esialgu PIN_LIMIT vastet, et avatud kirje jääks lähedale.
   const PIN_LIMIT = 10;
-  const state = { data: null, idx: [], tab: 'avaleht', filter: 'all', fund: null, q: '', open: new Set(), limit: 60, focus: null, pin: null, pinFrom: null, pinOpen: false, lastOpen: null, pa: paPref, labsAll: new Set(), msAll: new Set(), uAll: new Set() };
+  const state = { data: null, idx: [], tab: 'avaleht', filter: 'all', fund: null, q: '', open: new Set(), limit: 60, focus: null, pin: null, pinFrom: null, pinOpen: false, lastOpen: null, pa: paPref, labsAll: new Set(), msAll: new Set(), uAll: new Set(), keys: [], idOf: new Map(), pendingKey: null, checked: null };
   const el = {};
 
   // ------------------------------------------------------------ andmed
@@ -199,18 +201,71 @@
     }
   }
 
+  let lastCheck = 0;
   async function checkUpdate() {
     if (!navigator.onLine || !state.data) return;
+    lastCheck = Date.now();
     try {
       const v = await (await fetch('data/version.json', { cache: 'no-store' })).json();
+      if (v.checked && /^\d{4}-\d{2}-\d{2}$/.test(v.checked)) {
+        state.checked = v.checked;
+        try { localStorage.setItem('teatmik-checked', v.checked); } catch (e) { /* ignoreeri */ }
+        renderStatus(); renderStale();
+      }
       if (v.fingerprint && v.fingerprint !== state.data.meta.fingerprint) {
         const fresh = await (await fetch('data/data.json?v=' + encodeURIComponent(v.built), { cache: 'no-store' })).json();
         if (tryRender(fresh)) toast('Andmed uuendati (seis ' + fmtDate(fresh.meta.date) + ')');
       }
     } catch (e) { /* võrguta: kasutame olemasolevat */ }
   }
+  // Kaua lahti olnud (nt telefonis taustal seisnud) rakendus kontrollib esiplaanile tulles uuendusi, kuid mitte sagedamini kui 6 tunni järel.
+  const RECHECK_MS = 6 * 3600 * 1000;
+  function recheckIfStale() {
+    if (document.visibilityState !== 'visible' || !state.data || Date.now() - lastCheck < RECHECK_MS) return;
+    checkUpdate();
+    try { if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistration().then((r) => r && r.update()).catch(() => {}); } catch (e) { /* ignoreeri */ }
+  }
+
+  // Viimane teadaolev kontrolli kuupäev: version.json (võrgus), seadmes meelde jäetud väärtus või andmefaili ehituse kuupäev.
+  // Andmefaili kuupäev muutub ainult siis, kui andmed muutusid; version.json-i kuupäev uueneb iga õnnestunud kontrolliga.
+  const STALE_DAYS = 45;
+  function checkedDate() {
+    let c = (state.data && state.data.meta.date) || '';
+    if (state.checked && state.checked > c) c = state.checked;
+    try { const s = localStorage.getItem('teatmik-checked'); if (s && /^\d{4}-\d{2}-\d{2}$/.test(s) && s > c) c = s; } catch (e) { /* ignoreeri */ }
+    return c;
+  }
+  function staleDays() {
+    const c = checkedDate();
+    if (!c) return 0;
+    const [y, m, d] = c.split('-').map(Number);
+    return Math.floor((Date.now() - new Date(y, m - 1, d).getTime()) / 86400000);
+  }
+  const staleNote = () => (staleDays() > STALE_DAYS
+    ? `<p class="note" id="stale"><b>Andmeid ei ole üle ${STALE_DAYS} päeva kontrollitud</b> (viimati ${fmtDate(checkedDate())}). Hinnad ja sätted võivad olla vahepeal muutunud: ava leht võrgus või kontrolli olulist Riigi Teatajast.</p>`
+    : '');
+  function renderStale() {
+    const old = $('#stale');
+    if (!old) return;
+    const h = staleNote();
+    if (h) old.outerHTML = h; else old.remove();
+  }
+
+  // Kirje püsiv võti. Massiivi indeks (_id) kehtib ainult ühe andmefaili piires: andmete uuenemisel võib see nihkuda.
+  // Püsiva võtme järgi leitakse avatud kirje pärast uuendust uuesti üles ja sama võti on aadressis otselingina (?k=…).
+  function stableKey(it) {
+    switch (it.t) {
+      case 's': case 'a': return it.t + ':' + it.c;
+      case 'l': return 'l:' + it.src + ':' + it.par;
+      case 'm': return 'm:' + (it.c || it.n);
+      case 'b': return 'b:' + (it.ab || '') + ':' + it.n;
+      case 'k': return 'k:' + (it.id || it.src || it.u);
+      default: return it.t + ':' + (it.k || it.n); // f, q, v, j, g, u
+    }
+  }
 
   function setData(data) {
+    const prevKeys = state.data && state.data !== data ? state.keys : null;
     state.data = data;
     // Muudatuste kirjed (data.muutused) on rakenduses tavalised kirjed liigiga 'u'.
     if (!data._uAdded) {
@@ -220,8 +275,17 @@
     const items = data.items;
     const rules = data.rules;
     const codeSet = new Set(items.filter((x) => x.t === 's').map((x) => x.c));
+    const keys = [];
+    const idOf = new Map();
+    const seen = new Map();
     state.idx = items.map((it, i) => {
       it._id = i;
+      let key = stableKey(it);
+      const nth = (seen.get(key) || 0) + 1;
+      seen.set(key, nth);
+      if (nth > 1) key += '~' + nth; // sama võtmega kirjed (nt lühendita laborianalüüsid) järjekorra järgi
+      keys[i] = key;
+      idOf.set(key, i);
       let cls = 'teenus';
       if (it.t === 's') cls = it.f ? it.f[0] : 'teenus';
       else if (it.t === 'a') cls = 'abiv';
@@ -323,9 +387,42 @@
       if (it.t === 's') state.byCode[it.c] = it;
       if (it.t === 'b') for (const [c] of it.c || []) (state.labsByCode[c] = state.labsByCode[c] || []).push(it);
     }
+    state.keys = keys;
+    state.idOf = idOf;
+    if (prevKeys) {
+      // Andmed uuenesid, kui rakendus oli lahti: avatud kirjed leitakse uuest andmefailist püsiva võtme järgi.
+      const move = (id) => { const n = id == null ? null : idOf.get(prevKeys[id]); return n == null ? null : n; };
+      state.focus = move(state.focus); state.pin = move(state.pin); state.lastOpen = move(state.lastOpen);
+      if (state.pin == null) { state.pinFrom = null; state.pinOpen = false; }
+      state.open = new Set([...state.open].map(move).filter((x) => x != null));
+      state.msAll.clear(); state.uAll.clear();
+    }
+    if (state.pendingKey != null) {
+      // Otselink (?k=…): avab kirje täisvaates, kui selline kirje on olemas.
+      const id = idOf.get(state.pendingKey);
+      if (id != null) state.focus = id;
+      state.pendingKey = null;
+    }
     renderChips();
     renderStatus();
     route();
+    warmImages();
+  }
+
+  // Ravijuhendite lisade pildid vahemällu, et need oleksid olemas ka võrguta (teenindustöötaja salvestab iga laaditud faili).
+  // Ühekaupa ja viivitusega, et mitte segada lehe avamist; andmesäästurežiimis ei laadita.
+  let warmed = '';
+  function warmImages() {
+    const fp = state.data.meta.fingerprint || '';
+    if (warmed === fp || !navigator.onLine || !('caches' in window) || !('serviceWorker' in navigator) || (navigator.connection && navigator.connection.saveData)) return;
+    warmed = fp;
+    const urls = [];
+    for (const it of state.data.items) if (it.t === 'g') for (const pv of it.pv || []) for (const im of pv.img || []) urls.push(im[0]);
+    setTimeout(async () => {
+      for (const u of urls) {
+        try { if (!(await caches.match(u))) await fetch(u); } catch (e) { return; }
+      }
+    }, 4000);
   }
 
   // ------------------------------------------------------------ otsing
@@ -469,6 +566,10 @@
     return rest > 0 && rest <= Math.ceil(limit / 3) ? total : Math.min(limit, total);
   }
   function route() {
+    render();
+    syncUrl();
+  }
+  function render() {
     const r = el.results;
     const q = state.q.trim();
     state.hl = q ? hlRegex(norm(q).split(' ')) : null;
@@ -575,7 +676,7 @@
     } else if (it.t === 's') {
       const fund = (it.f || []).map((f) => `<span class="badge ${f}">${esc(FUND_SHORT[f] || f)}</span>`).join('') || phBadge(it);
       const zl = zeroLabel(it);
-      const price = zl ? `<small>${zl}</small>` : it.p != null ? fmtEur(it.p) : '';
+      const price = zl ? `<small>${esc(zl)}</small>` : it.p != null ? fmtEur(it.p) : '';
       const ks = (it.ks || []).map((k) => state.qByKey[k]).filter(Boolean).map((qq) => `<span class="badge ks" data-focus="${qq._id}" title="Ava kvaliteedisüsteemi jaotis">${esc(ksPrefix(qq))}: ${esc(qq.sn)}</span>`).join('');
       head = `<span class="name">${hl(it.n, re)}</span><span class="price">${price}</span>
         <span class="meta"><span class="code" data-copy="${esc(it.c)}" title="Kopeeri kood">${esc(it.c)}</span>${fund}${ks}${it.fn ? '<span class="badge f37">* ainult S00–S09</span>' : ''}<span>${esc(it.par ? it.par + ' ' + (it.pt || '') : srcName(it.src))}</span>${via ? '<span class="via">· vaste tingimustes</span>' : ''}</span>`;
@@ -590,7 +691,7 @@
     } else if (it.t === 'j') {
       const changed = (it.r || []).some((r) => r.muutus);
       head = `<span class="name">${hl(it.n, re)}</span><span></span>
-        <span class="meta"><span class="badge teema">${esc(it.g || 'teema')}</span>${it.al && it.al > new Date().toISOString().slice(0, 10) ? `<span class="badge warn">jõustub ${fmtDate(it.al)}</span>` : ''}<span>${(it.r || []).length} punkti</span>${(it.e || []).length ? `<span class="badge warn">${it.e.length} erinevus${it.e.length > 1 ? 't' : ''} allikates</span>` : ''}${changed ? '<span class="badge warn">allikas muutunud</span>' : ''}${via ? '<span class="via">· vaste sisus</span>' : ''}</span>`;
+        <span class="meta"><span class="badge teema">${esc(it.g || 'teema')}</span>${it.al && it.al > todayIso() ? `<span class="badge warn">jõustub ${fmtDate(it.al)}</span>` : ''}<span>${(it.r || []).length} punkti</span>${(it.e || []).length ? `<span class="badge warn">${it.e.length} erinevus${it.e.length > 1 ? 't' : ''} allikates</span>` : ''}${changed ? '<span class="badge warn">allikas muutunud</span>' : ''}${via ? '<span class="via">· vaste sisus</span>' : ''}</span>`;
     } else if (it.t === 'u') {
       head = `<span class="name">${hl(it.n, re)}</span><span class="price"><small>${it.tul ? 'jõustub ' : ''}${fmtDate(it.alates)}</small></span>
         <span class="meta">${it.tul ? '<span class="badge warn">tulekul</span>' : '<span class="badge muutus">jõustunud</span>'}<span>${esc(uSummary(it))}</span>${via ? '<span class="via">· vaste sisus</span>' : ''}</span>`;
@@ -1046,9 +1147,9 @@
       let h = '';
       const rel = (it.seotud || []).map((k) => state.teemaByKey[k]).filter(Boolean);
       if (rel.length) h += `<div class="seotud"><span>Vaata ka</span>${rel.map((x) => `<button class="badge teema ${tgCls(x.g)}" data-focus="${x._id}">${esc(x.sn)}</button>`).join('')}</div>`;
-      if (it.al && it.al > new Date().toISOString().slice(0, 10)) h += `<p class="note"><b>Jõustub ${fmtDate(it.al)}.</b> Viited on avaldatud, veel jõustumata redaktsioonidele; jõustumise päevast viitab teatmik kehtivale tekstile.</p>`;
+      if (it.al && it.al > todayIso()) h += `<p class="note"><b>Jõustub ${fmtDate(it.al)}.</b> Viited on avaldatud, veel jõustumata redaktsioonidele; jõustumise päevast viitab teatmik kehtivale tekstile.</p>`;
       for (const f of it.tul || []) {
-        if (f.alates <= new Date().toISOString().slice(0, 10)) continue;
+        if (f.alates <= todayIso()) continue;
         h += `<p class="note"><b>Alates ${fmtDate(f.alates)}:</b> ${hl(f.s, re)} ${chips(f.a)}</p>`;
       }
       let th = '';
@@ -1167,10 +1268,16 @@
         <p>Vaheleht „Ravijuhendid“ sisaldab kõigi ravijuhend.ee kinnitatud ravijuhendite ja käsitlusjuhendite otselinke koos koodi, kuupäevade, lisade ja patsiendijuhendiga. Mõne juhendi sageli vajalik lisa (nt KNH progresseerumise tabel, antibiootikumide valik ja annused, osteoporoosi, ATH ja 2. tüüpi diabeedi algoritm) on kirjes kohe pildina näha; kõrgvererõhktõve juures on Medicumi majasisesed riskitabelid. Lisaks on seal valitud tegevusjuhendid, mida ravijuhend.ee-s ei ole (nt „Lähisuhtevägivalla käsitlus perearstiabis“, justdigi.ee), koos lisade piltide ja lühikokkuvõttega. Lisasid kontrollitakse kord kuus ja pilt uueneb, kui allikas muutub.</p>
         <p>Linnuke „Ainult perearstiabi“ peidab teenused, mis ei kuulu perearsti fondidesse, kvaliteedisüsteemi ega perearstiabi peatükki (nt operatsioonid). Täpse koodi otsing näitab koodi alati.</p>
         <p>Rakendus töötab pärast esimest avamist ka võrguta. Telefonis lisa see avakuvale: iPhone'is Safari jagamismenüü → „Lisa avakuvale“, Androidis Chrome'i menüü → „Installi rakendus“.</p>
-        <p>Andmed tulevad Riigi Teataja avalikust liidesest ja neid kontrollitakse automaatselt kord kuus. Õiguslikult kehtib alati Riigi Teatajas avaldatud tekst.</p>
+        <p>Andmed tulevad Riigi Teataja avalikust liidesest ja neid kontrollitakse automaatselt kaks korda nädalas. Õiguslikult kehtib alati Riigi Teatajas avaldatud tekst.</p>
         <p id="install-slot"></p>
       </section>`;
   function renderHome() {
+    renderHomeBody();
+    // Hoiatus, kui andmeid pole ammu kontrollitud (kontroll ei käi või seade on olnud kaua võrguta).
+    const sn = staleNote();
+    if (sn) el.results.insertAdjacentHTML('afterbegin', sn);
+  }
+  function renderHomeBody() {
     const d = state.data;
     const tab = state.tab;
     const sec = (h, body, extra = '') => `<section class="section${extra}"><h2>${h}</h2>${body}</section>`;
@@ -1206,7 +1313,7 @@
       return it ? `<button class="qbtn juhi" data-focus="${it._id}"><b>${esc(t)}</b><small>${esc(sub)}</small></button>` : '';
     }).join('');
     const tj = d.items.filter((x) => x.t === 'j');
-    const tCard = (x) => `<button class="qbtn teema" data-focus="${x._id}"><b>${esc(x.sn)}</b><small>${x.n !== x.sn ? esc(x.n) + ' · ' : ''}${x.al && x.al > new Date().toISOString().slice(0, 10) ? 'jõustub ' + fmtDate(x.al) + ' · ' : ''}${(x.r || []).length} punkti${(x.e || []).length ? ' · ⚠ ' + x.e.length : ''}</small></button>`;
+    const tCard = (x) => `<button class="qbtn teema" data-focus="${x._id}"><b>${esc(x.sn)}</b><small>${x.n !== x.sn ? esc(x.n) + ' · ' : ''}${x.al && x.al > todayIso() ? 'jõustub ' + fmtDate(x.al) + ' · ' : ''}${(x.r || []).length} punkti${(x.e || []).length ? ' · ⚠ ' + x.e.length : ''}</small></button>`;
     const tGroups = (gs) => `<div class="tgroups">` + gs.map((g) => `<div class="tgroup ${tgCls(g)}"><h3>${esc(g)}</h3><div class="quick">`
       + (g === 'Tervisetõendid' ? juhiBtns : '')
       + tj.filter((x) => x.g === g).map(tCard).join('') + '</div></div>').join('') + '</div>';
@@ -1336,7 +1443,9 @@
     if (tm) h += `<div class="src"><span>Igapäevatöö reeglite tekstikontroll</span><span>${(tm.warn || []).length ? (tm.warn.length + ' märkust') : 'korras'}</span></div>`;
     const sv = d.items.filter((x) => x.t === 'v' && x.aasta);
     if (sv.length && m.soel) h += `<div class="src"><span><a href="${esc(m.soel.page)}" target="_blank" rel="noopener">Vähi sõeluuringud (terviseportaal)</a></span><span>${Math.max(...sv.map((x) => x.aasta))}. aasta sihtrühmad</span></div>`;
-    h += `<div class="src"><span>Viimati kontrollitud</span><span>${fmtDate(m.date)}</span></div>`;
+    const chk = checkedDate();
+    if (chk > m.date) h += `<div class="src"><span>Andmed viimati muutusid</span><span>${fmtDate(m.date)}</span></div>`;
+    h += `<div class="src"><span>Viimati kontrollitud</span><span>${fmtDate(chk)}${staleDays() > STALE_DAYS ? ' <span class="badge warn">vananenud</span>' : ''}</span></div>`;
     box.innerHTML = h;
   }
 
@@ -1458,12 +1567,12 @@
   const baseLimit = (n) => (state.pin != null ? PIN_LIMIT : n);
   function setQuery(q) {
     leaveContext(); el.q.value = q; state.q = q; state.limit = baseLimit(60); state.open.clear();
-    renderChips(); route(); syncUrl(); window.scrollTo(0, 0);
+    renderChips(); route(); window.scrollTo(0, 0);
   }
   function goHome() {
     state.q = ''; el.q.value = ''; state.fund = null; state.filter = 'all'; state.focus = null;
     state.pin = null; state.pinFrom = null; state.pinOpen = false; state.lastOpen = null; state.open.clear(); state.limit = 60;
-    renderChips(); route(); syncUrl(); window.scrollTo(0, 0);
+    renderChips(); route(); window.scrollTo(0, 0);
   }
   // Tühjenda / × / Esc: kui midagi oli avatud, naaseb sinna, kus see oli (täisvaade või nimekiri), muidu avalehele.
   function clearSearch() {
@@ -1479,7 +1588,7 @@
       state.q = ''; state.filter = 'all'; state.fund = null; state.focus = id;
     }
     el.q.value = state.q;
-    renderChips(); route(); syncUrl();
+    renderChips(); route();
     const head = from && el.results.querySelector(`[data-open="${id}"]`);
     if (head) head.closest('article').scrollIntoView({ block: 'start' }); else window.scrollTo(0, 0);
   }
@@ -1488,13 +1597,58 @@
     if (!box) return;
     box.classList.toggle('has-q', !!el.q.value || state.focus != null || state.pin != null || !!state.fund || state.filter !== 'all');
   }
+  // Aadress ja brauseri ajalugu. Aadressis on otsing (q), vaheleht (tab) ja täisvaates avatud kirje püsiv võti (k):
+  // kirjele saab linkida ja uuesti laadimine ei kaota kohta. Ajalukku lisandub uus kirje ainult siis, kui vaade vahetub
+  // (avaleht, nimekiri, kirje täisvaade või teine vaheleht); samas vaates trükkimine ja kategooria vahetus asendavad
+  // olemasolevat kirjet. Nii viib telefoni tagasiliigutus kirjest või otsingust eelmisse vaatesse, mitte rakendusest välja.
+  // Kui rakenduse enda nupp viib tagasi sinna, kust tuldi (Tühjenda → avaleht, „← Avaleht“ kaardilt, eelmine vaheleht),
+  // liigutakse ajaloos sammu tagasi, mitte ei lisata uut kirjet: muidu peaks avalehelt lahkumiseks mitu korda tagasi vajutama.
+  let navIdent = null;
+  let navBusy = false; // history.back() on tehtud, popstate veel saabumata
+  const navSnapshot = () => ({ tab: state.tab, q: state.q, filter: state.filter, fund: state.fund, k: state.focus != null ? state.keys[state.focus] : null });
+  const navIdentOf = (s) => s.tab + '|' + (s.k != null ? 'k:' + s.k : ((s.q || '').trim() || s.fund || (s.filter || 'all') !== 'all') ? 'list' : 'home');
   function syncUrl() {
+    if (navBusy) return;
     try {
+      const s = navSnapshot();
       const u = new URL(location.href);
-      if (state.q) u.searchParams.set('q', state.q); else u.searchParams.delete('q');
-      if (state.tab !== 'avaleht') u.searchParams.set('tab', state.tab); else u.searchParams.delete('tab');
-      history.replaceState(null, '', u);
+      const set = (name, v) => { if (v) u.searchParams.set(name, v); else u.searchParams.delete(name); };
+      set('q', s.q); set('tab', s.tab !== 'avaleht' ? s.tab : ''); set('k', s.k);
+      const ident = navIdentOf(s);
+      const cur = history.state;
+      if (navIdent != null && ident !== navIdent) {
+        if (cur && cur.prev === ident && (s.k != null || ident.endsWith('|home'))) {
+          // Eelmine ajaloo kirje on sama vaade (avaleht või sama kirje): samm tagasi; popstate taastab vaate.
+          navBusy = true; navIdent = ident;
+          history.back();
+          setTimeout(() => { if (navBusy) { navBusy = false; syncUrl(); } }, 800); // kui tagasi liikumist ei toimunud
+          return;
+        }
+        s.prev = navIdent;
+        history.pushState(s, '', u);
+      } else {
+        s.prev = cur && cur.prev != null ? cur.prev : null;
+        history.replaceState(s, '', u);
+      }
+      navIdent = ident;
     } catch (e) { /* ignoreeri */ }
+  }
+  // Tagasi või edasi liikumine: vaade taastatakse ajaloo kirje (või aadressi) järgi.
+  function applyNav(s) {
+    state.tab = TABS.some((x) => x.k === s.tab) ? s.tab : 'avaleht';
+    state.q = s.q || ''; el.q.value = state.q;
+    state.fund = s.fund && state.data.items.some((x) => x.t === 'f' && x.k === s.fund) ? s.fund : null;
+    state.filter = s.filter || 'all';
+    const id = s.k != null ? state.idOf.get(s.k) : null;
+    state.focus = id == null ? null : id;
+    state.pin = null; state.pinFrom = null; state.pinOpen = false; state.lastOpen = null; state.open.clear();
+    state.limit = state.fund ? 200 : 60;
+    navIdent = navIdentOf(navSnapshot());
+    renderChips(); route(); window.scrollTo(0, 0);
+  }
+  function navFromUrl() {
+    const sp = new URLSearchParams(location.search);
+    return { tab: sp.get('tab') || 'avaleht', q: sp.get('q') || '', filter: 'all', fund: null, k: sp.get('k') };
   }
 
   function setPa(v) {
@@ -1516,7 +1670,7 @@
         const hadFilter = state.filter !== 'all' || state.fund;
         leaveContext(); state.q = el.q.value; state.limit = baseLimit(60); state.open.clear();
         if (hadFilter && state.filter === 'all' && !state.fund) renderChips();
-        route(); syncUrl();
+        route();
       }, 90);
     });
     el.q.addEventListener('keydown', (e) => { if (e.key === 'Escape') clearSearch(); });
@@ -1594,6 +1748,8 @@
     const net = $('#net');
     const upd = () => { net.textContent = navigator.onLine ? 'võrgus' : 'võrguta'; net.classList.toggle('off', !navigator.onLine); };
     window.addEventListener('online', () => { upd(); checkUpdate(); });
+    document.addEventListener('visibilitychange', recheckIfStale);
+    window.addEventListener('popstate', (e) => { navBusy = false; if (state.data) applyNav(e.state || navFromUrl()); });
     window.addEventListener('offline', upd);
     upd();
     window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredInstall = e; renderInstall(); });
@@ -1606,6 +1762,7 @@
       if (tab0 && TABS.some((x) => x.k === tab0)) state.tab = tab0;
       const q0 = sp.get('q');
       if (q0) { el.q.value = q0; state.q = q0; }
+      state.pendingKey = sp.get('k');
     } catch (e) { /* ignoreeri */ }
   }
 

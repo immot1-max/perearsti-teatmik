@@ -2,7 +2,7 @@
    Kest: võrgust (uusim versioon), võrguta või aeglase võrgu korral vahemälust.
    Andmed: vahemälust; app.js kontrollib version.json kaudu uut versiooni.
    Uue versiooni aktiveerimisel laaditakse avatud aknad automaatselt uuesti. */
-const SHELL = 'teatmik-shell-v38';
+const SHELL = 'teatmik-shell-v39';
 const NET_TIMEOUT = 3500;
 const DATA = 'teatmik-data-v1';
 const ASSETS = ['./', 'index.html', 'app.js', 'style.css', 'fonts.css', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
@@ -78,16 +78,20 @@ self.addEventListener('fetch', (e) => {
 
 async function networkFirst(name, req) {
   const c = await caches.open(name);
+  // Rakenduse avamine on alati sama index.html, olgu aadressis otsing (?q=), vaheleht (?tab=) või kirje võti (?k=):
+  // vahemälus hoitakse seda ühe võtme all, mitte iga aadressi kohta eraldi koopiana. Uues aknas avatud pilt või muu
+  // fail on samuti navigeerimine, kuid jääb oma aadressi alla.
+  const page = req.mode === 'navigate' && /\/(index\.html)?$/.test(new URL(req.url).pathname);
   try {
     const r = await Promise.race([
       fetch(req, { cache: 'no-cache' }),
       new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), NET_TIMEOUT)),
     ]);
-    if (r && r.ok) { c.put(req, r.clone()); return r; }
+    if (r && r.ok) { c.put(page ? './' : req, r.clone()); return r; }
     if (r) return r;
   } catch (err) { /* võrguta või aeglane: vahemälust */ }
-  const hit = await c.match(req, { ignoreSearch: true });
+  const hit = page ? null : await c.match(req, { ignoreSearch: true });
   if (hit) return hit;
-  if (req.mode === 'navigate') return (await c.match('index.html')) || (await c.match('./')) || Response.error();
+  if (req.mode === 'navigate') return (await c.match('./')) || (await c.match('index.html')) || Response.error();
   return Response.error();
 }
