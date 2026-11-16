@@ -1,0 +1,16 @@
+# Ehitaja sõltuvused kindlate versioonidega (Python 3.12, seis 16.11.2026).
+# PDF-ide ja tabelite lugemine sõltub pdfplumberi ja pdfminer.six versioonist (märkide asukohad, tabelituvastus),
+# seepärast ei võeta töövoos iga kord uusimat. Uuendamiseks: muuda versioone, käivita ehitus ja testid.
+openpyxl==3.1.5
+pdfplumber==0.11.10
+lxml==6.1.3
+pillow==13.0.0
+
+# kaudsed sõltuvused
+pdfminer-six==20260107
+pypdfium2==5.15.2
+charset-normalizer==3.5.2
+cryptography==50.0.2
+cffi==2.1.1
+pycparser==3.12
+et-xmlfile==2.0.0

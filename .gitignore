@@ -4,3 +4,5 @@ __pycache__/
 *.pyc
 .DS_Store
 build/rt_viga.md
+build/varav_viga.md
+tests/node_modules/

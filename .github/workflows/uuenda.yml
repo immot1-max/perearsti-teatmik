@@ -2,27 +2,22 @@ name: Andmete kontroll
 
 on:
   schedule:
-    - cron: "17 4 3 * *"   # iga kuu 3. kuupäeval kell 04:17 UTC (Eesti aja järgi 07:17 suvel, 06:17 talvel)
+    # Esmaspäeval ja neljapäeval kell 04:17 UTC (Eesti aja järgi 07:17 suvel, 06:17 talvel).
+    # Kaks korda nädalas, sest GitHub kustutab vahemälu kirje, mida pole 7 päeva loetud: harvema kontrolli korral
+    # algaks iga käivitus tühja Riigi Teataja vahemäluga ja tõrke korral ei oleks eelmist teksti, millele toetuda.
+    - cron: "17 4 * * 1,4"
   workflow_dispatch:
+    inputs:
+      luba_kahanemine:
+        description: "Luba andmete kahanemine (avaldamise värav peatas ehituse, kuid muutus on tegelik)"
+        type: boolean
+        default: false
   push:
     branches: [main]
+    # Kogu ehitaja kood ja seadistus; aruanne on ehituse väljund.
     paths:
-      - "build/toru/**"
-      - "build/synonyms.json"
-      - "build/links.json"
-      - "build/sources.json"
-      - "build/ks_notes.json"
-      - "build/ms_ryhmakoodid.json"
-      - "build/soeluuringud.json"
-      - "build/teemad.json"
-      - "build/build.py"
-      - "build/muutused.py"
-      - "build/met_lisad.py"
-      - "build/ravijuhendid.json"
-      - "build/ravijuhendid.py"
-      - "build/ehas_register.json"
-      - "build/rta_reeglid.json"
-      - "build/rta_reeglid.py"
+      - "build/**"
+      - "!build/report.md"
 
 permissions:
   contents: write
@@ -42,6 +37,8 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: build/requirements.txt
 
       # Vahemälu taastatakse ja salvestatakse eraldi sammudes, et ka katkenud ehituse
       # järel jääks alla laaditud Riigi Teataja tekst järgmiseks korraks alles.
@@ -54,7 +51,7 @@ jobs:
           restore-keys: rt-
 
       - name: Sõltuvused
-        run: pip install openpyxl pdfplumber lxml
+        run: pip install -r build/requirements.txt
 
       # Sammu ajapiir on väiksem kui töö oma, et vahemälu salvestamine ja veateade jõuaksid ka siis toimuda.
       - name: Kontrolli ja ehita
@@ -64,6 +61,7 @@ jobs:
           PYTHONUNBUFFERED: "1"
           # Riigi Teataja vastab GitHubi serveritele kiirete päringute järel 429-ga; päringute vahe sekundites.
           RT_VAHE: "6"
+          LUBA_KAHANEMINE: ${{ inputs.luba_kahanemine && '1' || '' }}
         run: python build/build.py
 
       - name: Riigi Teataja vahemälu (salvestamine)
@@ -72,6 +70,14 @@ jobs:
         with:
           path: build/cache
           key: ${{ steps.cache.outputs.cache-primary-key }}
+
+      # Uued andmed avaldatakse ainult siis, kui rakendus nendega avaneb: suitsutest käivitab rakenduse
+      # värskelt ehitatud andmefailiga (vahelehed, otsing, iga kategooria kirjed, kõik teemakaardid).
+      - name: Rakenduse suitsutest uute andmetega
+        if: steps.b.outputs.changed == 'true'
+        run: |
+          npm ci --prefix tests --no-audit --no-fund
+          node tests/smoke.js
 
       - name: Salvesta uued andmed
         if: steps.b.outputs.changed == 'true'
@@ -84,6 +90,19 @@ jobs:
           # Ehitus kestab kaua; kui harule lükati vahepeal teine commit, tõstetakse andmete commit selle peale,
           # muidu lükkaks GitHub pushi tagasi ja ehituse tulemus läheks kaotsi. Kui ka teine commit muutis
           # andmefaili, jääb samm konflikti tõttu pooleli ja töövoog avab veateate.
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+          git push
+
+      # Andmed ei muutunud: salvestatakse ainult kontrolli kuupäev (data/version.json), et rakendus saaks näidata,
+      # millal viimati kontrolliti. Ühtlasi on see repo tegevus: avalikus repos lülitab GitHub ajastatud töövoo välja,
+      # kui 60 päeva ei ole ühtki muudatust.
+      - name: Salvesta kontrolli kuupäev
+        if: steps.b.outputs.changed != 'true' && steps.b.outputs.checked == 'true'
+        run: |
+          git config user.name "teatmiku-robot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/version.json
+          git commit -m "Kontroll $(date +%Y-%m-%d): muudatusi ei ole" || exit 0
           git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
           git push
 
@@ -101,7 +120,7 @@ jobs:
         run: |
           echo "" >> build/rt_viga.md
           echo "Logi: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> build/rt_viga.md
-          gh issue create --title "Teatmiku kontroll: Riigi Teataja ei vastanud $(date +%d.%m.%Y)" --body-file build/rt_viga.md
+          bash .github/teata.sh "Teatmiku kontroll: Riigi Teataja ei vastanud" "Teatmiku kontroll: Riigi Teataja ei vastanud $(date +%d.%m.%Y)" build/rt_viga.md
 
       - name: Teavita veast
         if: failure()
@@ -110,6 +129,7 @@ jobs:
         run: |
           {
             echo "Automaatne kontroll ebaõnnestus. Logi: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            if [ -f build/varav_viga.md ]; then echo ""; cat build/varav_viga.md; fi
             if [ -f build/rt_viga.md ]; then echo ""; cat build/rt_viga.md; fi
           } > "$RUNNER_TEMP/viga.md"
-          gh issue create --title "Teatmiku andmete kontroll ebaõnnestus $(date +%d.%m.%Y)" --body-file "$RUNNER_TEMP/viga.md"
+          bash .github/teata.sh "Teatmiku andmete kontroll ebaõnnestus" "Teatmiku andmete kontroll ebaõnnestus $(date +%d.%m.%Y)" "$RUNNER_TEMP/viga.md"

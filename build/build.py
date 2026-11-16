@@ -6,8 +6,9 @@ kirjutab rakenduse jaoks faili data/data.json. Kui allikad pole eelmisest
 korrast muutunud, ei tee midagi (vt --force).
 
 Kasutus:
-    python build/build.py            # kontrolli ja ehita vajadusel
-    python build/build.py --force    # ehita igal juhul
+    python build/build.py                      # kontrolli ja ehita vajadusel
+    python build/build.py --force              # ehita igal juhul
+    python build/build.py --luba-kahanemine    # avalda ka siis, kui andmeid on eelmisest märgatavalt vähem (vt publish_gate)
 """
 import argparse
 import base64
@@ -25,6 +26,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
+from zoneinfo import ZoneInfo
 
 import openpyxl
 import pdfplumber
@@ -42,7 +44,9 @@ NS = "{maarus_1_10.02.2010}"
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 SUP = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
-TODAY = dt.date.today()
+# Kuupäevad Eesti aja järgi: töövoog jookseb UTC-s, kuid redaktsioonid jõustuvad Eesti südaööl.
+TZ = ZoneInfo("Europe/Tallinn")
+TODAY = dt.datetime.now(TZ).date()
 # Fondide argikeelsed nimed (määruse tekstis neid ei ole)
 FUND_NAMES = {"f37": "Uuringufond", "lisaks": "Tegevusfond", "f13": "Teraapiafond"}
 # Kui fondil on täpsustus, asendab see pealkirjas protsendi (protsent on siis rakenduse selgitusreal).
@@ -170,10 +174,11 @@ def fetch_xml(akt_id, cache_dir):
 
 
 def utc_to_local_date(s):
+    """Riigi Teataja ajatempel (UTC, nt 2026-06-30T21:00:00Z) Eesti kuupäevaks (2026-07-01)."""
     if not s:
         return None
-    d = dt.datetime.strptime(s[:19], "%Y-%m-%dT%H:%M:%S") + dt.timedelta(hours=12)
-    return d.date().isoformat()
+    d = dt.datetime.strptime(s[:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=dt.timezone.utc)
+    return d.astimezone(TZ).date().isoformat()
 
 
 def content_chain(red):
@@ -1278,10 +1283,17 @@ def build(args):
 
     toru_dir = os.path.join(HERE, "toru")
     aux_hash = hashlib.sha256()
-    for fn in ["synonyms.json", "links.json", "build.py", "muutused.py", "met_lisad.py", "ks_notes.json", "ms_ryhmakoodid.json", "soeluuringud.json", "teemad.json",
-               "ravijuhendid.json", "ravijuhendid.py", "ehas_register.json"]:
-        with open(os.path.join(HERE, fn), "rb") as f:
+    # Sõrmejälge mõjutab kogu ehitaja kood, seadistus ja sõltuvuste versioonid (build/*.py, build/*.json, requirements.txt), et uut moodulit või seadistusfaili
+    # ei peaks siia eraldi lisama. sources.json-ist läheb räsisse ainult seadistus (nimi, lühend, jälgitavad sätted):
+    # grupi ID ja asendatud grupid kirjutab ehitaja ise ning need kajastuvad sõrmejäljes redaktsiooni ID kaudu.
+    for fn in sorted(glob.glob(os.path.join(HERE, "*.py")) + glob.glob(os.path.join(HERE, "*.json")) + glob.glob(os.path.join(HERE, "requirements.txt"))):
+        if os.path.basename(fn) == "sources.json":
+            continue
+        aux_hash.update(os.path.basename(fn).encode())
+        with open(fn, "rb") as f:
             aux_hash.update(f.read())
+    aux_hash.update(json.dumps({k: [v.get("nimi"), v.get("lyh"), v.get("par")] for k, v in sorted(sources_cfg.items())},
+                               ensure_ascii=False).encode())
     phase("Toru")
     toru_loaded = load_toru_rows(toru_dir)  # xlsx olemasolul uuendab väljavõtet
     ex_path = os.path.join(toru_dir, "toru_valjavote.json")
@@ -1337,7 +1349,8 @@ def build(args):
     write_rt_note(rt_warn)
     if prev and prev["meta"].get("fingerprint") == fingerprint and not args.force:
         print("Muudatusi ei ole." + (" Riigi Teataja tõrke tõttu jäi osa akte kontrollimata (build/rt_viga.md)." if rt_warn else ""))
-        write_output(changed=False, rt=bool(rt_warn))
+        checked = write_version(prev["meta"].get("built"), fingerprint, complete=not rt_warn)
+        write_output(changed=False, rt=bool(rt_warn), checked=checked)
         return
 
     with open(os.path.join(HERE, "sources.json"), "w", encoding="utf-8") as f:
@@ -1701,26 +1714,127 @@ def build(args):
         meta["kulu"] = {"lisa": kulu["lisa"], "u": kulu["u"], "son": kulu["son"], "vigased": kulu["vigased"]}
     data = {"meta": meta, "items": items, "rules": rules, "rta": rta_rules, "muutused": muut,
             "kulu": {"res": kulu["res"], "c": kulu["c"]} if kulu else None}
+    # Avaldamise värav: kui andmeid on eelmisest märgatavalt vähem (allika kuju muutus ja parser ei leia enam midagi),
+    # jääb avaldatud seis alles ja ehitus katkeb veaga; töövoog avab selle kohta teate.
+    gate = publish_gate(prev, data)
+    write_gate_note(gate, allowed=args.luba_kahanemine)
+    if gate:
+        print("[värav] " + ("lubatud käsitsi: " if args.luba_kahanemine else "andmeid EI avaldata: ") + "; ".join(gate), flush=True)
+        if not args.luba_kahanemine:
+            raise SystemExit("Avaldamise värav: uued andmed erinevad eelmistest liiga palju (build/varav_viga.md). Andmeid ei uuendatud.")
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
-    with open(os.path.join(ROOT, "data", "version.json"), "w", encoding="utf-8") as f:
-        json.dump({"built": meta["built"], "fingerprint": fingerprint}, f)
+    write_version(meta["built"], fingerprint, complete=not rt_warn)
 
     report = make_report(prev, data, missing)
     with open(os.path.join(HERE, "report.md"), "w", encoding="utf-8") as f:
         f.write(report)
     print(report)
     phase("valmis")
-    write_output(changed=True, rt=bool(rt_warn))
+    write_output(changed=True, rt=bool(rt_warn), checked=True)
 
 
-def write_output(changed, rt=False):
+def write_output(changed, rt=False, checked=False):
     gh = os.environ.get("GITHUB_OUTPUT")
     if gh:
         with open(gh, "a") as f:
             f.write(f"changed={'true' if changed else 'false'}\n")
             f.write(f"rt={'true' if rt else 'false'}\n")
+            f.write(f"checked={'true' if checked else 'false'}\n")
+
+
+def write_version(built, fingerprint, complete=True):
+    """data/version.json: andmete versioon (built, fingerprint) ja viimase täieliku kontrolli kuupäev (checked).
+    checked uueneb ka siis, kui andmed ei muutunud, et rakendus saaks eristada „kontrolliti, kõik sama“ olukorrast
+    „kontroll ei käi“. Kui Riigi Teataja jättis osa akte vastamata (complete=False), jääb eelmine kuupäev.
+    Tagastab True, kui fail muutus."""
+    p = os.path.join(ROOT, "data", "version.json")
+    old = {}
+    if os.path.exists(p):
+        try:
+            with open(p, encoding="utf-8") as f:
+                old = json.load(f)
+        except Exception:  # noqa: BLE001
+            old = {}
+    new = {"built": built, "fingerprint": fingerprint, "checked": TODAY.isoformat() if complete else old.get("checked")}
+    if not new["checked"]:
+        del new["checked"]
+    if new == old:
+        return False
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    with open(p, "w", encoding="utf-8") as f:
+        json.dump(new, f)
+    return True
+
+
+# Avaldamise värav. Iga näitaja: nimetus, väärtus ja suurim lubatud langus eelmise andmefailiga võrreldes.
+# Üksikutel allikatel (SYNLAB, raviarve reeglid, hüvitised, ravijuhendite loend) on oma lävi juba lugemise juures;
+# värav katab ülejäänu: akti tabeli päise, fondilõike sõnastuse, lisa PDF-i paigutuse või veebilehe märgistuse muutuse,
+# mille järel parser midagi ei leia, kuid ehitus muidu õnnestub.
+GATE_TYPES = {"s": "teenuseid", "f": "fonde", "l": "sätteid", "a": "abivahendeid", "k": "linke", "q": "kvaliteedisüsteemi jaotisi",
+              "b": "laborianalüüse", "m": "meditsiiniseadmete rühmi", "v": "sõeluuringuid", "j": "teemakaarte", "g": "ravijuhendeid"}
+
+
+def gate_metrics(data):
+    items = data.get("items") or []
+    by_t = {}
+    for x in items:
+        by_t.setdefault(x["t"], []).append(x)
+    m = {label: (len(by_t.get(t, [])), 0.10) for t, label in GATE_TYPES.items()}
+    sv = by_t.get("s", [])
+    m["perearstiabi koode"] = (sum(1 for x in sv if x.get("pa")), 0.10)
+    m["piirhinnaga teenuseid"] = (sum(1 for x in sv if x.get("p") is not None), 0.10)
+    m["Toru andmetega teenuseid"] = (sum(1 for x in sv if x.get("tp")), 0.15)
+    for f in by_t.get("f", []):
+        m[f"fondi „{f['k']}“ koode"] = (f.get("cnt") or 0, 0.20)
+    m["sätete tekstiplokke"] = (sum(len(x.get("b") or []) for x in by_t.get("l", [])), 0.20)
+    m["teemakaartide ridu"] = (sum(len(x.get("r") or []) for x in by_t.get("j", [])), 0.20)
+    m["meditsiiniseadmete tooteid"] = (sum(len(x.get("pr") or []) for x in by_t.get("m", [])), 0.15)
+    m["ravijuhendite lisasid"] = (sum(len(x.get("lisad") or []) for x in by_t.get("g", [])), 0.30)
+    m["koodidega seotud reegleid"] = (len(data.get("rules") or []), 0.20)
+    m["standardkuluga koode"] = (len((data.get("kulu") or {}).get("c") or {}), 0.15)
+    return m
+
+
+def fund_keys(data):
+    return sorted(x["k"] for x in data.get("items") or [] if x["t"] == "f")
+
+
+def publish_gate(prev, data):
+    """Võrdleb uut andmefaili eelmisega ja tagastab probleemide loendi (tühi, kui avaldada võib)."""
+    if not prev:
+        return []
+    out = []
+    keys_changed = fund_keys(prev) != fund_keys(data)
+    if keys_changed:
+        out.append(f"fondide võtmed muutusid: enne {', '.join(fund_keys(prev)) or 'puudusid'}, nüüd {', '.join(fund_keys(data)) or 'puuduvad'} "
+                   "(fondi protsent või lõike sõnastus muutus; rakenduse fondinimed, selgitused ja sünonüümid on võtmega seotud)")
+    old, new = gate_metrics(prev), gate_metrics(data)
+    for label, (a, drop) in old.items():
+        if keys_changed and label.startswith("fondi „"):
+            continue
+        b = new.get(label, (0, drop))[0]
+        if a > 0 and b < a * (1 - drop):
+            out.append(f"{label}: enne {a}, nüüd {b} (lubatud langus kuni {drop:.0%})")
+    return out
+
+
+def write_gate_note(problems, allowed=False):
+    """build/varav_viga.md: töövoo veateate sisu, kui värav ehituse peatas (failil pole muud rolli)."""
+    p = os.path.join(HERE, "varav_viga.md")
+    if not problems or allowed:
+        if os.path.exists(p):
+            os.remove(p)
+        return
+    lines = ["Uued andmed erinevad eelmistest rohkem, kui tavaline muudatus seletab, seega neid ei avaldatud "
+             "(avalikul lehel on eelmise kontrolli seis). Tavaliselt tähendab see, et allika kuju muutus ja parser ei leia enam osa andmeid.", ""]
+    lines += [f"- {x}" for x in problems]
+    lines += ["", "Kui muutus on tegelik (nt akt tunnistati kehtetuks või seadistusest eemaldati sihilikult osa sisu), käivita töövoog "
+              "käsitsi: Actions → Andmete kontroll → Run workflow, märgi „Luba andmete kahanemine“. "
+              "Kohalikult: `python build/build.py --luba-kahanemine`."]
+    with open(p, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
 
 
 def write_rt_note(rt_warn, fatal=False):
@@ -2089,5 +2203,7 @@ def make_report(prev, data, missing):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--force", action="store_true")
+    ap.add_argument("--force", action="store_true", help="ehita ka siis, kui allikad ei ole muutunud")
+    ap.add_argument("--luba-kahanemine", action="store_true", default=os.environ.get("LUBA_KAHANEMINE") in ("1", "true"),
+                    help="avalda andmed ka siis, kui neid on eelmisest märgatavalt vähem (avaldamise värav)")
     build(ap.parse_args())
