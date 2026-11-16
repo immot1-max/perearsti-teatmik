@@ -1,0 +1,49 @@
+name: Testid
+
+# Koodimuudatuse järel: ehitaja ühiktestid, rakenduse suitsutest päris andmefailiga ja teenindustöötaja test.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app.js"
+      - "sw.js"
+      - "index.html"
+      - "build/**"
+      - "tests/**"
+      - ".github/workflows/testid.yml"
+      - "!build/report.md"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  testid:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: build/requirements.txt
+
+      - name: Sõltuvused
+        run: |
+          pip install -r build/requirements.txt pytest==9.2.0 ruff==0.16.9
+          npm ci --prefix tests --no-audit --no-fund
+
+      - name: Ehitaja kood (ruff)
+        run: ruff check build tests --select F
+
+      - name: Ehitaja ühiktestid
+        run: pytest tests -q
+
+      - name: Rakenduse suitsutest
+        run: node tests/smoke.js
+
+      - name: Teenindustöötaja test
+        run: node tests/sw.test.js

@@ -56,7 +56,11 @@ Otsingutulemuste all on nupp „Ei leidnud?“, mis avab selle repo GitHubi *iss
 
 ## Kuidas andmed uuenevad
 
-GitHub Actions käivitab iga kuu 3. kuupäeval kontrolli (`.github/workflows/uuenda.yml`). Skript `build/build.py` küsib Riigi Teataja avalikust liidesest iga akti kehtiva redaktsiooni. Kui midagi on muutunud, ehitab ta `data/data.json` uuesti, salvestab selle ja avab selles repos *issue*, kus on muudatuste kokkuvõte (GitHub saadab selle kohta e-kirja). Kontrolli saab käivitada ka käsitsi: Actions → Andmete kontroll → Run workflow.
+GitHub Actions käivitab kontrolli kaks korda nädalas, esmaspäeval ja neljapäeval (`.github/workflows/uuenda.yml`). Skript `build/build.py` küsib Riigi Teataja avalikust liidesest iga akti kehtiva redaktsiooni. Kui midagi on muutunud, ehitab ta `data/data.json` uuesti, salvestab selle ja avab selles repos *issue*, kus on muudatuste kokkuvõte (GitHub saadab selle kohta e-kirja). Kontrolli saab käivitada ka käsitsi: Actions → Andmete kontroll → Run workflow.
+
+Kui midagi ei muutunud, salvestab kontroll ainult oma kuupäeva (`data/version.json`, väli `checked`). Rakenduse avalehe jaotises „Andmete seis“ on seetõttu kaks kuupäeva: millal andmed viimati muutusid ja millal neid viimati kontrolliti. Kui kontrollist on möödas üle 45 päeva (kontroll ei käi või seade on olnud kaua võrguta), näitab rakendus avalehel hoiatust.
+
+Enne avaldamist läbivad uued andmed kaks kontrolli. Avaldamise värav võrdleb uut andmefaili eelmisega: kui teenuseid, fonde, sätteid, hindu või muud sisu on märgatavalt vähem (tavaliselt tähendab see, et allika kuju muutus ja skript ei leia enam osa andmeid), jäävad avaldatud andmed alles ja repos avatakse veateade. Kui kahanemine on tegelik, käivita kontroll käsitsi ja märgi „Luba andmete kahanemine“. Seejärel käivitatakse rakendus uute andmetega testkeskkonnas (`tests/smoke.js`); kui mõni vaade ei avane, andmeid ei avaldata.
 
 Tervishoiuteenuste loetelu antakse aasta jooksul välja uue aktina (2026. aastal 01.01, 01.04 ja 01.07). Skript tuvastab, kui akt on kehtetuks tunnistatud, ja liigub asendava akti juurde.
 
@@ -112,7 +116,21 @@ Uued ja kadunud juhendid, uued versioonid (kood või kinnitamise kuupäev muutus
 
 ## Ainult perearstiabi
 
-Vaikimisi näidatakse teenustest ainult neid, mis kuuluvad perearsti fondidesse, kvaliteedisüsteemi või perearstiabi peatükki (424 koodi 15.10.2026 seisuga). Linnukese eemaldamisel on nähtavad kõik koodid, ka operatsioonid ja haiglateenused. Täpse koodi otsing näitab koodi alati.
+Vaikimisi näidatakse teenustest ainult neid, mis kuuluvad perearsti fondidesse, kvaliteedisüsteemi või perearstiabi peatükki (üle 400 koodi). Linnukese eemaldamisel on nähtavad kõik koodid, ka operatsioonid ja haiglateenused. Täpse koodi otsing näitab koodi alati.
+
+## Lingid ja tagasi liikumine
+
+Aadressis on otsing (`?q=`), vaheleht (`?tab=`) ja täisvaates avatud kirje võti (`?k=`, nt `?k=j:haigusleht` või `?k=s:6417`), seega saab kaardile või koodile linkida. Brauseri ja telefoni tagasinupp viib eelmisse vaatesse: kirjest nimekirja, otsingust avalehele, vahelehelt eelmisele.
+
+## Testid
+
+Rakendus ise ei vaja ehitustööriistu. Testid on kaustas `tests/` ja GitHub Actions käivitab need iga koodimuudatuse järel (`.github/workflows/testid.yml`):
+
+- `pytest tests`: ehitaja ühiktestid (avaldamise värav, kontrolli kuupäev, kuupäevad, tabelite lugemine). Sõltuvused: `pip install -r build/requirements.txt pytest`.
+- `node tests/smoke.js`: rakendus jsdom-is päris andmefailiga (vahelehed, otsing, iga kategooria kirjed, kõik teemakaardid, tagasi liikumine, otselingid, andmete uuenemine). Enne esimest korda `npm ci --prefix tests`.
+- `node tests/sw.test.js`: teenindustöötaja vahemäluloogika.
+
+Ehitaja sõltuvused on kindlate versioonidega failis `build/requirements.txt`, sest PDF-ide lugemine sõltub teegi versioonist.
 
 ## Autor
 

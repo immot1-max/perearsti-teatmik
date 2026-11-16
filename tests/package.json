@@ -1,0 +1,11 @@
+{
+  "name": "perearsti-teatmik-testid",
+  "private": true,
+  "description": "Rakenduse suitsutest (jsdom) ja teenindustöötaja test. Rakendus ise ehitustööriistu ega sõltuvusi ei vaja.",
+  "scripts": {
+    "test": "node smoke.js && node sw.test.js"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0"
+  }
+}
