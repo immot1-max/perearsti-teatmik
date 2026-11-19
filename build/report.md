@@ -1,4 +1,4 @@
-# Andmete uuendus 16.11.2026
+# Andmete uuendus 19.11.2026
 
 ## Allikad
 - Tervisekassa tervishoiuteenuste loetelu: [116062026020](https://www.riigiteataja.ee/akt/116062026020) kehtib alates 01.07.2026
@@ -37,16 +37,6 @@
 - SYNLABi hinnakiri: 949 analüüsi, SYNLAB Eesti OÜ analüüside hinnakiri ja koondtabel tervishoiuteenuse pakkujale (al 01.04.2026) - SYNLAB Eesti
 - Toru: toru_2026jul.xlsx (viimane muudatus 01.07.2026), hinnaerinevusi loeteluga: 3
 
-## Mis muutus: uued kirjed
-- VÕS jõustub 01.03.2029: sisulist muutust ei leitud
-- RelvS jõustub 01.07.2027: sisulist muutust ei leitud
-- RelvS jõustub 01.03.2027: sisulist muutust ei leitud
-- VÕS jõustub 01.02.2027: sisulist muutust ei leitud
-- RelvS jõustub 01.01.2027: sisulist muutust ei leitud
-- VÕS jõustub 01.01.2027: sisulist muutust ei leitud
-- RelvS jõustub 27.11.2026: 1 sätet
-- VÕS jõustub 27.11.2026: sisulist muutust ei leitud
-
 ## Teenused: 0 hinnamuutust, 0 uut, 0 eemaldatud, 0 fondimuutust
 ## Abivahendid: 0 muudetud, 0 uut, 0 eemaldatud
 
@@ -58,8 +48,10 @@
 
 ## Igapäevatöö teemakaardid
 - NB: Standardkulu lisa: 1 rida ei õnnestunud lugeda (koodid 52625).
-- Allikas pole juba mitu kontrolli kättesaadav: ravimiinfo.ee: ravimiotsing (eraleht, mitte ametlik allikas) (<urlopen error [Errno 104] Connection reset by peer>)
-- Allikas muutus: Sotsiaalministeerium: patsiendi elulõpu tahteavalduse korduma kippuvad küsimused (uuendatud 2026-11-12); vaata teemakaart üle (build/teemad.json)
+- Allikas muutus: Sotsiaalkindlustusamet: klienditeenindused (aadressid ja lahtiolekuajad) (uuendatud 2026-11-19); vaata teemakaart üle (build/teemad.json)
+- Allikas muutus: Tervisekassa: tervishoiuteenuste loetelu juhendid (kodeerimine, suunamine) (uuendatud 2026-11-17); vaata teemakaart üle (build/teemad.json)
+- Allikas pole juba mitu kontrolli kättesaadav: ravimiinfo.ee: ravimiotsing (eraleht, mitte ametlik allikas) (<urlopen error _ssl.c:994: The handshake operation timed out>)
+- Kontrollimata 1 allikat (sait vastas „liiga palju päringuid“; järgmisel korral proovitakse kauem proovimata allikaid esimesena): Euroopa Komisjon: Euroopa terviseandmeruumi määrus ja rakendamise ajakava
 
 ## Ravijuhendid (ravijuhend.ee)
 - 47 ravijuhendit, 11 käsitlusjuhendit, 2 muud juhendit (väljaspool ravijuhend.ee), 8 lisa eelvaadet
